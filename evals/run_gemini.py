@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from sigil.eval_common import (
     DEFAULT_ENV_FILE,
     append_jsonl,
+    build_cached_task_prompt,
     decode_variant_output,
     direct_sigil_stop_sequences,
     gemini_generation_config,
@@ -226,6 +227,7 @@ def main(argv: list[str] | None = None) -> int:
         task_id = str(task["id"])
         task_prompt = str(task["prompt"])
         prompt_suffix = str(task.get("prompt_suffix") or task_prompt)
+        task_context = str(task.get("task_context") or "").strip()
         cache_prefix = str(task.get("cache_prefix") or "").strip()
         for variant in args.variants:
             completed += 1
@@ -256,7 +258,7 @@ def main(argv: list[str] | None = None) -> int:
                     cache_create_ms = round((time.perf_counter() - cache_started_at) * 1000, 2)
             started_at = time.perf_counter()
             payload = build_payload(
-                task_prompt=prompt_suffix if cached_content_name else task_prompt,
+                task_prompt=build_cached_task_prompt(prompt_suffix, task_context) if cached_content_name else task_prompt,
                 instructions=prompt_cache[variant.prompt_path],
                 max_output_tokens=args.max_output_tokens,
                 transport=variant.transport,

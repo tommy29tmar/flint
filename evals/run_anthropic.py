@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from sigil.eval_common import (
     DEFAULT_ENV_FILE,
     append_jsonl,
+    build_cached_task_prompt,
     decode_variant_output,
     direct_sigil_stop_sequences,
     load_jsonl,
@@ -178,12 +179,17 @@ def main(argv: list[str] | None = None) -> int:
         task_id = str(task["id"])
         task_prompt = str(task["prompt"])
         prompt_suffix = str(task.get("prompt_suffix") or task_prompt)
+        task_context = str(task.get("task_context") or "").strip()
         cache_prefix = str(task.get("cache_prefix") or "").strip()
         for variant in args.variants:
             completed += 1
             print(f"[{completed}/{total}] {task_id} :: {variant.name}", file=sys.stderr)
             started_at = time.perf_counter()
-            task_prompt_text = prompt_suffix if (args.cache_task_prefix and cache_prefix) else task_prompt
+            task_prompt_text = (
+                build_cached_task_prompt(prompt_suffix, task_context)
+                if (args.cache_task_prefix and cache_prefix)
+                else task_prompt
+            )
             payload = build_payload(
                 model=args.model,
                 task_prompt=task_prompt_text,

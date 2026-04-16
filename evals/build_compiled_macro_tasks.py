@@ -20,7 +20,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("source", type=Path)
     parser.add_argument("prefix", type=Path)
     parser.add_argument("out", type=Path)
-    parser.add_argument("--context-style", choices=["cacheable", "focused", "targeted", "layered"], default="cacheable")
+    parser.add_argument(
+        "--context-style",
+        choices=["cacheable", "focused", "targeted", "needle", "layered", "layered-needle"],
+        default="cacheable",
+    )
     parser.add_argument("--task-label", default="Task")
     args = parser.parse_args(argv)
 
@@ -30,8 +34,13 @@ def main(argv: list[str] | None = None) -> int:
     for row in source_rows:
         prompt_suffix = str(row["prompt"]).strip()
         category = str(row.get("category") or "unknown")
-        if args.context_style == "layered":
-            compiled_prefix, task_context = compile_context_layers(prefix_text, category=category, task=row)
+        if args.context_style in {"layered", "layered-needle"}:
+            compiled_prefix, task_context = compile_context_layers(
+                prefix_text,
+                category=category,
+                task=row,
+                task_style="needle" if args.context_style == "layered-needle" else "targeted",
+            )
             combined_prompt = (
                 f"{compiled_prefix}\n\n[Task Context]\n{task_context}\n\n[{args.task_label}]\n{prompt_suffix}"
             )

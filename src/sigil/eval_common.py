@@ -258,6 +258,14 @@ def build_conditioned_task_prompt(task_prompt: str, draft_text: str) -> str:
     )
 
 
+def build_cached_task_prompt(prompt_suffix: str, task_context: str | None = None) -> str:
+    suffix = prompt_suffix.strip()
+    overlay = (task_context or "").strip()
+    if not overlay:
+        return suffix
+    return f"[Task Context]\n{overlay}\n\n{suffix}"
+
+
 def append_jsonl(path: Path, row: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as handle:

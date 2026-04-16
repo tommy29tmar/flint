@@ -73,6 +73,15 @@ class RunGeminiTests(unittest.TestCase):
         self.assertEqual(payload["cachedContent"], "cachedContents/demo123")
         self.assertNotIn("systemInstruction", payload)
 
+    def test_build_cached_task_prompt_includes_task_context_overlay(self) -> None:
+        rendered = RUN_GEMINI.build_cached_task_prompt(
+            '[capsule micro debug]\nanchors: "x-user-id" | "401"',
+            '[ctx targeted debugging]\nanchors: "x-user-id" | "401"\nfocus: boundary',
+        )
+        self.assertIn("[Task Context]", rendered)
+        self.assertIn("[ctx targeted debugging]", rendered)
+        self.assertTrue(rendered.endswith('[capsule micro debug]\nanchors: "x-user-id" | "401"'))
+
     def test_build_payload_can_disable_stop_sequences(self) -> None:
         payload = RUN_GEMINI.build_payload(
             task_prompt="Dynamic task suffix.",

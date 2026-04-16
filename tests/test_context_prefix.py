@@ -66,6 +66,21 @@ class ContextPrefixTests(unittest.TestCase):
         self.assertIn('"4 months"', targeted)
         self.assertIn("PostgreSQL is the default SoR.", targeted)
 
+    def test_needle_prefix_is_shorter_than_targeted_and_keeps_anchors(self) -> None:
+        source = (ROOT / "evals" / "prefixes" / "service_context_v1.txt").read_text(encoding="utf-8")
+        task = {
+            "id": "t2",
+            "category": "debugging",
+            "prompt": "Fix auth expiry bug around x-user-id and 401 boundary with next(err).",
+            "exact_literals": ["x-user-id", "401", "next(err)"],
+            "must_include": ["auth", "expiry", "boundary"],
+        }
+        targeted = compile_context_prefix(source, category="debugging", style="targeted", task=task)
+        needle = compile_context_prefix(source, category="debugging", style="needle", task=task)
+        self.assertIn("[ctx needle debugging]", needle)
+        self.assertIn('anchors: "x-user-id" | "401" | "next(err)"', needle)
+        self.assertLess(approx_token_count(needle), approx_token_count(targeted))
+
     def test_context_layers_keep_shared_prefix_and_task_overlay(self) -> None:
         source = (ROOT / "evals" / "prefixes" / "service_context_v1.txt").read_text(encoding="utf-8")
         debug_task = {

@@ -26,6 +26,7 @@ The stable architecture is:
   - typed capsule-mini contracts when `nano` throws away too much structure
   - `targeted` compiled context when macro prompts need task-aware prefix compression
   - `layered` compiled context when you need both cache-stable shared prefixes and task-specific overlays
+  - `needle` overlays when the task-specific overlay itself must stay warm-path cheap
 
 ## Why People Pay Attention To This
 
@@ -115,6 +116,7 @@ What now looks credible in practice:
 - multi-IR routing is stronger than forcing one contract everywhere
 - routed policies expose a real Pareto surface between total cost and semantic retention
 - stronger models improve SIGIL markedly, but they also compress terse natural-language baselines better, so transfer between model families requires retuning
+- `layered-needle` is the most promising current macro warm-path regime: shared cacheable prefix plus a smaller task overlay, instead of a full targeted task summary
 
 Latest benchmark signal now splits into two honest regimes.
 

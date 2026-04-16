@@ -61,6 +61,15 @@ class RunAnthropicTests(unittest.TestCase):
         self.assertEqual(payload["system"][1]["cache_control"]["type"], "ephemeral")
         self.assertEqual(payload["messages"][0]["content"][0]["text"], "suffix only")
 
+    def test_build_cached_task_prompt_includes_task_context_overlay(self) -> None:
+        rendered = RUN_ANTHROPIC.build_cached_task_prompt(
+            '[capsule micro architecture]\nstore: "PostgreSQL"',
+            '[ctx targeted architecture]\nstore: "PostgreSQL"\ndeadline: "4 months"',
+        )
+        self.assertIn("[Task Context]", rendered)
+        self.assertIn("[ctx targeted architecture]", rendered)
+        self.assertTrue(rendered.endswith('[capsule micro architecture]\nstore: "PostgreSQL"'))
+
     def test_build_payload_with_stop_sequences(self) -> None:
         payload = RUN_ANTHROPIC.build_payload(
             model="claude-sonnet-4-20250514",

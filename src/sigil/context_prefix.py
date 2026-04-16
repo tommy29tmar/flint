@@ -89,6 +89,34 @@ FOCUSED_SECTIONS = {
     ),
 }
 
+NEEDLE_SECTIONS = {
+    "debugging": (
+        "authentication and session rules",
+        "token and expiry rules",
+        "testing heuristics",
+        "code and review conventions",
+        "repository norms",
+    ),
+    "architecture": (
+        "architecture heuristics",
+        "operational posture",
+        "answer-style heuristics",
+        "repository norms",
+    ),
+    "code_review": (
+        "authentication and session rules",
+        "security review heuristics",
+        "testing heuristics",
+        "repository norms",
+    ),
+    "refactoring": (
+        "refactor heuristics",
+        "code and review conventions",
+        "testing heuristics",
+        "repository norms",
+    ),
+}
+
 PHRASE_REPLACEMENTS = (
     ("public API gateway", "public_gateway"),
     ("Node.js and TypeScript", "Node.js+TypeScript"),
@@ -248,6 +276,20 @@ def _render_targeted_section(
     return _render_section(selected, label=LABELS.get(section_name, section_name), tight=True)
 
 
+def _render_needle_section(
+    section_name: str,
+    items: list[str],
+    *,
+    anchors: list[str],
+    terms: set[str],
+) -> str | None:
+    selected = _select_targeted_items(section_name, items, anchors=anchors, terms=terms)
+    if not selected:
+        return None
+    limit = 2 if section_name == "repository norms" else 1
+    return _render_section(selected[:limit], label=LABELS.get(section_name, section_name), tight=True)
+
+
 def compile_context_prefix(
     text: str,
     *,
@@ -255,7 +297,7 @@ def compile_context_prefix(
     style: str = "cacheable",
     task: dict[str, Any] | None = None,
 ) -> str:
-    if style not in {"cacheable", "focused", "targeted"}:
+    if style not in {"cacheable", "focused", "targeted", "needle"}:
         raise ValueError(f"Unsupported context style: {style}")
     sections = parse_handbook_sections(text)
     preamble = [_collapse(item) for item in sections.get("preamble", []) if item.strip()]
@@ -268,14 +310,19 @@ def compile_context_prefix(
         f"scope: {intro}",
         f"focus: {category}",
     ]
-    if style == "targeted" and anchors:
+    if style in {"targeted", "needle"} and anchors:
         encoded = " | ".join(f'"{anchor}"' for anchor in anchors[:4])
         lines.append(f"anchors: {encoded}")
-    tight = style in {"focused", "targeted"}
-    keys = _section_keys_for(category, "focused" if style == "targeted" else style)
+    tight = style in {"focused", "targeted", "needle"}
+    if style == "needle":
+        keys = NEEDLE_SECTIONS.get(category, FOCUSED_SECTIONS.get(category, SECTION_ORDER[:4]))
+    else:
+        keys = _section_keys_for(category, "focused" if style in {"targeted", "needle"} else style)
     for key in keys:
         if style == "targeted":
             rendered = _render_targeted_section(key, sections.get(key, []), anchors=anchors, terms=terms)
+        elif style == "needle":
+            rendered = _render_needle_section(key, sections.get(key, []), anchors=anchors, terms=terms)
         else:
             rendered = _render_section(sections.get(key, []), label=LABELS.get(key, key), tight=tight)
         if rendered:
@@ -304,7 +351,18 @@ def compile_context_prefix(
                     label = rendered.split(":", 1)[0]
                     if label in {"core", "ops", "auth", "expiry", "review", "arch", "refactor", "test", "glossary", "norms"}:
                         compact_lines.append(rendered)
-                if approx_token_count("\n".join(compact_lines)) >= 300:
+                    if approx_token_count("\n".join(compact_lines)) >= 300:
+                        break
+            lines = compact_lines
+    if style == "needle":
+        token_count = approx_token_count(rendered)
+        if token_count > 180:
+            compact_lines = lines[:5]
+            for key in keys:
+                section_line = _render_needle_section(key, sections.get(key, []), anchors=anchors, terms=terms)
+                if section_line:
+                    compact_lines.append(section_line)
+                if approx_token_count("\n".join(compact_lines)) >= 150:
                     break
             lines = compact_lines
     return "\n".join(lines)
