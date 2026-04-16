@@ -77,8 +77,9 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     bench_adaptive_parser.add_argument("tasks", type=Path)
     bench_adaptive_parser.add_argument("out", type=Path)
-    bench_adaptive_parser.add_argument("--primary-run", dest="primary_runs", action="append", type=Path, required=True)
-    bench_adaptive_parser.add_argument("--fallback-run", dest="fallback_runs", action="append", type=Path, required=True)
+    bench_adaptive_parser.add_argument("--candidate-run", dest="candidate_runs", action="append", type=Path, default=None)
+    bench_adaptive_parser.add_argument("--primary-run", dest="primary_runs", action="append", type=Path, default=None)
+    bench_adaptive_parser.add_argument("--fallback-run", dest="fallback_runs", action="append", type=Path, default=None)
     bench_adaptive_parser.add_argument("--baseline-run", type=Path, default=None)
     bench_adaptive_parser.add_argument("--baseline-variant", default="baseline-terse")
     bench_adaptive_parser.add_argument("--variant-name", default="sigil-adaptive")
@@ -139,6 +140,7 @@ def main(argv: list[str] | None = None) -> int:
             result = build_adaptive_run(
                 args.tasks,
                 args.out,
+                candidate_runs=args.candidate_runs,
                 primary_runs=args.primary_runs,
                 fallback_runs=args.fallback_runs,
                 baseline_run=args.baseline_run,

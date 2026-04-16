@@ -179,6 +179,7 @@ def build_adaptive_run(
     tasks: Path,
     out: Path,
     *,
+    candidate_runs: list[Path] | None = None,
     primary_runs: list[Path],
     fallback_runs: list[Path],
     baseline_run: Path | None = None,
@@ -192,10 +193,14 @@ def build_adaptive_run(
 ) -> dict[str, object]:
     module = _load_repo_module("sigil_eval_build_adaptive_run", "evals/build_adaptive_run.py")
     command = [str(tasks), str(out)]
-    for path in primary_runs:
-        command.extend(["--primary-run", str(path)])
-    for path in fallback_runs:
-        command.extend(["--fallback-run", str(path)])
+    if candidate_runs:
+        for path in candidate_runs:
+            command.extend(["--candidate-run", str(path)])
+    else:
+        for path in primary_runs:
+            command.extend(["--primary-run", str(path)])
+        for path in fallback_runs:
+            command.extend(["--fallback-run", str(path)])
     if baseline_run is not None:
         command.extend(["--baseline-run", str(baseline_run), "--baseline-variant", baseline_variant])
     command.extend(

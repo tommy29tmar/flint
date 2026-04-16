@@ -29,6 +29,7 @@ The stable architecture is:
   - `layered` compiled context when you need both cache-stable shared prefixes and task-specific overlays
   - `needle` overlays when the task-specific overlay itself must stay warm-path cheap
 - adaptive expansion: compact first pass, then fallback only when the verifier rejects the compressed answer
+- cascaded expansion: ordered tiers like `nano -> wire-lite -> capsule-mini -> plain`, picking the first tier that passes the verifier
 
 ## Why People Pay Attention To This
 

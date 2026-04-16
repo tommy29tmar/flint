@@ -132,6 +132,19 @@ Use it when:
 - the compressed route wins often but is still brittle on a small subset of tasks
 - you want “compress first, expand only if needed” instead of forcing the rich route everywhere
 
+There is now also a generalized cascade form:
+
+- ordered `candidate-run` tiers
+- first verifier-passing tier wins
+- later tiers are only evaluated locally, not sent back to the provider
+
+This is the right shape when you want:
+
+- `nano` first
+- `wire-lite` second
+- `capsule-mini` third
+- `plain` last
+
 The practical meaning of the current profiles is:
 
 - `efficiency`: maximize visible compression and stay as close as possible to baseline total cost
@@ -142,6 +155,21 @@ There is now a fourth practical pattern:
 
 - `selective efficiency`: let SIGIL compete against the terse baseline per category, and keep SIGIL only where it wins
 - `adaptive expansion`: let SIGIL try the cheapest route first, then expand only when the local verifier rejects the answer
+- `cascaded adaptive expansion`: let SIGIL walk an ordered list of increasingly rich contracts and stop at the first acceptable output
+
+Example:
+
+```bash
+sigil bench build-adaptive-run evals/tasks_hybrid_micro_extended.jsonl evals/runs/adaptive.jsonl \
+  --candidate-run evals/runs/nano.jsonl \
+  --candidate-run evals/runs/wire_lite.jsonl \
+  --candidate-run evals/runs/capsule_mini.jsonl \
+  --candidate-run evals/runs/plain.jsonl \
+  --baseline-run evals/runs/baseline.jsonl \
+  --allow-repair \
+  --min-must-include 0.75 \
+  --min-exact-literal 0.75
+```
 
 ## Can A Dedicated Codex Agent Replace The API?
 

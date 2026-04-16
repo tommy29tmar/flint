@@ -327,6 +327,79 @@ class CliTests(unittest.TestCase):
             row = json.loads(out.read_text(encoding="utf-8").splitlines()[0])
             self.assertEqual(row["adaptive_selected_from"], "fallback")
 
+    def test_bench_build_adaptive_run_candidate_cascade_command(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            tasks = root / "tasks.jsonl"
+            tier1 = root / "tier1.jsonl"
+            tier2 = root / "tier2.jsonl"
+            out = root / "adaptive.jsonl"
+            tasks.write_text(
+                json.dumps(
+                    {
+                        "id": "t1",
+                        "category": "debugging",
+                        "mode": "hybrid",
+                        "must_include": ["auth"],
+                        "exact_literals": ["401"],
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            tier1.write_text(
+                json.dumps(
+                    {
+                        "task_id": "t1",
+                        "variant": "sigil-nano",
+                        "transport": "sigil",
+                        "structured_expected": True,
+                        "content": "@sigil v0 hybrid\nG: x\nA: y\n\n[AUDIT]\nwrong\n",
+                        "usage": {"output_tokens": 12, "input_tokens": 20},
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            tier2.write_text(
+                json.dumps(
+                    {
+                        "task_id": "t1",
+                        "variant": "sigil-wire",
+                        "transport": "sigil",
+                        "structured_expected": True,
+                        "content": (ROOT / "examples" / "debugging.sigil").read_text(encoding="utf-8"),
+                        "usage": {"output_tokens": 48, "input_tokens": 120},
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                exit_code = main(
+                    [
+                        "bench",
+                        "build-adaptive-run",
+                        str(tasks),
+                        str(out),
+                        "--candidate-run",
+                        str(tier1),
+                        "--candidate-run",
+                        str(tier2),
+                        "--allow-repair",
+                        "--min-must-include",
+                        "1.0",
+                        "--min-exact-literal",
+                        "1.0",
+                    ]
+                )
+            self.assertEqual(exit_code, 0)
+            summary = json.loads(buffer.getvalue())
+            self.assertEqual(summary["selected_fallback"], 1)
+            row = json.loads(out.read_text(encoding="utf-8").splitlines()[0])
+            self.assertEqual(row["adaptive_selected_variant"], "sigil-wire")
+
     def test_bench_report_command(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
