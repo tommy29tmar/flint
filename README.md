@@ -19,6 +19,7 @@ Provider status now lives on three rails:
 The stable architecture is:
 
 - provider-agnostic grammar, parser, repair, audit, and task compiler
+- local verifier for parse, literal retention, and must-include coverage
 - model-calibrated prompt families and routing profiles
 - provider-specific transports only where the API surface really differs
 - multiple compiled task contracts when one compact IR is not enough:
@@ -27,6 +28,7 @@ The stable architecture is:
   - `targeted` compiled context when macro prompts need task-aware prefix compression
   - `layered` compiled context when you need both cache-stable shared prefixes and task-specific overlays
   - `needle` overlays when the task-specific overlay itself must stay warm-path cheap
+- adaptive expansion: compact first pass, then fallback only when the verifier rejects the compressed answer
 
 ## Why People Pay Attention To This
 
@@ -117,6 +119,7 @@ What now looks credible in practice:
 - routed policies expose a real Pareto surface between total cost and semantic retention
 - stronger models improve SIGIL markedly, but they also compress terse natural-language baselines better, so transfer between model families requires retuning
 - `layered-needle` is the most promising current macro warm-path regime: shared cacheable prefix plus a smaller task overlay, instead of a full targeted task summary
+- verifier-gated fallback is now implemented as a first-class runtime pattern, not just an eval trick
 
 Latest benchmark signal now splits into two honest regimes.
 

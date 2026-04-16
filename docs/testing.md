@@ -117,6 +117,21 @@ The current repo already supports this with:
 
 This is currently the most credible path from “interesting prompt” to “real transport policy”.
 
+There is now a second control layer:
+
+- [evals/build_adaptive_run.py](../evals/build_adaptive_run.py)
+
+This lets you use:
+
+- a compact primary run
+- a richer fallback run
+- a local verifier that promotes fallback only when parse, literal retention, or must-include coverage fail
+
+Use it when:
+
+- the compressed route wins often but is still brittle on a small subset of tasks
+- you want “compress first, expand only if needed” instead of forcing the rich route everywhere
+
 The practical meaning of the current profiles is:
 
 - `efficiency`: maximize visible compression and stay as close as possible to baseline total cost
@@ -126,6 +141,7 @@ The practical meaning of the current profiles is:
 There is now a fourth practical pattern:
 
 - `selective efficiency`: let SIGIL compete against the terse baseline per category, and keep SIGIL only where it wins
+- `adaptive expansion`: let SIGIL try the cheapest route first, then expand only when the local verifier rejects the answer
 
 ## Can A Dedicated Codex Agent Replace The API?
 

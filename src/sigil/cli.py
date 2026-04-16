@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from .bench import (
+    build_adaptive_run,
     build_compiled_macro_tasks,
     build_extended_corpus,
     build_macro_tasks,
@@ -70,6 +71,23 @@ def _build_parser() -> argparse.ArgumentParser:
     bench_capsule_parser.add_argument("out", type=Path)
     bench_capsule_parser.add_argument("--style", choices=["v1", "micro", "nano", "bridge"], default="v1")
 
+    bench_adaptive_parser = bench_subparsers.add_parser(
+        "build-adaptive-run",
+        help="Build a verifier-gated adaptive run with fallback expansion.",
+    )
+    bench_adaptive_parser.add_argument("tasks", type=Path)
+    bench_adaptive_parser.add_argument("out", type=Path)
+    bench_adaptive_parser.add_argument("--primary-run", dest="primary_runs", action="append", type=Path, required=True)
+    bench_adaptive_parser.add_argument("--fallback-run", dest="fallback_runs", action="append", type=Path, required=True)
+    bench_adaptive_parser.add_argument("--baseline-run", type=Path, default=None)
+    bench_adaptive_parser.add_argument("--baseline-variant", default="baseline-terse")
+    bench_adaptive_parser.add_argument("--variant-name", default="sigil-adaptive")
+    bench_adaptive_parser.add_argument("--min-must-include", type=float, default=0.75)
+    bench_adaptive_parser.add_argument("--min-exact-literal", type=float, default=0.75)
+    bench_adaptive_parser.add_argument("--allow-repair", action="store_true")
+    bench_adaptive_parser.add_argument("--no-require-parse", action="store_true")
+    bench_adaptive_parser.add_argument("--no-require-mode-match", action="store_true")
+
     bench_report_parser = bench_subparsers.add_parser("report", help="Render a Markdown benchmark report from a manifest.")
     bench_report_parser.add_argument("manifest", type=Path)
     bench_report_parser.add_argument("--out", type=Path, default=None)
@@ -115,6 +133,23 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.bench_command == "build-capsules":
             result = build_task_capsules(args.source, args.out, style=args.style)
+            print(json.dumps(result, indent=2, ensure_ascii=False))
+            return 0
+        if args.bench_command == "build-adaptive-run":
+            result = build_adaptive_run(
+                args.tasks,
+                args.out,
+                primary_runs=args.primary_runs,
+                fallback_runs=args.fallback_runs,
+                baseline_run=args.baseline_run,
+                baseline_variant=args.baseline_variant,
+                variant_name=args.variant_name,
+                min_must_include=args.min_must_include,
+                min_exact_literal=args.min_exact_literal,
+                allow_repair=args.allow_repair,
+                require_parse=not args.no_require_parse,
+                require_mode_match=not args.no_require_mode_match,
+            )
             print(json.dumps(result, indent=2, ensure_ascii=False))
             return 0
         if args.bench_command == "report":

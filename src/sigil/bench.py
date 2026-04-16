@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import importlib.util
+import io
 import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from statistics import mean
+from contextlib import redirect_stdout
 
 from .eval_common import load_jsonl
 from .metrics import approx_token_count
@@ -171,6 +173,69 @@ def build_task_capsules(source: Path, out: Path, style: str = "v1") -> dict[str,
     if exit_code != 0:
         raise SystemExit(exit_code)
     return corpus_summary(out)
+
+
+def build_adaptive_run(
+    tasks: Path,
+    out: Path,
+    *,
+    primary_runs: list[Path],
+    fallback_runs: list[Path],
+    baseline_run: Path | None = None,
+    baseline_variant: str = "baseline-terse",
+    variant_name: str = "sigil-adaptive",
+    min_must_include: float = 0.75,
+    min_exact_literal: float = 0.75,
+    allow_repair: bool = False,
+    require_parse: bool = True,
+    require_mode_match: bool = True,
+) -> dict[str, object]:
+    module = _load_repo_module("sigil_eval_build_adaptive_run", "evals/build_adaptive_run.py")
+    command = [str(tasks), str(out)]
+    for path in primary_runs:
+        command.extend(["--primary-run", str(path)])
+    for path in fallback_runs:
+        command.extend(["--fallback-run", str(path)])
+    if baseline_run is not None:
+        command.extend(["--baseline-run", str(baseline_run), "--baseline-variant", baseline_variant])
+    command.extend(
+        [
+            "--variant-name",
+            variant_name,
+            "--min-must-include",
+            str(min_must_include),
+            "--min-exact-literal",
+            str(min_exact_literal),
+        ]
+    )
+    if allow_repair:
+        command.append("--allow-repair")
+    if not require_parse:
+        command.append("--no-require-parse")
+    if not require_mode_match:
+        command.append("--no-require-mode-match")
+    with redirect_stdout(io.StringIO()):
+        exit_code = module.main(command)
+    if exit_code != 0:
+        raise SystemExit(exit_code)
+    rows = load_jsonl(out)
+    variant_counts: dict[str, int] = {}
+    selected_primary = 0
+    selected_fallback = 0
+    for row in rows:
+        variant = str(row["variant"])
+        variant_counts[variant] = variant_counts.get(variant, 0) + 1
+        if row.get("adaptive_selected_from") == "primary":
+            selected_primary += 1
+        elif row.get("adaptive_selected_from") == "fallback":
+            selected_fallback += 1
+    return {
+        "path": str(out),
+        "count": len(rows),
+        "variants": variant_counts,
+        "selected_primary": selected_primary,
+        "selected_fallback": selected_fallback,
+    }
 
 
 def _metric_config(metric_name: str) -> dict[str, str]:
