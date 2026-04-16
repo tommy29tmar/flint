@@ -12,6 +12,8 @@ build/
 .coverage
 htmlcov/
 .DS_Store
+.playwright-cli/
+uv.lock
 evals/runs/tmp_*.jsonl
 evals/runs/*smoke*.jsonl
 evals/runs/my_run.jsonl

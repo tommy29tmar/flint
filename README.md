@@ -1,5 +1,9 @@
 # SIGIL
 
+[![CI](https://github.com/tommy29tmar/SIGIL/actions/workflows/ci.yml/badge.svg)](https://github.com/tommy29tmar/SIGIL/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-informational.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](pyproject.toml)
+
 **Compress the work, not just the words.**
 
 SIGIL is a proposed reasoning IR for LLM workflows. The core idea is simple:
@@ -20,6 +24,30 @@ The stable architecture is:
 - multiple compiled task contracts when one compact IR is not enough:
   - `nano` capsules for ultra-cheap routes
   - typed capsule-mini contracts when `nano` throws away too much structure
+
+## Why People Pay Attention To This
+
+Most token-compression projects stop at style compression. SIGIL is trying to
+compress the actual work surface:
+
+- task contracts
+- transport format
+- shared context
+- provider- and model-specific routing
+
+That makes the thesis stronger than “answer in fewer words.”
+
+## Benchmark Snapshot
+
+| Regime | Current strongest signal |
+| --- | --- |
+| OpenAI extended | `gpt-5.4-mini`: `11.03%` aggregate total-token savings |
+| Anthropic extended | `claude-sonnet-4-20250514`: `28.37%` aggregate total-token savings |
+| Anthropic holdout | `claude-opus-4-6`: `27.32%` aggregate total-token savings |
+| Gemini extended | `gemini-2.5-flash`: `5.63%` aggregate total-token savings |
+| Gemini macro cached | `47.24%` effective-total savings |
+
+Full generated numbers live in [docs/results.md](docs/results.md).
 
 This repository now contains both:
 
@@ -221,6 +249,13 @@ Install the package in editable mode:
 python3 -m pip install -e .
 ```
 
+Or with `uv`:
+
+```bash
+uv venv
+uv pip install -e .
+```
+
 Validate a SIGIL document:
 
 ```bash
@@ -238,6 +273,13 @@ Render or reuse the audit view:
 ```bash
 sigil audit examples/debugging.sigil
 ```
+
+## Community
+
+- start with [CONTRIBUTING.md](CONTRIBUTING.md)
+- use [SUPPORT.md](SUPPORT.md) for the right support channel
+- read [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before contributing
+- cite the repo via [CITATION.cff](CITATION.cff) if you use it in research or derivative tooling
 
 Inspect structural metrics:
 
