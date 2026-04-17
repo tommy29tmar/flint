@@ -22,3 +22,4 @@ evals/runs/my_run.jsonl
 # Local-only experiments that must NOT be pushed to the public repo.
 # Preserves flint5-tool research code + any future shelved experiment.
 local/
+evals/runs/tmp/
