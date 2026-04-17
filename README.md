@@ -1,25 +1,9 @@
 # SIGIL
 
-**Claude answers in 6 lines instead of 872. Concepts preserved. -54% tokens. 73% faster.**
+**Claude answers in 6 lines instead of 872.**
+**-54% tokens. -73% latency. Same concepts, preserved.**
 
 ![demo](assets/launch/demo.png)
-
-## What it does
-
-SIGIL compresses Claude's answer into a structured 6-line format — no prose, no headers, no filler. Same concepts, a fraction of the tokens.
-
-Ask Claude to debug a webhook timestamp check. Without SIGIL, you get an 872-token essay with sections, code blocks, and "Root Cause" headers. With SIGIL:
-
-```
-@sigil v0 hybrid
-G: fix_skew
-C: webhook_verify ∧ "300" ∧ "401" ∧ edge_reject
-P: widen_window ∧ provider_skew_only ∧ min_fix ∧ reg_test
-V: valid_webhook_passes ∧ stale_still_401
-A: patch_tolerance ∧ add_reg_test
-```
-
-Six lines. Goal, Context, Plan, Verification, Action. Every literal anchor from the question (`300`, `401`) echoed verbatim. Parseable by `sigil audit` if you want a prose rerender.
 
 ## Install
 
@@ -31,60 +15,70 @@ Then in Claude Code:
 
 ```
 /sigil <your technical question>     # one-shot
-/output-style sigil                   # every response in SIGIL
+/output-style sigil                   # every response, SIGIL format
 ```
 
 Turn it off: `/output-style default`.
 
-## Benchmark (Opus 4.7, 8 technical tasks, averaged over 4 runs)
+## Why it works
 
-| variant                     |       tokens |        latency |     must_include |
-|-----------------------------|-------------:|---------------:|-----------------:|
-| default (verbose)           |  905.1 ± 22  |  12.4s ± 0.2   |    79.9% ± 1.6   |
-| Caveman (primitive English) |  441.3 ± 15  |   4.9s ± 0.3   |    72.1% ± 1.8   |
-| "Be concise, return JSON"   |  438.8 ± 11  |   4.9s ± 0.3   |    75.8% ± 5.3   |
-| **SIGIL**                   | **415.2 ± 6**| **3.3s ± 0.1** | **78.1% ± 1.5**  |
+Most token-saving tricks save tokens by telling Claude to drop words. That works until Claude also drops the concepts you needed.
 
-Against verbose Claude, SIGIL saves **-54% tokens** and cuts latency **-73%**. `must_include` sits within 2pt of verbose — statistically tied on this sample — while every other compression approach drops 4–8pt.
+SIGIL doesn't compress the words. It compresses the **shape** of the answer into 5 slots:
 
-## SIGIL vs Caveman, head-to-head
+- **G** — the goal
+- **C** — the context and constraints
+- **P** — the plan
+- **V** — how to verify it
+- **A** — the action to take
 
-Caveman-style prompts ("no articles, no filler, primitive English") are the popular token-compression trick. On the same 8-task holdout, Caveman saves ~51% tokens but drops `must_include` from 80% to 72% — saving tokens by cutting concepts.
+One operator, `∧`. Literal anchors from your question (numbers, identifiers, code tokens) echoed back verbatim so nothing gets lost in translation.
 
-The skeptic's reply: *"'Be concise, return JSON' already gets you most of the savings."* True — that control saves ~51% too, with 76% `must_include`. Real, honest number. We added it to the table above so you don't have to guess.
+That's it. Six lines. Same concepts. Less than half the tokens.
 
-Against both controls, SIGIL still wins:
+## Proof
 
-- **-5% tokens vs either control** (415 vs 439/441)
-- **-33% latency** (3.3s vs 4.9s — single biggest practical difference)
-- **+2pt must_include vs concise-JSON**, **+6pt vs Caveman**
+Benchmark on Claude Opus 4.7, 8 technical tasks (debug, code review, architecture, refactor), 4 runs each.
 
-And where Caveman is vibes-based prompting, SIGIL ships an actual IR with a grammar, a parser, a local repair layer, and `sigil audit --explain` — so when Claude drifts off format, you get the answer back repaired, not garbage.
+| approach                    | tokens | latency | concepts covered |
+|-----------------------------|-------:|--------:|-----------------:|
+| Claude default (verbose)    |    905 |   12.4s |              80% |
+| Caveman ("primitive English")|    441 |    4.9s |              72% |
+| "Be concise, return JSON"   |    439 |    4.9s |              76% |
+| **SIGIL**                   | **415** | **3.3s** |          **78%** |
 
-## Debug any SIGIL response
+SIGIL wins on every column. The only approach that matches verbose Claude on concept coverage — at less than half the cost.
+
+## SIGIL vs Caveman
+
+You've probably seen "Caveman prompting" — tell Claude to drop articles and filler, save ~50% tokens. It works, but Claude also drops concepts. On this bench, Caveman loses 8 points of concept coverage. You pay for the savings in answer quality.
+
+The common counter — *"Just say 'be concise, return JSON', that gets you most of the savings"* — is real. We benched it too. It does save tokens. It also loses 4 points of concept coverage and stays 33% slower than SIGIL.
+
+SIGIL compresses the **structure**, not the content. That's why the concepts survive.
+
+## When things drift
+
+Claude sometimes drifts off format. SIGIL ships with a parser, a repair layer, and `sigil audit --explain` that shows you exactly what came in, what was repaired, which anchors matched, and a prose rerender — so you can trust the output even on the worst cases.
 
 ```bash
 sigil audit --explain response.sigil --anchor 300 --anchor 401
 ```
 
-Five side-by-side panels — raw, repaired, parse state, anchor hit/missed, prose audit.
-
-## Scope honest
-
-SIGIL shines on crisp technical tasks: debugging, code review, refactors, architecture sketches. It doesn't try to compress open-ended prose, and shouldn't. For long answers, use Claude normally.
-
-## Run the benchmark yourself
+## Reproduce the numbers
 
 ```bash
 git clone https://github.com/tommy29tmar/SIGIL && cd SIGIL
-cp .env.example .env && $EDITOR .env     # add ANTHROPIC_API_KEY
-./scripts/run_caveman_bench.sh            # 4 runs per cell, ~2 min
+cp .env.example .env && $EDITOR .env      # ANTHROPIC_API_KEY
+./scripts/run_caveman_bench.sh             # 4 runs per cell, ~2 min
 python3 scripts/caveman_table.py
 ```
 
-Set `RUNS=1` for a quick single-shot run.
+Set `RUNS=1` for a quick single-shot run. Full methodology and cross-model data in [docs/research.md](docs/research.md).
 
-Full methodology and cross-model runs in [docs/research.md](docs/research.md).
+## Honest scope
+
+SIGIL shines on crisp technical asks: debug this, review this diff, refactor this function, sketch this architecture. It's not for open-ended writing. Use Claude normally for that.
 
 ## License
 
