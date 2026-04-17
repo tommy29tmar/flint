@@ -22,7 +22,11 @@ if [ ! -d "$CLAUDE_DIR" ]; then
 fi
 
 # Detect if running from a repo checkout (for local testing). Otherwise curl down.
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || echo "")"
+# When piped via `curl | bash`, BASH_SOURCE is empty and SCRIPT_DIR stays empty.
+SCRIPT_DIR=""
+if [ -n "${BASH_SOURCE[0]:-}" ]; then
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || echo "")"
+fi
 IS_LOCAL=0
 if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/skill/SKILL.md" ]; then
   IS_LOCAL=1
