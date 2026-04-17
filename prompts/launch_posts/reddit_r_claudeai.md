@@ -33,11 +33,12 @@ install + usage, include a screenshot, answer questions.
 > Then in Claude Code:
 >
 > ```
-> /flint <technical question>        # one-shot
-> /output-style flint                 # every response, Flint format
+> /flint <technical question>        # one-shot slash command
 > ```
 >
-> Turn it off anytime with `/output-style default`.
+> For every response in Flint, open `/config`, pick **Output style → flint**
+> (or add `"outputStyle": "flint"` to `~/.claude/settings.json`). Turn it
+> off by selecting `default` in the same menu.
 >
 > **Why it's not "caveman prompting":**
 >

@@ -45,9 +45,11 @@ https://github.com/tommy29tmar/flint
 > eyeball; reproduction is `RUNS=4 ./scripts/run_stress_bench.sh` + a table
 > script, ~5 min and ~$2 on Opus 4.7.
 >
-> Install is `curl | bash` into `~/.claude`; turns on via `/output-style
-> flint` in Claude Code, or you can use the ~90-token prompt directly via
-> any Anthropic Messages API call.
+> Install is `curl | bash` into `~/.claude`; the `/flint` slash command is
+> one-shot, or you can switch every response to Flint via Claude Code's
+> `/config` → Output style menu (also settable as `"outputStyle": "flint"`
+> in settings.json). Or use the ~90-token prompt directly via any
+> Anthropic Messages API call.
 >
 > Happy to answer anything — particularly keen on methodology pushback.
 

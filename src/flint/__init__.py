@@ -4,7 +4,7 @@ from .normalize import normalize_document_text
 from .render import generate_audit
 from .schema_transport import load_schema_definition, render_schema_payload
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 
 __all__ = [
     "FlintParseError",

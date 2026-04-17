@@ -73,11 +73,11 @@ on tweet 4. Post between 9-11 AM ET or 7-9 PM ET.
 >
 > curl -fsSL https://raw.githubusercontent.com/tommy29tmar/flint/main/integrations/claude-code/install.sh | bash
 >
-> Then in Claude Code:
->    /flint <your question>       one-shot
->    /output-style flint          every response
+> In Claude Code:
+>    /flint <question>                      one-shot
+>    /config → Output style → flint        every response
 >
-> Off: /output-style default
+> Off: same menu, pick default.
 
 ---
 

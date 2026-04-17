@@ -98,9 +98,9 @@ Style rules:
 > It bounds reasoning to a 5-slot shape instead of free-form prose. On
 > technical tasks with a clear goal, that's an improvement — the structure
 > is the reasoning scaffold. On open-ended / creative tasks it *would*
-> hurt, which is why Flint is opt-in (`/flint` per-turn or
-> `/output-style flint` per-session) and explicitly off by default. Full
-> scope in [docs/failure_modes.md](https://github.com/tommy29tmar/flint/blob/main/docs/failure_modes.md).
+> hurt, which is why Flint is opt-in (`/flint` per-turn, or pick `flint`
+> in `/config → Output style` per-session) and explicitly off by default.
+> Full scope in [docs/failure_modes.md](https://github.com/tommy29tmar/flint/blob/main/docs/failure_modes.md).
 
 ---
 

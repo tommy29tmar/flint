@@ -62,11 +62,12 @@ keep tool_use for its own orthogonal purposes.
 
 ## Will Flint hurt creative or open-ended writing?
 
-Yes. That's why it's opt-in per-turn (`/flint <q>`) or per-session
-(`/output-style flint`), and explicitly off by default. Flint is for crisp
-technical questions with a verifiable endpoint. Use Claude normally for
-essays, brainstorming, back-and-forth chat. See
-[failure_modes.md](failure_modes.md) for the full list.
+Yes. That's why it's opt-in per-turn (`/flint <q>`) or per-session (pick
+`flint` in `/config → Output style`, or set `"outputStyle": "flint"` in
+your settings), and explicitly off by default. Flint is for crisp technical
+questions with a verifiable endpoint. Use Claude normally for essays,
+brainstorming, back-and-forth chat. See [failure_modes.md](failure_modes.md)
+for the full list.
 
 ## How is this different from JSON mode / structured output?
 

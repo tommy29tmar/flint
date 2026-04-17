@@ -16,7 +16,8 @@ link.
 > ```
 > curl -fsSL https://raw.githubusercontent.com/tommy29tmar/flint/main/integrations/claude-code/install.sh | bash
 > ```
-> Then `/output-style flint` in any session. MIT, no account, no proxy.
+> Then `/flint <question>` for one-shot, or pick **flint** in `/config →
+> Output style` to make it every response. MIT, no account, no proxy.
 >
 > Repo: <https://github.com/tommy29tmar/flint>
 > Methodology: <https://github.com/tommy29tmar/flint/blob/main/docs/methodology.md>
@@ -44,9 +45,9 @@ hook here)*
 > ```
 >
 > Use:
-> - `/flint <your question>` — one-shot
-> - `/output-style flint` — every response, Flint format
-> - `/output-style default` — off
+> - `/flint <your question>` — one-shot slash command
+> - `/config` → Output style → flint — every response
+> - same menu, pick `default` — off
 >
 > Not for creative writing / open chat / summarization — use Claude
 > normally for those.

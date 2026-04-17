@@ -6,7 +6,8 @@ on your machine.
 ## The artifact that ships
 
 Exactly **one file** is what the installer puts on Claude Opus 4.7 when you
-run `/output-style flint`:
+activate the Flint output style (via `/config` → Output style → flint, or
+`"outputStyle": "flint"` in settings):
 
 ```
 integrations/claude-code/flint_system_prompt.txt   (8 lines, ~90 tokens)

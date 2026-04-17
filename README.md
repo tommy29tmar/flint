@@ -16,10 +16,9 @@ Then in Claude Code:
 
 ```
 /flint <your technical question>     # one-shot
-/output-style flint                   # every response, Flint format
 ```
 
-Turn it off: `/output-style default`.
+To make Flint the output style for every response, run `/config` and pick **Output style → flint** — or add `"outputStyle": "flint"` to `~/.claude/settings.json`. Turn it off by selecting `default` from the same menu, or remove the field.
 
 ## Why it works
 

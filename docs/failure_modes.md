@@ -24,7 +24,8 @@ tasks don't. In order of bluntness:
 
 **Rule of thumb:** if the task has a crisp technical goal and a verifiable
 endpoint, Flint fits. If the task is "think out loud with me", turn Flint
-off (`/output-style default`).
+off — pick `default` in `/config → Output style`, or remove the
+`outputStyle` field from your settings.
 
 ## Drift patterns
 
@@ -170,15 +171,13 @@ retry, adjust the prompt, or eat the loss.
 If you're chatting with Claude Code and you hit a question Flint is
 obviously bad at (explanation-heavy, creative, back-and-forth), flip back:
 
-```
-/output-style default
-```
+- `/config` → **Output style** → pick `default`, **or**
+- remove the `"outputStyle": "flint"` line from `~/.claude/settings.json`.
 
-Then flip forward again when you're back on a technical ask:
-
-```
-/output-style flint
-```
+Flip forward again the same way (pick `flint`, or put the field back) when
+you're back on a technical ask. For a single one-off technical question
+without flipping at all, use `/flint <question>` — that's one-shot and
+doesn't touch the session output style.
 
 The skill is designed to be toggled. Don't try to force every turn through
 it.
