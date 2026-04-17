@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Head-to-head SIGIL vs Caveman (primitive-english) vs concise+JSON control vs verbose Claude.
+# Head-to-head Flint vs Caveman (primitive-english) vs concise+JSON control vs verbose Claude.
 # Same frame Caveman uses to report "~60% savings". Run ${RUNS:-4} times per cell
 # so the aggregate table has confidence intervals, not single-shot noise.
 set -euo pipefail
