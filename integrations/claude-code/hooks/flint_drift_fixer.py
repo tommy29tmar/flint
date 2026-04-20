@@ -69,7 +69,12 @@ CODE_ARTIFACT_RULES: list[str] = [
     r"\bwrite\s+(?:the\s+)?(?:code|tests?|snippet|function|method|patch|fix|script|implementation|regression\s+tests?|pytest|unit\s+tests?)",
     r"\bimplement\s+(?:the|a|an)\b",
     r"\bapply\s+the\s+(?:fix|change|patch|update)",
-    r"\b(?:include|with)\s+(?:sample|example|inline|exact)\s+(?:code|config|snippet)\b",
+    # "include/with [optional qualifier] <code artifact>" — covers
+    # "include sample code", "with the nginx config", "include the patch snippet"
+    r"\b(?:include|with)\s+(?:the\s+)?(?:sample|example|inline|exact|updated|actual|full)\s+(?:\w+\s+){0,3}?(?:code|config|snippet|patch|diff|script)\b",
+    r"\b(?:include|with)\s+(?:the\s+)?(?:code|config|snippet|patch|diff|script)\b",
+    # <code artifact> followed by "inline" — "config we deployed inline", "patch snippet inline"
+    r"\b(?:code|config|snippet|patch|diff|script)\s+(?:\w+\s+){0,4}?\binline\b",
     r"\bsample\s+(?:code|config|snippet)\b",
     r"\bupdated\s+(?:\w+\.\w+|jwt_\w+|auth\w*|handler|service|module|file)",
     r"\bpropose\s+the\s+fix.*(?:show|code|snippet|file)",
@@ -94,17 +99,17 @@ def _matches_any(text: str, patterns: list[str]) -> bool:
 
 
 def classify(prompt: str) -> str:
-    """Return one of 'ir' | 'prose_code' | 'prose_polished' | 'prose_caveman'.
+    """Return one of 'ir' | 'prose_code' | 'prose_polished_code' | 'prose_polished' | 'prose_caveman'.
 
     Decision order (first match wins):
-      1. Strongly polished audience (leadership / customer-facing + memo / paragraphs)
-         -> 'prose_polished'. Overrides everything else: a memo-for-leadership
-         that mentions bugs is still a memo.
-      2. Code artifact requested (show/write code, tests, updated file)
-         -> 'prose_code'. Verbatim code does not fit inside IR atoms.
-      3. Technical score >= IR_THRESHOLD -> 'ir'. Crisp goal + verifiable endpoint.
-      4. Any polished-audience hint -> 'prose_polished'.
-      5. Default -> 'prose_caveman' (terse, compressed prose).
+      1. Polished audience AND code artifact requested -> 'prose_polished_code'.
+         Example: "customer-facing memo with the exact nginx config inline".
+         Professional prose register + fenced code block.
+      2. Strongly polished audience (no code) -> 'prose_polished'.
+      3. Code artifact requested (no polished audience) -> 'prose_code'.
+      4. Technical score >= IR_THRESHOLD -> 'ir'.
+      5. Any polished-audience hint -> 'prose_polished'.
+      6. Default -> 'prose_caveman' (terse, compressed prose).
     """
     text = prompt or ""
     ir_score = 0
@@ -119,6 +124,8 @@ def classify(prompt: str) -> str:
     wants_code = _matches_any(text, CODE_ARTIFACT_RULES)
     polished_audience = _matches_any(text, POLISHED_AUDIENCE_RULES)
 
+    if polished_audience and prose_score >= 4 and wants_code:
+        return "prose_polished_code"
     if polished_audience and prose_score >= 4:
         return "prose_polished"
     if wants_code:
@@ -166,11 +173,23 @@ PROSE_POLISHED_DIRECTIVE = (
     "submit_flint_ir."
 )
 
+PROSE_POLISHED_CODE_DIRECTIVE = (
+    "[TURN CLASSIFICATION: prose-polished+code] This turn addresses a "
+    "polished audience (leadership, customer, stakeholder) AND asks for "
+    "an executable artifact inline (code, config, snippet). Respond with "
+    "professional readable prose (complete sentences, articles preserved, "
+    "no Caveman compression, no filler) followed by one or more fenced "
+    "code blocks (```lang ... ```). Match the tone asked (blameless, "
+    "reassuring). Do NOT emit Flint IR atoms — code must render verbatim. "
+    "Do NOT call submit_flint_ir."
+)
+
 DIRECTIVES: dict[str, str] = {
     "ir": IR_DIRECTIVE,
     "prose_code": PROSE_CODE_DIRECTIVE,
     "prose_caveman": PROSE_CAVEMAN_DIRECTIVE,
     "prose_polished": PROSE_POLISHED_DIRECTIVE,
+    "prose_polished_code": PROSE_POLISHED_CODE_DIRECTIVE,
 }
 
 

@@ -70,10 +70,17 @@ PROSE_CODE_PROMPTS = [
 ]
 
 PROSE_POLISHED_PROMPTS = [
-    # Leadership / memo / customer-facing
+    # Leadership / memo / customer-facing, NO code artifact
     "Write a 2-paragraph summary for non-technical leadership: what we're doing, why, risks",
     "Write a memo for leadership. Tone: professional, no code. Cover what we found",
     "Draft a customer-facing post-mortem: blameless, factual, 4-5 paragraphs, no code, no IR",
+]
+
+PROSE_POLISHED_CODE_PROMPTS = [
+    # Polished audience + inline code artifact
+    "Customer-facing memo: include the exact nginx config we deployed inline. 2 paragraphs.",
+    "Draft a 3-paragraph post-mortem for leadership; include sample code showing the fix.",
+    "Write a stakeholder update with the patch snippet inline. Professional tone.",
 ]
 
 PROSE_CAVEMAN_PROMPTS = [
@@ -107,6 +114,11 @@ def test_prose_code_prompts_classified_as_prose_code(prompt: str) -> None:
 @pytest.mark.parametrize("prompt", PROSE_POLISHED_PROMPTS)
 def test_prose_polished_prompts_classified_as_prose_polished(prompt: str) -> None:
     assert hook.classify(prompt) == "prose_polished", f"expected 'prose_polished' for: {prompt!r}"
+
+
+@pytest.mark.parametrize("prompt", PROSE_POLISHED_CODE_PROMPTS)
+def test_prose_polished_code_prompts_classified_as_prose_polished_code(prompt: str) -> None:
+    assert hook.classify(prompt) == "prose_polished_code", f"expected 'prose_polished_code' for: {prompt!r}"
 
 
 @pytest.mark.parametrize("prompt", PROSE_CAVEMAN_PROMPTS)
@@ -147,6 +159,15 @@ def test_build_output_for_prose_polished() -> None:
     assert "prose-polished" in ctx
     assert "professional" in ctx.lower()
     assert "Caveman compression" in ctx or "No Caveman" in ctx
+    assert "Do NOT emit Flint IR" in ctx
+
+
+def test_build_output_for_prose_polished_code() -> None:
+    ctx = hook.build_output("prose_polished_code")["hookSpecificOutput"]["additionalContext"]
+    assert "prose-polished+code" in ctx
+    assert "professional" in ctx.lower()
+    assert "fenced code block" in ctx
+    assert "caveman compression" in ctx.lower()
     assert "Do NOT emit Flint IR" in ctx
 
 

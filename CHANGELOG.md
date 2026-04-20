@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.8.2 — 2026-04-21
+
+### Fifth route — `prose_polished_code`
+
+Addresses the edge case Codex flagged in the v0.8.1 review: prompts
+that combine a polished audience with an inline code artifact (e.g.
+"customer-facing memo: include the exact nginx config we deployed
+inline") were routed to `prose_polished`, losing the code block.
+
+New classifier output: `prose_polished_code` — professional readable
+prose (articles preserved, no Caveman compression) followed by fenced
+code block(s). Added precedence: when `polished_audience` AND `wants_code`
+AND `prose_score >= 4`, route to the new label.
+
+Extended `CODE_ARTIFACT_RULES` to catch "include/with [qualifier] code"
+and "<artifact> inline" patterns (previously missed).
+
+51 classifier tests passing.
+
+## 0.8.1 — 2026-04-21
+
+See prior entries — Codex-authored cleanup of migration debt from the
+rename. No classifier changes.
+
 ## 0.8.0 — 2026-04-21
 
 ### 3-way routing + honest metrics — class_acc jumps 44% → 100%
