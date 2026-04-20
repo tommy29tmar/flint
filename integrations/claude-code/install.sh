@@ -76,9 +76,9 @@ fetch "flint_thinking_mcp_system_prompt.txt" "$CLAUDE_DIR/flint_thinking_mcp_sys
   echo "   (thinking-mode-MCP prompt install failed — flint-mcp will not work until installed)"
 fetch "mcp-config.json" "$CLAUDE_DIR/flint-mcp-config.json" || \
   echo "   (mcp-config install failed — flint-mcp requires it)"
-fetch "hooks/flint_drift_fixer.sh" "$CLAUDE_DIR/hooks/flint_drift_fixer.sh" || \
+fetch "hooks/flint_drift_fixer.py" "$CLAUDE_DIR/hooks/flint_drift_fixer.py" || \
   echo "   (drift-fix hook install failed — flint will fall back to system-prompt-only mode)"
-chmod +x "$CLAUDE_DIR/hooks/flint_drift_fixer.sh" 2>/dev/null || true
+chmod +x "$CLAUDE_DIR/hooks/flint_drift_fixer.py" 2>/dev/null || true
 fetch "flint-drift-fix-settings.json" "$CLAUDE_DIR/flint-drift-fix-settings.json" || \
   echo "   (drift-fix settings install failed — flint will not register the hook)"
 

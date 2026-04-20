@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/flint_drift_fixer.sh"
+            "command": "$HOME/.claude/hooks/flint_drift_fixer.py"
           }
         ]
       }

@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.7.1 — 2026-04-20
+
+### Classifier rewrite — drift-fix hook in Python + tests
+
+Replaces the fragile `flint_drift_fixer.sh` bash/sed/grep pipeline with
+`flint_drift_fixer.py` (pure-Python, no deps). Addresses Codex feedback:
+
+- **Score-based classifier** instead of first-match regex. Each rule
+  carries a weight; a prompt is classified IR if the sum exceeds the
+  threshold. This catches cases the sh classifier missed
+  (architecture review, root-cause hypothesis without code, security
+  audit with "attack vectors" / "security issues", italian triggers).
+- **38 unit tests** at `tests/test_flint_drift_fixer.py` covering
+  IR-shape (debug, review, audit, fix, refactor, architecture,
+  monitoring, italian, code-embedded), prose-shape (leadership,
+  memo, tutorial, brainstorm, chat), edge cases (empty, malformed
+  JSON, prose-override precedence).
+- **Deterministic JSON output**: Python's `json.dumps` handles escaping
+  robustly, vs the sed-based quote escaping in the sh version which
+  broke on prompts containing embedded quotes or newlines.
+
+### Migration
+Existing installs: re-run `integrations/claude-code/install.sh` to pick
+up the new hook. The settings file now points to `flint_drift_fixer.py`.
+
 ## 0.7.0 — 2026-04-20
 
 ### Consolidation — rename + remove basic lanes
