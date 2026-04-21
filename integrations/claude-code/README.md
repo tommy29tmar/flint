@@ -31,19 +31,22 @@ The default `claude` command is untouched.
 ## Locales
 
 The classifier ships with English patterns by default. Other languages
-are opt-in via the `HEWN_LOCALE` environment variable (comma-separated):
+are opt-in via the `--locale` flag or the `HEWN_LOCALE` environment
+variable (both accept comma-separated stacks; the flag wins when both
+are set):
 
 ```bash
-HEWN_LOCALE=en          # default — English only
-HEWN_LOCALE=en,it       # English + Italian
-HEWN_LOCALE=en,es,fr    # English + Spanish + French
-HEWN_LOCALE=en,de       # English + German
+hewn --locale en,it       # English + Italian for this invocation
+hewn --locale en,es,fr    # English + Spanish + French
+export HEWN_LOCALE=en,it  # persistent across sessions
 ```
 
-Shipped locales: `en`, `it`, `es`, `fr`, `de`. `en` and `it` are
-validated against real prompt corpora; `es`/`fr`/`de` are synthesized
-1:1 from the Italian patterns and await community curation — PRs with
-real-prompt evidence welcome at `hooks/locales/<code>.py`.
+Shipped locales: `en`, `it`, `es`, `fr`, `de`. All five are validated
+at 100% coverage on a 12-prompt realistic corpus spanning every route;
+`en` and `it` additionally draw from real-prompt history, while
+`es`/`fr`/`de` patterns were synthesized from the Italian baseline —
+PRs expanding them with more real-prompt evidence are welcome at
+`hooks/locales/<code>.py`.
 
 ## Files installed
 

@@ -6,9 +6,44 @@
 #     terse prose for user-facing output, IR for IR-shape tasks.
 #   - Per-turn drift-fix hook (via --settings with UserPromptSubmit hook)
 #     that re-injects task-shape classification on every turn.
+#
+# Flags consumed by the wrapper (not forwarded to claude):
+#   --locale <code>   Stack of locale pattern files for the classifier.
+#                     Comma-separated, e.g. --locale en,it.
+#                     Overrides HEWN_LOCALE env var for this invocation.
+#                     Available: en (default), it, es, fr, de.
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Extract --locale <value> / --locale=<value> from argv before forwarding.
+locale_override=""
+forward_args=()
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --locale)
+      if [ $# -lt 2 ]; then
+        echo "hewn: --locale requires a value (e.g. --locale en,it)" >&2
+        exit 2
+      fi
+      locale_override="$2"
+      shift 2
+      ;;
+    --locale=*)
+      locale_override="${1#--locale=}"
+      shift
+      ;;
+    *)
+      forward_args+=("$1")
+      shift
+      ;;
+  esac
+done
+if [ -n "$locale_override" ]; then
+  export HEWN_LOCALE="$locale_override"
+fi
+# Reset positional args to the forwarded set, guarded for empty arrays under set -u.
+set -- ${forward_args[@]+"${forward_args[@]}"}
 
 resolve_file() {
   local name="$1"; shift
