@@ -16,9 +16,6 @@ Hewn is a Claude Code CLI wrapper. It runs `claude` with:
 curl -fsSL https://raw.githubusercontent.com/tommy29tmar/hewn/main/integrations/claude-code/install.sh | bash
 ```
 
-(During the GitHub repo rename from `flint` → `hewn`, the old URL still
-works via redirect.)
-
 ## Usage
 
 ```bash

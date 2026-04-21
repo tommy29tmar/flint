@@ -15,10 +15,8 @@ set -euo pipefail
 
 CLAUDE_DIR="${HOME}/.claude"
 BIN_DIR="${HOME}/.local/bin"
-# TODO: switch to tommy29tmar/hewn after the GitHub repo rename lands; GitHub
-# auto-redirects the old URL during the transition.
-REPO_URL="https://github.com/tommy29tmar/flint.git"
-RAW_URL="https://raw.githubusercontent.com/tommy29tmar/flint/main"
+REPO_URL="https://github.com/tommy29tmar/hewn.git"
+RAW_URL="https://raw.githubusercontent.com/tommy29tmar/hewn/main"
 
 if [ ! -d "$CLAUDE_DIR" ]; then
   echo "error: ~/.claude not found. Install Claude Code first."

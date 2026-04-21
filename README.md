@@ -22,9 +22,6 @@ The default `claude` binary is untouched. Hewn is an opt-in separate command.
 curl -fsSL https://raw.githubusercontent.com/tommy29tmar/hewn/main/integrations/claude-code/install.sh | bash
 ```
 
-(During the GitHub repo rename from `flint` → `hewn`, the old URL still works
-via redirect.)
-
 Requires: Claude Code already installed (`~/.claude` must exist) and
 `~/.local/bin` on `$PATH`.
 
