@@ -131,6 +131,24 @@ hewn
 hewn -p "your prompt"
 ```
 
+## Locales
+
+Hewn ships classifier patterns for `en`, `it`, `es`, `fr`, `de`. The
+locale is auto-detected from `$LANG` at run time, so Italian/Spanish/
+French/German shells just work out of the box. Example: `LANG=it_IT.UTF-8`
+loads `en + it` automatically.
+
+Override when needed:
+
+```bash
+hewn --locale en,it        # force this stack for one invocation
+export HEWN_LOCALE=en,es   # persistent in your shell rc
+export HEWN_LOCALE=en      # force English-only
+```
+
+Precedence: `--locale` > `HEWN_LOCALE` > `$LANG` auto-detect > English-only.
+Details: [integrations/claude-code/README.md](integrations/claude-code/README.md#locales).
+
 Want normal Claude again?
 
 ```bash
@@ -176,6 +194,7 @@ If you want expansive creative writing, use normal `claude`.
 - `~/.local/bin/hewn`
 - `~/.claude/hewn_thinking_system_prompt.txt`
 - `~/.claude/hooks/hewn_drift_fixer.py`
+- `~/.claude/hooks/locales/{en,it,es,fr,de}.py`
 
 That is it.
 
@@ -209,6 +228,7 @@ Most users do not need to care. Run `hewn`; Claude gets shorter.
 rm -f ~/.local/bin/hewn \
       ~/.claude/hewn_thinking_system_prompt.txt \
       ~/.claude/hooks/hewn_drift_fixer.py
+rm -rf ~/.claude/hooks/locales
 ```
 
 ## License

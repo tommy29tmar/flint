@@ -18,9 +18,15 @@ Score-based classifier:
 
 Locales:
 - Rule sets live in hooks/locales/<name>.py (en.py, it.py, es.py, fr.py, de.py).
-- Default is English only. Stack additional locales via HEWN_LOCALE env var:
-    HEWN_LOCALE=it       # Italian only (rarely useful — English defaults help)
-    HEWN_LOCALE=en,it    # English + Italian (typical bilingual user)
+- Resolution precedence (highest first):
+    1. HEWN_LOCALE env var (e.g. "en,it") — explicit override.
+    2. $LC_ALL / $LC_MESSAGES / $LANG auto-detect. If the 2-letter prefix
+       matches a shipped locale file, stack it on top of English.
+       Example: LANG=it_IT.UTF-8 -> loads en + it.
+    3. English only. Applies when auto-detect hits C/POSIX/en_*/unshipped.
+- Common overrides:
+    HEWN_LOCALE=en       # force English-only despite a non-English shell
+    HEWN_LOCALE=en,it    # English + Italian
     HEWN_LOCALE=en,es,fr # English + Spanish + French
 
 See tests/test_hewn_drift_fixer.py for the classification corpus.
@@ -75,10 +81,34 @@ def _assemble_rules(locales: tuple[str, ...]) -> tuple:
     return result
 
 
+def _detect_system_locale() -> str | None:
+    """Return a 2-letter locale code from LC_ALL/LC_MESSAGES/LANG if a
+    matching locale file ships with this install. Returns None when the
+    system locale is unset, POSIX/C, English, or a language we don't ship.
+    """
+    for env_var in ("LC_ALL", "LC_MESSAGES", "LANG"):
+        val = os.environ.get(env_var, "")
+        if not val or val in ("C", "POSIX", "C.UTF-8"):
+            continue
+        prefix = val.split("_", 1)[0].split(".", 1)[0].lower()
+        if not prefix or prefix == "en":
+            return None
+        if (LOCALE_DIR / f"{prefix}.py").exists():
+            return prefix
+        return None
+    return None
+
+
 def _default_locales() -> tuple[str, ...]:
-    raw = os.environ.get("HEWN_LOCALE", "en")
-    parts = tuple(s.strip() for s in raw.split(",") if s.strip())
-    return parts or ("en",)
+    """Resolve locale stack. Precedence: HEWN_LOCALE > $LANG auto-detect > en-only."""
+    raw = os.environ.get("HEWN_LOCALE")
+    if raw:
+        parts = tuple(s.strip() for s in raw.split(",") if s.strip())
+        return parts or ("en",)
+    detected = _detect_system_locale()
+    if detected:
+        return ("en", detected)
+    return ("en",)
 
 
 def _matches_any(text: str, patterns: list[str]) -> bool:

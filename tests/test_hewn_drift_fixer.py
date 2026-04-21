@@ -261,20 +261,67 @@ class OtherLocalesSanityTests(unittest.TestCase):
 
 
 class DefaultLocaleTests(unittest.TestCase):
-    """Verify HEWN_LOCALE env var is honored when no explicit locales passed."""
+    """Locale resolution: HEWN_LOCALE > $LANG auto-detect > English-only."""
 
-    def test_default_is_english(self):
-        # Italian prompt should NOT route to IR when only English loaded
-        prompt = "Studia questa directory e dimmi cosa manca"
-        import os
-        with unittest.mock.patch.dict(os.environ, {"HEWN_LOCALE": "en"}, clear=False):
-            self.assertEqual(hook.classify(prompt), "prose_caveman")
+    IT_PROMPT = "Studia questa directory e dimmi cosa manca"
 
-    def test_env_var_stacks_locales(self):
-        prompt = "Studia questa directory e dimmi cosa manca"
+    def test_hewn_locale_en_forces_english(self):
+        # Explicit HEWN_LOCALE=en beats $LANG auto-detect
         import os
-        with unittest.mock.patch.dict(os.environ, {"HEWN_LOCALE": "en,it"}, clear=False):
-            self.assertEqual(hook.classify(prompt), "ir")
+        env = {"HEWN_LOCALE": "en", "LANG": "it_IT.UTF-8"}
+        with unittest.mock.patch.dict(os.environ, env, clear=False):
+            self.assertEqual(hook.classify(self.IT_PROMPT), "prose_caveman")
+
+    def test_hewn_locale_stacks_locales(self):
+        import os
+        env = {"HEWN_LOCALE": "en,it"}
+        with unittest.mock.patch.dict(os.environ, env, clear=False):
+            self.assertEqual(hook.classify(self.IT_PROMPT), "ir")
+
+    def test_lang_autodetects_italian(self):
+        import os
+        # HEWN_LOCALE must be unset for auto-detect to fire
+        env = {"LANG": "it_IT.UTF-8"}
+        with unittest.mock.patch.dict(os.environ, env, clear=False):
+            os.environ.pop("HEWN_LOCALE", None)
+            self.assertEqual(hook.classify(self.IT_PROMPT), "ir")
+
+    def test_lang_c_falls_back_to_english(self):
+        import os
+        env = {"LANG": "C"}
+        with unittest.mock.patch.dict(os.environ, env, clear=False):
+            os.environ.pop("HEWN_LOCALE", None)
+            os.environ.pop("LC_ALL", None)
+            os.environ.pop("LC_MESSAGES", None)
+            self.assertEqual(hook.classify(self.IT_PROMPT), "prose_caveman")
+
+    def test_lang_en_us_is_english_only(self):
+        import os
+        env = {"LANG": "en_US.UTF-8"}
+        with unittest.mock.patch.dict(os.environ, env, clear=False):
+            os.environ.pop("HEWN_LOCALE", None)
+            os.environ.pop("LC_ALL", None)
+            os.environ.pop("LC_MESSAGES", None)
+            self.assertEqual(hook.classify(self.IT_PROMPT), "prose_caveman")
+
+    def test_lang_unshipped_locale_falls_back(self):
+        import os
+        # Japanese — no ja.py shipped
+        env = {"LANG": "ja_JP.UTF-8"}
+        with unittest.mock.patch.dict(os.environ, env, clear=False):
+            os.environ.pop("HEWN_LOCALE", None)
+            os.environ.pop("LC_ALL", None)
+            os.environ.pop("LC_MESSAGES", None)
+            self.assertEqual(hook.classify(self.IT_PROMPT), "prose_caveman")
+
+    def test_lc_all_overrides_lang(self):
+        import os
+        # LC_ALL=it wins over LANG=en
+        env = {"LC_ALL": "it_IT.UTF-8", "LANG": "en_US.UTF-8"}
+        with unittest.mock.patch.dict(os.environ, env, clear=False):
+            os.environ.pop("HEWN_LOCALE", None)
+            os.environ.pop("LC_MESSAGES", None)
+            self.assertEqual(hook.classify(self.IT_PROMPT), "ir")
 
 
 class BuildOutputTests(unittest.TestCase):
