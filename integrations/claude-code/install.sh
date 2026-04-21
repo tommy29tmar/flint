@@ -8,6 +8,7 @@
 #   - hewn CLI wrapper to ~/.local/bin/hewn
 #   - hewn_thinking_system_prompt.txt to ~/.claude/
 #   - hewn_drift_fixer.py UserPromptSubmit hook to ~/.claude/hooks/
+#   - locale pattern files (en/it/es/fr/de) to ~/.claude/hooks/locales/
 #
 # Refuses to run if ~/.claude is not present (i.e. Claude Code not installed).
 
@@ -42,7 +43,7 @@ fetch() {
   fi
 }
 
-mkdir -p "$BIN_DIR" "$CLAUDE_DIR/hooks"
+mkdir -p "$BIN_DIR" "$CLAUDE_DIR/hooks/locales"
 
 echo "==> Installing hewn CLI wrapper"
 fetch "bin/hewn" "$BIN_DIR/hewn"
@@ -54,6 +55,11 @@ fetch "hewn_thinking_system_prompt.txt" "$CLAUDE_DIR/hewn_thinking_system_prompt
 echo "==> Installing drift-fix hook"
 fetch "hooks/hewn_drift_fixer.py" "$CLAUDE_DIR/hooks/hewn_drift_fixer.py"
 chmod +x "$CLAUDE_DIR/hooks/hewn_drift_fixer.py"
+
+echo "==> Installing locale pattern files"
+for locale in en it es fr de; do
+  fetch "hooks/locales/${locale}.py" "$CLAUDE_DIR/hooks/locales/${locale}.py"
+done
 
 if ! echo ":$PATH:" | grep -q ":$BIN_DIR:"; then
   echo ""

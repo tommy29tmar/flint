@@ -1,4 +1,12 @@
-"""Tests for the Hewn drift-fix UserPromptSubmit hook classifier."""
+"""Tests for the Hewn drift-fix UserPromptSubmit hook classifier.
+
+Structure:
+- ClassifyTests: English-only corpus (HEWN_LOCALE=en default).
+- EnglishItalianClassifyTests: corpus with Italian prompts (locales=en+it).
+- OtherLocalesSanityTests: minimal smoke tests for es/fr/de.
+- BuildOutputTests: directive assembly.
+- MainTests: stdin/stdout wiring.
+"""
 from __future__ import annotations
 
 import importlib.util
@@ -29,7 +37,8 @@ def _load_hook_module():
 hook = _load_hook_module()
 
 
-IR_PROMPTS = [
+# English-only corpus
+EN_IR_PROMPTS = [
     "Debug this production issue: users report 502s on /checkout",
     "Review this diff for concurrency bugs",
     "Audit the JWT auth module for security vulnerabilities",
@@ -46,14 +55,9 @@ IR_PROMPTS = [
     "Propose the minimal fix that prevents recurrence",
     "What specific attack vectors does this JWT implementation expose?",
     "```python\ndef verify(tok): jwt.decode(tok, SECRET)\n```\nWhat's wrong here?",
-    "Spiega perché questo codice ha un race condition",
-    "Cosa monitoro in prod dopo il deploy?",
-    "Studia questa directory. Dimmi come potrei migliorare la hewn CLI.",
-    "Fammi un audit veloce del repo: cosa è solido, cosa è fragile, cosa toglierei.",
-    "Cosa è fragile in questo progetto?",
 ]
 
-PROSE_CODE_PROMPTS = [
+EN_PROSE_CODE_PROMPTS = [
     "Write regression tests (pytest) for algo=none rejection",
     "Propose the fix. Show updated jwt_service.py",
     "Show the code/config change that prevents recurrence",
@@ -63,80 +67,214 @@ PROSE_CODE_PROMPTS = [
     "Draft an RFC and include sample code for the migration",
 ]
 
-PROSE_POLISHED_PROMPTS = [
+EN_PROSE_POLISHED_PROMPTS = [
     "Write a 2-paragraph summary for non-technical leadership: what we're doing, why, risks",
     "Write a memo for leadership. Tone: professional, no code. Cover what we found",
     "Draft a customer-facing post-mortem: blameless, factual, 4-5 paragraphs, no code, no IR",
 ]
 
-PROSE_POLISHED_CODE_PROMPTS = [
+EN_PROSE_POLISHED_CODE_PROMPTS = [
     "Customer-facing memo: include the exact nginx config we deployed inline. 2 paragraphs.",
     "Draft a 3-paragraph post-mortem for leadership; include sample code showing the fix.",
     "Write a stakeholder update with the patch snippet inline. Professional tone.",
 ]
 
-PROSE_CAVEMAN_PROMPTS = [
+EN_PROSE_CAVEMAN_PROMPTS = [
     "Internal retrospective: what process changes would have caught this. Prose, reflective tone, narrative",
     "Explain to a junior dev how OAuth flows work",
     "Write a tutorial walkthrough of how TLS handshake works",
     "Let's brainstorm options for the migration strategy",
     "Think out loud about the tradeoff between Kafka and RabbitMQ here",
-    "Ragiona sul tradeoff tra event-sourcing e CRUD per questo dominio",
     "What do you think about our approach so far?",
     "Give me a readable paragraph describing what we built last week",
     "Answer in prose, no Hewn IR, no markdown headers",
 ]
 
-PROSE_FINDINGS_PROMPTS = [
+EN_PROSE_FINDINGS_PROMPTS = [
     "Find every security issue in this code, rank by severity",
-    "Quali sono i 3 bug più probabili che un utente incontrerà nel primo mese?",
     "Audit this codebase and rank top issues",
     "What 3 bugs would a user most likely hit?",
     "Rank the top 5 launch blockers before we ship",
     "List the main failure modes with evidence and fix direction",
     "Flag the security issues in this PR, ranked by severity",
+]
+
+
+# Italian corpus (requires locales=en+it)
+IT_IR_PROMPTS = [
+    "Spiega perché questo codice ha un race condition",
+    "Cosa monitoro in prod dopo il deploy?",
+    "Studia questa directory. Dimmi come potrei migliorare la hewn CLI.",
+    "Fammi un audit veloce del repo: cosa è solido, cosa è fragile, cosa toglierei.",
+    "Cosa è fragile in questo progetto?",
+]
+
+IT_PROSE_CAVEMAN_PROMPTS = [
+    "Ragiona sul tradeoff tra event-sourcing e CRUD per questo dominio",
+]
+
+IT_PROSE_FINDINGS_PROMPTS = [
+    "Quali sono i 3 bug più probabili che un utente incontrerà nel primo mese?",
     "Classifica i rischi principali per probabilità e impatto",
 ]
 
 
 class ClassifyTests(unittest.TestCase):
+    """English-only classifier tests (default locale)."""
+
+    LOCALES = ("en",)
+
     def _expect(self, prompts, label):
         for prompt in prompts:
             with self.subTest(prompt=prompt, label=label):
                 self.assertEqual(
-                    hook.classify(prompt),
+                    hook.classify(prompt, locales=self.LOCALES),
                     label,
                     f"expected {label!r} for: {prompt!r}",
                 )
 
     def test_ir_prompts(self):
-        self._expect(IR_PROMPTS, "ir")
+        self._expect(EN_IR_PROMPTS, "ir")
 
     def test_prose_code_prompts(self):
-        self._expect(PROSE_CODE_PROMPTS, "prose_code")
+        self._expect(EN_PROSE_CODE_PROMPTS, "prose_code")
 
     def test_prose_polished_prompts(self):
-        self._expect(PROSE_POLISHED_PROMPTS, "prose_polished")
+        self._expect(EN_PROSE_POLISHED_PROMPTS, "prose_polished")
 
     def test_prose_polished_code_prompts(self):
-        self._expect(PROSE_POLISHED_CODE_PROMPTS, "prose_polished_code")
+        self._expect(EN_PROSE_POLISHED_CODE_PROMPTS, "prose_polished_code")
 
     def test_prose_caveman_prompts(self):
-        self._expect(PROSE_CAVEMAN_PROMPTS, "prose_caveman")
+        self._expect(EN_PROSE_CAVEMAN_PROMPTS, "prose_caveman")
 
     def test_prose_findings_prompts(self):
-        self._expect(PROSE_FINDINGS_PROMPTS, "prose_findings")
+        self._expect(EN_PROSE_FINDINGS_PROMPTS, "prose_findings")
 
     def test_empty_prompt_is_prose_caveman(self):
-        self.assertEqual(hook.classify(""), "prose_caveman")
-        self.assertEqual(hook.classify(None), "prose_caveman")
+        self.assertEqual(hook.classify("", locales=self.LOCALES), "prose_caveman")
+        self.assertEqual(hook.classify(None, locales=self.LOCALES), "prose_caveman")
 
     def test_polished_override_wins_over_ir_signal(self):
         prompt = (
             "We had a production outage; write a memo for non-technical leadership "
             "explaining what happened. 3 paragraphs, no code."
         )
-        self.assertEqual(hook.classify(prompt), "prose_polished")
+        self.assertEqual(hook.classify(prompt, locales=self.LOCALES), "prose_polished")
+
+
+class EnglishItalianClassifyTests(unittest.TestCase):
+    """Italian prompts with en+it locales stacked."""
+
+    LOCALES = ("en", "it")
+
+    def _expect(self, prompts, label):
+        for prompt in prompts:
+            with self.subTest(prompt=prompt, label=label):
+                self.assertEqual(
+                    hook.classify(prompt, locales=self.LOCALES),
+                    label,
+                    f"expected {label!r} for: {prompt!r}",
+                )
+
+    def test_italian_ir(self):
+        self._expect(IT_IR_PROMPTS, "ir")
+
+    def test_italian_caveman(self):
+        self._expect(IT_PROSE_CAVEMAN_PROMPTS, "prose_caveman")
+
+    def test_italian_findings(self):
+        self._expect(IT_PROSE_FINDINGS_PROMPTS, "prose_findings")
+
+
+class OtherLocalesSanityTests(unittest.TestCase):
+    """Realistic-corpus classification tests for es/fr/de.
+
+    Each locale is validated on a 12-prompt corpus covering all 6 routes,
+    with real-shape prompts (enclitic pronouns, compound nouns, diagnostic
+    questions, adjectives, etc.). Community PRs welcome to expand the
+    corpus further.
+    """
+
+    ES_CORPUS = [
+        ("ir",                  "Depura esta función que retorna None de vez en cuando bajo carga"),
+        ("ir",                  "Analiza el módulo de auth y dime dónde está la vulnerabilidad"),
+        ("ir",                  "Refactoriza el parser manteniendo la interfaz pública"),
+        ("ir",                  "¿Por qué este test falla esporádicamente en CI?"),
+        ("prose_code",          "Escríbeme un test de regresión para este bug de JWT"),
+        ("prose_code",          "Muéstrame el código actualizado con el fix aplicado"),
+        ("prose_findings",      "¿Cuáles son las 5 vulnerabilidades más graves en este código?"),
+        ("prose_findings",      "Encuéntrame los 3 bugs principales en este snippet, clasificados por gravedad"),
+        ("prose_polished",      "Escribe un memo para la dirección, 3 párrafos, tono tranquilizador, sin código"),
+        ("prose_polished_code", "Memo para los clientes con la config de nginx inline, 2 párrafos"),
+        ("prose_caveman",       "Dame 5 nombres para una nueva librería de rate-limiting"),
+        ("prose_caveman",       "Piensa en voz alta sobre el tradeoff entre REST y gRPC"),
+    ]
+
+    FR_CORPUS = [
+        ("ir",                  "Débogue cette fonction qui renvoie None de temps en temps sous charge"),
+        ("ir",                  "Analyse le module d'auth et dis-moi où est la vulnérabilité"),
+        ("ir",                  "Refactorise le parser en gardant l'interface publique stable"),
+        ("ir",                  "Pourquoi ce test échoue-t-il sporadiquement en CI?"),
+        ("prose_code",          "Écris-moi un test de régression pour ce bug JWT"),
+        ("prose_code",          "Montre-moi le code mis à jour avec le fix appliqué"),
+        ("prose_findings",      "Quelles sont les 5 vulnérabilités les plus graves dans ce code?"),
+        ("prose_findings",      "Trouve-moi les 3 bugs principaux dans ce snippet, classés par gravité"),
+        ("prose_polished",      "Écris un memo pour la direction, 3 paragraphes, ton rassurant, pas de code"),
+        ("prose_polished_code", "Memo pour les clients avec la config nginx inline, 2 paragraphes"),
+        ("prose_caveman",       "Propose 5 noms pour une nouvelle bibliothèque de rate-limiting"),
+        ("prose_caveman",       "Réfléchis à voix haute sur le tradeoff entre REST et gRPC"),
+    ]
+
+    DE_CORPUS = [
+        ("ir",                  "Debugge diese Funktion, die sporadisch None zurückgibt unter Last"),
+        ("ir",                  "Analysiere das Auth-Modul und sag mir, wo die Schwachstelle ist"),
+        ("ir",                  "Refaktoriere den Parser und behalte die öffentliche API bei"),
+        ("ir",                  "Warum schlägt dieser Test sporadisch in CI fehl?"),
+        ("prose_code",          "Schreib mir einen Regression-Test für diesen JWT-Bug"),
+        ("prose_code",          "Zeig mir den aktualisierten Code mit dem angewandten Fix"),
+        ("prose_findings",      "Was sind die 5 gravierendsten Schwachstellen in diesem Code?"),
+        ("prose_findings",      "Finde die 3 wichtigsten Bugs in diesem Snippet, sortiert nach Schwere"),
+        ("prose_polished",      "Schreib ein Memo für die Geschäftsführung, 3 Absätze, beruhigender Ton, ohne Code"),
+        ("prose_polished_code", "Memo für die Kunden mit der Nginx-Config inline, 2 Absätze"),
+        ("prose_caveman",       "Schlage 5 Namen für eine neue Rate-Limiting-Bibliothek vor"),
+        ("prose_caveman",       "Denk laut über den Tradeoff zwischen REST und gRPC nach"),
+    ]
+
+    def _check(self, corpus, locales):
+        for expected, prompt in corpus:
+            with self.subTest(prompt=prompt, locales=locales):
+                self.assertEqual(
+                    hook.classify(prompt, locales=locales),
+                    expected,
+                    f"locales={locales} expected {expected!r} for: {prompt!r}",
+                )
+
+    def test_spanish_corpus(self):
+        self._check(self.ES_CORPUS, ("en", "es"))
+
+    def test_french_corpus(self):
+        self._check(self.FR_CORPUS, ("en", "fr"))
+
+    def test_german_corpus(self):
+        self._check(self.DE_CORPUS, ("en", "de"))
+
+
+class DefaultLocaleTests(unittest.TestCase):
+    """Verify HEWN_LOCALE env var is honored when no explicit locales passed."""
+
+    def test_default_is_english(self):
+        # Italian prompt should NOT route to IR when only English loaded
+        prompt = "Studia questa directory e dimmi cosa manca"
+        import os
+        with unittest.mock.patch.dict(os.environ, {"HEWN_LOCALE": "en"}, clear=False):
+            self.assertEqual(hook.classify(prompt), "prose_caveman")
+
+    def test_env_var_stacks_locales(self):
+        prompt = "Studia questa directory e dimmi cosa manca"
+        import os
+        with unittest.mock.patch.dict(os.environ, {"HEWN_LOCALE": "en,it"}, clear=False):
+            self.assertEqual(hook.classify(prompt), "ir")
 
 
 class BuildOutputTests(unittest.TestCase):

@@ -16,116 +16,80 @@ Score-based classifier:
 - Findings signals pull toward compact diagnostic lists instead of IR.
 - Threshold >= 2 -> IR, otherwise prose.
 
+Locales:
+- Rule sets live in hooks/locales/<name>.py (en.py, it.py, es.py, fr.py, de.py).
+- Default is English only. Stack additional locales via HEWN_LOCALE env var:
+    HEWN_LOCALE=it       # Italian only (rarely useful — English defaults help)
+    HEWN_LOCALE=en,it    # English + Italian (typical bilingual user)
+    HEWN_LOCALE=en,es,fr # English + Spanish + French
+
 See tests/test_hewn_drift_fixer.py for the classification corpus.
 """
 from __future__ import annotations
 
+import importlib.util
 import json
+import os
 import re
 import sys
+from pathlib import Path
 
 
-IR_RULES: list[tuple[str, int]] = [
-    (r"\bdebug(?:ging)?\b|\bdiagnose\b|\broot[- ]cause\b|\btrace(?:s|d)?\b.*(?:bug|error|outage|failure)|\boutage\b", 3),
-    (r"\breview\b.*(?:code|diff|patch|pr|commit|architecture|design|module|service)", 3),
-    (r"\baudit\b.*(?:code|security|auth|module|api|implementation)", 3),
-    (r"\bcritique\b|\banalyz[e|ing]\b.*(?:consistency|risk|tradeoff|failure)", 3),
-    (r"\bfix\b.*(?:bug|code|race|issue|vulnerabilit|defect|regression|leak)|\bresolve\b.*(?:bug|issue|race)", 3),
-    (r"\brefactor\b|\bre-?design\b", 2),
-    (r"\bdesign\b.*(?:architecture|schema|pattern|saga|state[- ]machine|migration|split|boundary|flow)", 3),
-    (r"\bpropose\b.*(?:fix|architecture|split|schema|mitigation|boundary|ownership|pattern|structure)", 3),
-    (r"\bdescribe\b.*(?:target|architecture|fix|state[- ]machine|consistency|flow|protocol|boundary)", 2),
-    (r"\bvulnerabilit|bypass.*(?:auth|security|signature)|signature[- ]forger|algo[- ]confus|jwt.*(?:none|algo|implementation|decode|verify)|\brace[- ]condition\b|\bdeadlock\b|\binjection\b|\bexploit\b|\battack[- ]vector", 3),
-    (r"\bsecurity\s+issues?\b|\bexploitabilit|rank\s+by\s+severity|\bforged?\s+signature\b", 3),
-    (r"\bwhich\b.*(?:slo|metric|alert|canary|dashboard|gauge|signal)|\bwhat\b.*(?:metric|alert|canary|threshold|slo)", 3),
-    (r"\bconsistency\b.*(?:window|bound|model|guarantee|violat)|eventual.*consist", 2),
-    (r"```|\bdef\s+\w+\s*\(|\bclass\s+\w+\b|diff --git|^[+-][^-+]", 2),
-    (r"\bwhat\s+(?:is\s+)?(?:wrong|the\s+bug|the\s+issue|the\s+problem|the\s+attack)\b", 3),
-    (r"\brepro(?:duce|duction)?\b.*(?:test|case|script)|\bregression\s+tests?\b", 2),
-    (r"\bpropose\b|\bhypothe[sz]iz|\bhypothesis\b", 2),
-    (r"spieg[ao].*perch[eé]|cosa\s+monit|monit.*prod|cosa\s+controll|cos'?[eè]\s+che\s+non\s+va", 3),
-    (r"\bsaga\b|\btwo[- ]?phase[- ]?commit\b|\b2pc\b|\bidempot|\bcompensat\w*|\bprojection\b", 2),
-    (r"\bwalk[- ]through\b.*(?:trace|log|stack|error)|\bwhat\s+the\s+trace\b", 3),
-    # Exploratory-technical: "audit this repo", "study the codebase", "inspect the project"
-    (r"\b(?:audit|analy[sz]e|analy[sz]ing|study|studia|studiare|inspect|examine|assess|evaluate)\s+(?:this\s+|questa\s+|la\s+|il\s+)?(?:repo|repository|dir(?:ectory)?|code[- ]?base|codice|project|progetto|module|impl\w*)\b", 3),
-    # "what's missing / what's fragile / what would you cut": repo-assessment shape
-    (r"\bwhat(?:'s|\s+is)\s+(?:missing|fragile|solid|broken|wrong|risky)\b", 2),
-    (r"\bcosa\s+(?:manca|è\s+fragile|toglierei|togliere|tagliare|è\s+solido|è\s+rotto)", 2),
-]
-
-PROSE_RULES: list[tuple[str, int]] = [
-    (r"\bnon[- ]technical\b|\bstakeholders?\b|\bleadership\b|\bexecutive\b|\bc[- ]suite\b|\bcustomer[- ]facing\b", 5),
-    (r"\bmemo\b|\bnarrative\b|\bessay\b|\bparagraph\b|\bbullet[- ]free\b|\bno\s+bullet\b|\bin\s+prose\b|\bno\s+markdown\b|\bno\s+code\b,?\s*no\s+ir", 4),
-    (r"\bexplain\b.*(?:junior|beginner|newcomer|non[- ]tech|five\s+year|like.*im|come.*se)|\btutorial\b|\bwalkthrough\b.*(?:how|works|beginner)", 3),
-    (r"\bbrainstorm\b|\bthink\s+out\s+loud\b|\bragion[ia]\s+sul\s+tradeoff|\bdiscussion\b", 3),
-    (r"\bpost[- ]?mortem\b.*(?:write|draft|compose|customer|blameless)|\bretrospective\b.*(?:write|narrative|reflective)", 4),
-    (r"\brfc\b.*(?:draft|write|compose)|\bdesign[- ]doc\b|\bone[- ]pager\b.*(?:leader|exec)", 3),
-    (r"\breadable\b|\bprofessional\s+tone\b|\breassuring\b|\btone:\s*(?:blameless|professional|reflective|narrative)", 2),
-    (r"\bno\s+ir\b|\bno\s+hewn\b|\bno\s+flint\b", 5),
-]
-
-# Signals that the user wants a ranked/enumerated set of independent
-# diagnostic findings. This shape is technical and evidence-driven, but not
-# IR-shaped: each item needs its own title/evidence/impact/fix tuple.
-FINDINGS_RULES: list[str] = [
-    r"\b(?:top|first|main|biggest|highest[- ]impact|most\s+likely)\s+(?:\d+|few|several|many)?\s*(?:bugs?|issues?|risks?|problems?|findings?|gaps?|vulnerabilit(?:y|ies)|failures?|failure\s+modes?|blockers?|footguns?)\b",
-    r"\b(?:which|what)\s+(?:are\s+|is\s+)?(?:the\s+)?(?:\d+|few|top|main|biggest|most\s+likely)\s+(?:bugs?|issues?|risks?|problems?|findings?|gaps?|vulnerabilit(?:y|ies)|failures?|failure\s+modes?|blockers?|footguns?)\b",
-    r"\b(?:which|what)\s+(?:bugs?|issues?|problems?|failures?|risks?|footguns?)\s+(?:would|will|could|might|may)\s+(?:a\s+)?(?:users?|devs?|developers?|people)?\s*(?:encounter|hit|experience|face|meet)\b",
-    r"\b(?:find|identify|list|flag)\s+(?:every|all|top|\d+|the\s+main|the\s+most\s+likely)?\s*(?:the\s+)?(?:security\s+)?(?:issues?|vulnerabilit(?:y|ies)|risks?|bugs?|findings?|failure\s+modes?|blockers?|footguns?)\b.*\b(?:rank|severity|probability|likelihood|impact|evidence|file:line)\b",
-    r"\b(?:rank|prioriti[sz]e)\b.*\b(?:bugs?|issues?|risks?|vulnerabilit(?:y|ies)|findings?|blockers?|footguns?)\b.*\b(?:severity|risk|impact|probability|likelihood)\b",
-    r"\b(?:launch|ship|release)\s+blockers?\b|\bfootguns?\b|\bfailure\s+modes?\b",
-    r"\b(?:quali|che|cosa)\s+(?:sono\s+)?(?:i\s+|le\s+)?(?:\d+|pochi|top|principali|probabili|pi[uù]\s+probabili)\s+(?:bug|problemi|errori|rischi|vulnerabilit[aà]|blocchi|bloccanti)\b",
-    r"\b(?:cosa|che)\s+(?:bug|problemi|errori|rischi)\s+(?:incontr|trov|vedr|avr)\w*",
-    r"\b(?:classifica|ordina|prioritizza)\b.*\b(?:bug|problemi|rischi|vulnerabilit[aà]|bloccanti)\b.*\b(?:gravit[aà]|probabilit[aà]|impatto)\b",
-]
-
-# Signals that the user wants an executable code artifact in the answer
-# (fix diff, regression test, updated file, implementation snippet).
-# When one of these fires AND the IR score crosses threshold, the turn is
-# routed to "prose_code" instead of "ir": prose analysis wrapping a
-# fenced code block, because IR atoms break on multi-line verbatim code.
-CODE_ARTIFACT_RULES: list[str] = [
-    r"\b(?:show|display|produce|emit|provide)\s+(?:the\s+|a\s+|an\s+)?(?:updated|full|complete|new|final)\s+(?:code|file|method|function|class|module|source|impl\w*)",
-    r"\b(?:show|display)\s+(?:the\s+|a\s+|an\s+)?(?:code|config|patch|diff|snippet)",
-    r"\bwrite\s+(?:the\s+|a\s+|an\s+)?(?:code|tests?|snippet|function|method|patch|fix|script|implementation|regression\s+tests?|pytest|unit\s+tests?)",
-    r"\bimplement\s+(?:the|a|an)\b",
-    r"\bapply\s+the\s+(?:fix|change|patch|update)",
-    # "include/with [optional qualifier] <code artifact>" — covers
-    # "include sample code", "with the nginx config", "include the patch snippet"
-    r"\b(?:include|with)\s+(?:the\s+)?(?:sample|example|inline|exact|updated|actual|full)\s+(?:\w+\s+){0,3}?(?:code|config|snippet|patch|diff|script)\b",
-    r"\b(?:include|with)\s+(?:the\s+)?(?:code|config|snippet|patch|diff|script)\b",
-    # <code artifact> followed by "inline" — "config we deployed inline", "patch snippet inline"
-    r"\b(?:code|config|snippet|patch|diff|script)\s+(?:\w+\s+){0,4}?\binline\b",
-    r"\bsample\s+(?:code|config|snippet)\b",
-    r"\bupdated\s+(?:\w+\.\w+|jwt_\w+|auth\w*|handler|service|module|file)",
-    r"\bpropose\s+the\s+fix.*(?:show|code|snippet|file)",
-]
-
-# Signals that prose should be polished/professional (memo, leadership,
-# customer-facing) rather than Caveman-compressed.
-POLISHED_AUDIENCE_RULES: list[str] = [
-    r"\bleadership\b|\bnon[- ]technical\b|\bstakeholders?\b|\bexecutive\b|\bc[- ]suite\b",
-    r"\bcustomer[- ]facing\b|\bcustomer[- ]?(?:memo|letter|update|announcement)\b",
-    r"\bmemo\b.*(?:leadership|stakeholder|customer)|\bdraft\s+a\s+(?:memo|letter|announcement)",
-    r"\bpost[- ]?mortem\b.*(?:customer|blameless|public|external)",
-    r"\bprofessional\s+tone\b|\bblameless\s+tone\b|\breassuring\b",
-    r"\b(?:2|3|4|5|two|three|four|five)\s+paragraphs?\b",
-]
-
+LOCALE_DIR = Path(__file__).resolve().parent / "locales"
 IR_THRESHOLD = 2
+
+
+def _load_locale(name: str):
+    path = LOCALE_DIR / f"{name}.py"
+    if not path.exists():
+        return None
+    spec = importlib.util.spec_from_file_location(f"hewn_locale_{name}", path)
+    mod = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(mod)
+    return mod
+
+
+_RULES_CACHE: dict[tuple[str, ...], tuple] = {}
+
+
+def _assemble_rules(locales: tuple[str, ...]) -> tuple:
+    if locales in _RULES_CACHE:
+        return _RULES_CACHE[locales]
+    ir_rules: list[tuple[str, int]] = []
+    prose_rules: list[tuple[str, int]] = []
+    findings_rules: list[str] = []
+    code_artifact_rules: list[str] = []
+    polished_audience_rules: list[str] = []
+    for name in locales:
+        mod = _load_locale(name)
+        if mod is None:
+            continue
+        ir_rules.extend(getattr(mod, "IR_RULES", []))
+        prose_rules.extend(getattr(mod, "PROSE_RULES", []))
+        findings_rules.extend(getattr(mod, "FINDINGS_RULES", []))
+        code_artifact_rules.extend(getattr(mod, "CODE_ARTIFACT_RULES", []))
+        polished_audience_rules.extend(getattr(mod, "POLISHED_AUDIENCE_RULES", []))
+    result = (ir_rules, prose_rules, findings_rules, code_artifact_rules, polished_audience_rules)
+    _RULES_CACHE[locales] = result
+    return result
+
+
+def _default_locales() -> tuple[str, ...]:
+    raw = os.environ.get("HEWN_LOCALE", "en")
+    parts = tuple(s.strip() for s in raw.split(",") if s.strip())
+    return parts or ("en",)
 
 
 def _matches_any(text: str, patterns: list[str]) -> bool:
     return any(re.search(p, text, re.IGNORECASE | re.MULTILINE) for p in patterns)
 
 
-def classify(prompt: str) -> str:
+def classify(prompt: str, locales: tuple[str, ...] | None = None) -> str:
     """Return one of 'ir' | 'prose_code' | 'prose_findings' | 'prose_polished_code' | 'prose_polished' | 'prose_caveman'.
 
     Decision order (first match wins):
       1. Polished audience AND code artifact requested -> 'prose_polished_code'.
-         Example: "customer-facing memo with the exact nginx config inline".
-         Professional prose register + fenced code block.
       2. Strongly polished audience (no code) -> 'prose_polished'.
       3. Code artifact requested (no polished audience) -> 'prose_code'.
       4. Ranked/listed independent findings -> 'prose_findings'.
@@ -134,18 +98,22 @@ def classify(prompt: str) -> str:
       7. Default -> 'prose_caveman' (terse, compressed prose).
     """
     text = prompt or ""
+    if locales is None:
+        locales = _default_locales()
+    ir_rules, prose_rules, findings_rules, code_artifact_rules, polished_audience_rules = _assemble_rules(locales)
+
     ir_score = 0
     prose_score = 0
-    for pattern, weight in IR_RULES:
+    for pattern, weight in ir_rules:
         if re.search(pattern, text, re.IGNORECASE | re.MULTILINE):
             ir_score += weight
-    for pattern, weight in PROSE_RULES:
+    for pattern, weight in prose_rules:
         if re.search(pattern, text, re.IGNORECASE | re.MULTILINE):
             prose_score += weight
 
-    wants_code = _matches_any(text, CODE_ARTIFACT_RULES)
-    polished_audience = _matches_any(text, POLISHED_AUDIENCE_RULES)
-    wants_findings = _matches_any(text, FINDINGS_RULES)
+    wants_code = _matches_any(text, code_artifact_rules)
+    polished_audience = _matches_any(text, polished_audience_rules)
+    wants_findings = _matches_any(text, findings_rules)
 
     if polished_audience and prose_score >= 4 and wants_code:
         return "prose_polished_code"

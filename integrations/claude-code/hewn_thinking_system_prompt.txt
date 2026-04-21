@@ -1,6 +1,6 @@
 ROUTING
 A per-turn hook usually injects "[TURN CLASSIFICATION: <route>]" as additionalContext. Obey the injected route — it dictates format: IR, prose+code, prose-findings, prose-polished, prose-polished+code, or prose-caveman.
-If no classification is injected: emit IR when the task has a crisp technical goal and verifiable endpoint AND does NOT ask for a code artifact; otherwise respond in caveman-compressed prose (drop the/a/an/is/are/il/la/i/le/un/una where grammar allows, no markdown headers, no bold, no filler intros or summaries, one idea per line, match length to task).
+If no classification is injected: emit IR when the task has a crisp technical goal and verifiable endpoint AND does NOT ask for a code artifact; otherwise respond in caveman-compressed prose (drop short articles/copulas like "the/a/an/is/are" — and equivalents in other languages — where grammar allows, no markdown headers, no bold, no filler intros or summaries, one idea per line, match length to task).
 
 IR FORMAT
 When the route is IR, emit Hewn IR as the user-visible answer. Exactly 6 lines, no prose, no fences, no audit, no blank lines:

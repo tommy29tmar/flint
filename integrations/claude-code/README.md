@@ -28,11 +28,29 @@ Any flag accepted by `claude` is forwarded: `hewn --model claude-opus-4-7 -p "�
 
 The default `claude` command is untouched.
 
+## Locales
+
+The classifier ships with English patterns by default. Other languages
+are opt-in via the `HEWN_LOCALE` environment variable (comma-separated):
+
+```bash
+HEWN_LOCALE=en          # default — English only
+HEWN_LOCALE=en,it       # English + Italian
+HEWN_LOCALE=en,es,fr    # English + Spanish + French
+HEWN_LOCALE=en,de       # English + German
+```
+
+Shipped locales: `en`, `it`, `es`, `fr`, `de`. `en` and `it` are
+validated against real prompt corpora; `es`/`fr`/`de` are synthesized
+1:1 from the Italian patterns and await community curation — PRs with
+real-prompt evidence welcome at `hooks/locales/<code>.py`.
+
 ## Files installed
 
 - `~/.local/bin/hewn` — the wrapper
 - `~/.claude/hewn_thinking_system_prompt.txt` — the system prompt
 - `~/.claude/hooks/hewn_drift_fixer.py` — the UserPromptSubmit hook
+- `~/.claude/hooks/locales/{en,it,es,fr,de}.py` — locale patterns
 
 ## Uninstall
 
@@ -40,4 +58,5 @@ The default `claude` command is untouched.
 rm -f ~/.local/bin/hewn \
       ~/.claude/hewn_thinking_system_prompt.txt \
       ~/.claude/hooks/hewn_drift_fixer.py
+rm -rf ~/.claude/hooks/locales
 ```
