@@ -85,9 +85,9 @@ FINDINGS_RULES: list[str] = [
 # routed to "prose_code" instead of "ir": prose analysis wrapping a
 # fenced code block, because IR atoms break on multi-line verbatim code.
 CODE_ARTIFACT_RULES: list[str] = [
-    r"\b(?:show|display|produce|emit|provide)\s+(?:the\s+)?(?:updated|full|complete|new|final)\s+(?:code|file|method|function|class|module|source|impl\w*)",
-    r"\b(?:show|display)\s+(?:the\s+)?(?:code|config|patch|diff|snippet)",
-    r"\bwrite\s+(?:the\s+)?(?:code|tests?|snippet|function|method|patch|fix|script|implementation|regression\s+tests?|pytest|unit\s+tests?)",
+    r"\b(?:show|display|produce|emit|provide)\s+(?:the\s+|a\s+|an\s+)?(?:updated|full|complete|new|final)\s+(?:code|file|method|function|class|module|source|impl\w*)",
+    r"\b(?:show|display)\s+(?:the\s+|a\s+|an\s+)?(?:code|config|patch|diff|snippet)",
+    r"\bwrite\s+(?:the\s+|a\s+|an\s+)?(?:code|tests?|snippet|function|method|patch|fix|script|implementation|regression\s+tests?|pytest|unit\s+tests?)",
     r"\bimplement\s+(?:the|a|an)\b",
     r"\bapply\s+the\s+(?:fix|change|patch|update)",
     # "include/with [optional qualifier] <code artifact>" — covers
@@ -167,7 +167,10 @@ IR_DIRECTIVE = (
     "and verifiable endpoint. Respond in Hewn IR: emit '@hewn v0 hybrid' "
     "+ G/C/P/V/A clauses as free text. Do NOT respond in prose for this "
     "turn. Keep atoms in lowercase_snake_case or call form f(\"x\") or "
-    "quoted literals. No code blocks inside atoms."
+    "quoted literals. NEVER use suffix form like evaluates_to_\"6\" or "
+    "fix_expected_to_\"7\" (underscore immediately before a quote) — use "
+    "call form evaluates_to(\"6\") or rename the concept "
+    "(evaluates_to_six). No code blocks inside atoms."
 )
 
 PROSE_CODE_DIRECTIVE = (

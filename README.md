@@ -1,20 +1,37 @@
 # Hewn
 
-**Claude Code wrapper that routes every turn to a compact answer shape.**
+why burn many token when few do job
 
-Hewn is a small `bash` wrapper around `claude` that does two things:
+**Claude talks too much. Hewn makes it get to the point.**
 
-1. Appends a thinking-mode **system prompt** that routes each user turn to one
-   of six answer shapes (IR, prose+code, prose-findings, prose-polished,
-   prose-polished+code, prose-caveman) based on task structure.
-2. Registers a per-turn **drift-fix hook** that classifies every prompt and
-   re-injects the routing directive as `additionalContext`, preventing the
-   T2+ drift observed when the system prompt alone does the routing.
+No proxy. No telemetry. Default `claude` untouched.
 
-The result: shorter, more structured answers on technical work, unchanged
-prose on writing tasks, and consistent behavior across a multi-turn session.
+```text
+VERBOSE CLAUDE   736 output tokens
+CAVEMAN          423 output tokens
+HEWN             186 output tokens
+```
 
-The default `claude` binary is untouched. Hewn is an opt-in separate command.
+Same useful answer. Less token burn.
+
+And unlike simple voice-compression prompts, Hewn is designed to keep more of
+the useful context in the answer.
+
+## Before / After
+
+Normal Claude:
+
+> The issue is likely caused by the authentication middleware not correctly
+> validating token expiry. You should check whether the comparison allows an
+> already-expired token through, then add a regression test around the boundary
+> condition to make sure this does not happen again.
+
+Hewn:
+
+> Auth expiry check likely off by one. Fix boundary compare. Add regression
+> test for expired token.
+
+**Same point. Fewer words. Brain still on.**
 
 ## Install
 
@@ -22,65 +39,93 @@ The default `claude` binary is untouched. Hewn is an opt-in separate command.
 curl -fsSL https://raw.githubusercontent.com/tommy29tmar/hewn/main/integrations/claude-code/install.sh | bash
 ```
 
-Requires: Claude Code already installed (`~/.claude` must exist) and
-`~/.local/bin` on `$PATH`.
-
-## Usage
+## Use
 
 ```bash
-hewn                     # interactive session
-hewn -p "your prompt"    # non-interactive
+hewn
+hewn -p "your prompt"
 ```
 
-Any flag accepted by `claude` is forwarded.
-
-## What gets installed
-
-- `~/.local/bin/hewn` — the wrapper
-- `~/.claude/hewn_thinking_system_prompt.txt` — the routing prompt
-- `~/.claude/hooks/hewn_drift_fixer.py` — the UserPromptSubmit classifier
-  (pure Python stdlib, runs in <10ms)
-
-At runtime the wrapper generates a short temp `--settings` JSON that points
-Claude Code's hook dispatcher at the classifier.
-
-## The six routes
-
-| Shape | When | Output |
-|---|---|---|
-| **IR** | crisp technical goal + verifiable endpoint, no code artifact asked | six-line `@hewn v0 hybrid` / G / C / P / V / A |
-| **prose+code** | technical goal + asks for code, test, patch, snippet | terse analysis + fenced code |
-| **prose-findings** | ranked/listed independent findings (bugs, risks, vulns) | numbered list with evidence per item |
-| **prose-polished** | leadership / customer / stakeholder audience, no code | professional readable prose |
-| **prose-polished+code** | polished audience + inline code, config, snippet, or patch | professional prose + fenced code |
-| **prose-caveman** | chat, brainstorm, tutorial, quick explanation | terse compressed prose |
-
-The classifier is a score-based regex match over the user prompt. See
-`integrations/claude-code/hooks/hewn_drift_fixer.py` for the rules.
-
-## Upgrading from Flint
-
-Hewn is the hard-cutover continuation of the earlier Flint project. If you
-previously installed Flint, clean up legacy files before re-installing:
+Want normal Claude again?
 
 ```bash
-rm -rf \
-  ~/.claude/skills/flint ~/.claude/skills/flint-on \
-  ~/.claude/skills/flint-off ~/.claude/skills/flint-audit \
-  ~/.claude/output-styles/flint.md ~/.claude/output-styles/flint-thinking.md \
-  ~/.claude/output-styles/hewn.md ~/.claude/output-styles/hewn-thinking.md \
-  ~/.claude/flint_thinking_system_prompt.txt \
-  ~/.claude/flint_thinking_mcp_system_prompt.txt \
-  ~/.claude/flint_system_prompt.txt \
-  ~/.claude/flint-drift-fix-settings.json \
-  ~/.claude/flint-mcp-config.json \
-  ~/.claude/hooks/flint_drift_fixer.py
-rm -f ~/.local/bin/flint ~/.local/bin/flint-mcp \
-      ~/.local/bin/hewn-mcp ~/.local/bin/cccaveman
+claude
 ```
 
-The MCP server, Python parser/audit CLI, skills, and output styles from the
-Flint era are no longer part of the project. Git history preserves them.
+Hewn is a separate command. It never replaces `claude`.
+
+## What It Does
+
+- Cuts filler.
+- Keeps answers tight.
+- Uses compact structure when structure saves more.
+- Keeps polished prose when you ask for polished prose.
+- Works inside Claude Code with one wrapper command.
+
+## Why Not Just Caveman?
+
+Caveman makes Claude talk shorter.
+
+Hewn makes Claude waste less while keeping more context.
+
+On the current Opus 4.7 launch bench:
+
+| Mode | Output tokens | Latency | Concepts covered |
+| --- | ---: | ---: | ---: |
+| Verbose Claude | 736 | 15s | 86% |
+| Caveman | 423 | 9s | 84% |
+| **Hewn** | **186** | **5s** | **95%** |
+
+Bench shape: 10 long-context tasks x 4 runs, prompt cache on. "Concepts
+covered" means required points from the prompt were still present in the
+answer.
+
+Caveman compresses voice. Hewn compresses the answer: fewer tokens, more of
+the required context preserved.
+
+## Best For
+
+- Claude Code sessions
+- Opus 4.7 token burn
+- Long prompts
+- Debugging
+- Reviews
+- Planning
+- Anything where Claude starts writing a wall of text
+
+If you want expansive creative writing, use normal `claude`.
+
+## What Gets Installed
+
+- `~/.local/bin/hewn`
+- `~/.claude/hewn_thinking_system_prompt.txt`
+- `~/.claude/hooks/hewn_drift_fixer.py`
+
+That is it.
+
+## Under The Hood
+
+Hewn wraps:
+
+```bash
+claude --append-system-prompt <hewn prompt> --settings <temp hook config>
+```
+
+The prompt keeps Claude terse. The hook re-injects the right answer shape every
+turn so long sessions do not drift back into bloated prose.
+
+Technical tasks may route into a tiny IR:
+
+```text
+@hewn v0 hybrid
+G: goal
+C: constraints
+P: plan
+V: verify
+A: action
+```
+
+Most users do not need to care. Run `hewn`; Claude gets shorter.
 
 ## Uninstall
 
@@ -92,4 +137,4 @@ rm -f ~/.local/bin/hewn \
 
 ## License
 
-MIT. See [LICENSE](LICENSE) and [CITATION.cff](CITATION.cff).
+MIT. See [LICENSE](LICENSE).
