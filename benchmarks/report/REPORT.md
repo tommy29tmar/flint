@@ -1,5 +1,74 @@
 # Hewn vs Verbose Claude vs Caveman — benchmark report
 
+## TL;DR
+
+Hewn is a Claude Code wrapper that routes each turn between Hewn IR
+(compact technical atoms), prose-caveman (drop-articles prose for Q&A
+and explanations), and micro-prose (terse diagnostic for vibe/non-tech
+turns). A local-Python classifier hook re-injects the chosen route
+every turn so the wrapper does not drift into verbose prose over long
+sessions.
+
+We benchmarked Hewn vs verbose Claude vs Caveman on 518 `claude -p`
+calls (no API billing — OAuth subscription) across 7 tracks spanning
+strict Caveman parity, short Q&A, vibe prompts, long-context reviews,
+multi-turn sessions and adversarial polished-prose tasks. Caveman's
+`SKILL.md` is vendored under `caveman_source/` at a pinned commit
+(sha256 recorded in metadata). Concept coverage and readability are
+measured by LLM-as-judge with hardcoded rubrics.
+
+**Where Hewn wins:**
+- **Short technical Q&A (T1b, 10 prompts × 3 runs)** — Hewn 149 mean
+  output tokens vs Caveman 166 vs baseline 348. Concept coverage
+  within 4pp of Caveman (91% vs 95%). Hewn beats Caveman on tokens
+  with comparable quality.
+- **Multi-turn (T4, 2 sequences × 5 turns × 2 runs)** — Hewn's hook
+  delivers its promise: hewn_full cumulative 2838 mean tokens vs
+  Caveman 4226 (~33% less) at **100% concept coverage under a
+  transcript-aware judge** (tied with Caveman and baseline). The
+  per-turn judge underrated Hewn because Hewn correctly avoids
+  repeating already-established facts; a fair evaluator that scores
+  the whole conversation closes the gap entirely.
+- **Long-context IR-shaped tasks (T3 `rate-limit-xff-review`)** —
+  39% concept coverage vs Caveman 5% and baseline 5%. Hewn
+  understands compact IR-style task framing; other arms reply "no task
+  specified" to the same prompt.
+
+**Where Hewn trades:**
+- **Non-tech vibe prompts (T2)** — Hewn 60 mean tokens vs Caveman
+  194 (~3x more compressed) at 63% concept coverage vs Caveman 78%.
+  Hewn is agent-mode (ask before guessing); Caveman is tutorial-mode
+  (enumerate options). Different use cases; design trade-off preserved.
+- **Adversarial polished prose (T5)** — all arms including Hewn
+  produce near-stub responses (~0% rubric concepts across the board);
+  every arm partially refuses the marketing/apology tasks without
+  more context. No Hewn advantage claimed.
+
+**Methodology guarantees:**
+- Model pinned to full ID `claude-opus-4-7`; every call asserts
+  `modelUsage["claude-opus-4-7"].outputTokens == usage.output_tokens`.
+- Caveman parity track (T1a) replicates their `evals/llm_run.py`
+  exactly: 1 run, 3 arms, tiktoken `o200k_base`. Result: 59% median
+  token savings vs terse (matches their published ~60% claim).
+- Append-vs-replace asymmetry calibrated in T0 on short_en (10
+  prompts × 1 run × terse, terse_appended, caveman_full,
+  caveman_full_appended).
+- Arm order randomized per (prompt, run) via factoradic Lehmer code
+  seeded by sha256 — reproducible across Python versions/machines.
+- Multi-turn (T4) uses explicit `--resume <session_id>` with system
+  prompt re-passed each turn; post-run session-isolation validation.
+- All raw `claude -p` JSON snapshots + raw judge outputs committed
+  under `benchmarks/snapshots/` for deterministic re-derivation.
+- 8 rounds of cross-model plan review with Codex (preserved under
+  `benchmarks/codex-review-iterations/plan-v{1..9}.md`).
+
+See `COMPARISON_v1_v2_v3.md` for the full Hewn iteration history
+(v1 soft prose-caveman, v2 aggressive micro-IR auto-routing, v3
+balanced strict prose-caveman, v4 = current, with `(a) vague → ask,
+(b) concrete error → likely cause + safe fix` for vibe micro-prose).
+
+---
+
 _Generated: 2026-04-22T12:31:45.576896+00:00_
 _Model: `claude-opus-4-7`_
 _Claude CLI: 2.1.117 (Claude Code)_
@@ -346,7 +415,7 @@ OK — no session_id collision across distinct (arm, seq, run) tuples.
 | hewn_full_v1 | 70% | 50% | 0% | 0.8 | 0 | 35% |
 | hewn_full_v2 | 53% | 50% | 0% | 0.3 | 0 | 47% |
 | hewn_full_v3 | 53% | 50% | 0% | 0.0 | 0 | 37% |
-| hewn_prompt_only | 62% | 50% | 0% | 0.5 | 0 | 48% |
+| hewn_prompt_only | 67% | 50% | 0% | 0.5 | 0 | 48% |
 | hewn_prompt_only_v1 | 45% | 50% | 0% | 0.3 | 0 | 60% |
 | hewn_prompt_only_v2 | 55% | 50% | 0% | 0.1 | 0 | 72% |
 | hewn_prompt_only_v3 | 48% | 50% | 0% | 0.3 | 0 | 68% |

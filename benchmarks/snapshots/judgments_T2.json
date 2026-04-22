@@ -5618,5 +5618,73 @@
       "respects_user_level": false
     },
     "readability_count_true": 1
+  },
+  "hewn_prompt_only/typeerror-undefined-map_r2": {
+    "arm": "hewn_prompt_only",
+    "prompt_id": "typeerror-undefined-map",
+    "run_index": 2,
+    "literals_present": {
+      "TypeError": false,
+      "undefined": true
+    },
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 90,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "explains_what_the_error_means": true,
+      "names_the_likely_cause_data_is_undefined_when_map_is_called": true,
+      "suggests_defensive_check_e_g_optional_chaining_or_default_array": true,
+      "suggests_finding_root_cause_why_data_is_undefined": true
+    },
+    "concepts_count_present": 4,
+    "concepts_count_total": 4,
+    "readability": {
+      "uses_plain_language": false,
+      "actionable": true,
+      "starts_helpfully": true,
+      "respects_user_level": false
+    },
+    "readability_count_true": 2
+  },
+  "hewn_prompt_only/typeerror-undefined-map_r3": {
+    "arm": "hewn_prompt_only",
+    "prompt_id": "typeerror-undefined-map",
+    "run_index": 3,
+    "literals_present": {
+      "TypeError": false,
+      "undefined": true
+    },
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 1,
+        "leading_article_count": 0,
+        "words": 112,
+        "filler_per_100w": 0.89,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "explains_what_the_error_means": true,
+      "names_the_likely_cause_data_is_undefined_when_map_is_called": true,
+      "suggests_defensive_check_e_g_optional_chaining_or_default_array": true,
+      "suggests_finding_root_cause_why_data_is_undefined": true
+    },
+    "concepts_count_present": 4,
+    "concepts_count_total": 4,
+    "readability": {
+      "uses_plain_language": false,
+      "actionable": true,
+      "starts_helpfully": true,
+      "respects_user_level": false
+    },
+    "readability_count_true": 2
   }
 }

@@ -471,3 +471,116 @@ silent rate limit / fallback to a different model (check
   `session_id` from turn 1 and pass it as `--resume <id>` for turns 2+.
 - **Don't forget the system prompt on resume turns**: Claude does NOT
   persist `--system-prompt` across `--resume`. Re-pass every turn.
+
+## 17. Hewn iterations (v1 → v4) and how to re-run any of them
+
+The benchmark run evolved across four Hewn prompt/hook iterations.
+Every prior version is preserved: snapshots live under
+`<track>/hewn_*_v1/`, `hewn_*_v2/`, `hewn_*_v3/` alongside the current
+`hewn_full` / `hewn_prompt_only` (= v4). Judgments have matching
+suffixed keys.
+
+| Version | `hewn_thinking_system_prompt.txt` + hook behaviour | Commit |
+|---|---|---|
+| **v1** | Original soft prose-caveman directive; caveman-ish prose with extra sections ("Gotchas", "Rule of thumb") | `b141e4e` (commit that first ran the bench) |
+| **v2** | Codex first tightening: `MICRO_PROSE_MODE` override + 7 new IR-route regexes in `locales/en.py` so Q&A explanations auto-routed to IR. Huge token cuts, but concept coverage crashed (T1b 96% → 38%). | `99ffcba` |
+| **v3** | Rolled back the auto-IR regexes; replaced `MICRO_PROSE_MODE` override with explicit strict prose-caveman directive (drop articles, fragments, no headers, no rule-of-thumb sections) + micro-prose fallback for vibe turns. Best overall balance; beats Caveman on short-Q&A tokens. | `b6409a5` |
+| **v4** | Same as v3 plus Codex's T2 tweak: micro-prose distinguishes "(a) pure vague prompt → ask only missing input" from "(b) concrete error prompt → name 1 likely cause + 1 safe defensive fix, then ask for call site". Improves T2 concept coverage +10pp without breaking v3's compression. | `f2501b4` |
+
+To re-run one version exactly, `git checkout <commit>` and rerun the
+tracks. To compare all versions side-by-side: the current `main`
+branch already has v1/v2/v3 snapshots preserved under suffixed
+directories; `python3 benchmarks/compare_versions.py` writes
+`report/COMPARISON_v1_v2_v3.md`.
+
+## 18. T4 transcript-aware judge (added 2026-04-22 afternoon)
+
+The original T4 per-turn judge evaluated each assistant turn in
+isolation against a per-turn concept list. This penalised Hewn's
+design of NOT restating facts already established in earlier turns —
+the per-turn judge cannot see that a concept introduced at turn 2 is
+still operative at turn 4.
+
+`benchmarks/judge.py` now has a second multi-turn mode:
+
+```bash
+python3 benchmarks/judge.py --track T4 --mode transcript
+# writes snapshots/judgments_T4_transcript.json
+# (separate from per-turn snapshots/judgments_T4.json — both preserved)
+```
+
+The transcript judge:
+- Reconstructs the full 5-turn conversation (user+assistant interleaved).
+- Flattens all required concepts across all 5 turns into one list.
+- Asks the judge: "given the FULL conversation, was each concept
+  established at some point by the assistant?" — with explicit
+  instruction that concepts introduced early and built on later still
+  count as covered.
+- Returns per-sequence concept coverage; aggregated per arm in
+  `compare_versions.py` → `COMPARISON_v1_v2_v3.md`.
+
+Under the transcript judge, Hewn v3/v4 tie Caveman and baseline at
+100% concept coverage on T4, while using ~33% fewer cumulative tokens
+across the 5 turns. The per-turn judge's ~82% for Hewn was a metric
+artifact, not a quality regression.
+
+## 19. Reference numbers — final (v4 + transcript judge)
+
+Use these as the final sanity-check baseline for any re-run on the
+same CLI version and model.
+
+**T1a (strict Caveman parity, 1 run, tiktoken):**
+- Baseline 2377 / terse 2318 / caveman_full 943 total tokens
+- caveman savings vs terse: **59% median, 60% vs baseline**
+  (matches Caveman's published ~60% claim)
+
+**T1b (10 prompts × 3 runs, Anthropic output tokens, median per arm):**
+| Arm | Mean tokens | Concept coverage |
+|---|---:|---:|
+| baseline | 349 | 96% |
+| terse | 356 | 96% |
+| caveman_full | 167 | 95% |
+| caveman_full_plus_ultra_directive | 140 | 93% |
+| hewn_prompt_only (v4) | ≈352 | ≈96% |
+| **hewn_full (v4)** | **149** | **91%** |
+
+Headline: Hewn beats Caveman on token count (149 < 167) with a 4pp
+concept-coverage gap.
+
+**T2 (5 vibe prompts × 3 runs):**
+| Arm | Mean tokens | Concept coverage | Non-tech readability |
+|---|---:|---:|---:|
+| baseline | 232 | 47% | 78% |
+| caveman_full | 194 | 78% | 20% |
+| **hewn_full (v4)** | **60** | **63%** | 20% |
+
+Headline: Hewn ~3x more compressed than Caveman at −15pp concept
+coverage. Readability ties Caveman. Documented design trade-off
+(agent-mode vs tutorial-mode).
+
+**T3 (3 long-context prompts):**
+| Arm | Mean tokens | Concept coverage |
+|---|---:|---:|
+| baseline | 876 | 5% |
+| caveman_full | 664 | 5% |
+| **hewn_full (v4)** | 2473 | **39%** |
+
+Headline: on the IR-shaped `rate-limit-xff-review` prompt Hewn is the
+only arm that understands the task. Different artifact category.
+
+**T4 (2 sequences × 5 turns × 2 runs, cumulative per sequence,
+transcript-aware concept judge):**
+| Arm | debug-prod cumul | design-feature cumul | transcript coverage |
+|---|---:|---:|---:|
+| baseline | 5550 | 8841 | 100% |
+| caveman_full | 1612 | 6840 | 100% |
+| **hewn_full (v4)** | **719** | **4956** | **100%** |
+
+Headline: Hewn wins on tokens, ties on quality.
+
+**T5 (2 expansive-prose prompts):** all arms refuse / produce stubs
+(~0% concept coverage across the board, ~250 tokens mean). Not a
+differentiator.
+
+If a re-run drifts more than ±25% on these, investigate CLI version
+drift, model snapshot change, or `~/.claude/CLAUDE.md` content change.
