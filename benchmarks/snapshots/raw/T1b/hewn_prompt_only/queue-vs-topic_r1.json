@@ -14,61 +14,61 @@
   ],
   "digest_hex": "5d6d15de966d2de1a01243f9e0d98a5b8908442798145efdf692af7bd3cb36a9",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:01:53.642036+00:00",
-  "output_tokens_tiktoken": 81,
-  "output_tokens_anthropic": 133,
+  "timestamp": "2026-04-22T09:25:37.860093+00:00",
+  "output_tokens_tiktoken": 170,
+  "output_tokens_anthropic": 347,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17027,
+  "cache_creation_input_tokens": 17053,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33829,
+  "total_input_tokens": 33855,
   "cache_state": "warm",
-  "wallclock_ms": 10836.849524988793,
-  "duration_ms": 4891,
-  "duration_api_ms": 6024,
+  "wallclock_ms": 15477.041681995615,
+  "duration_ms": 9217,
+  "duration_api_ms": 10758,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "ae60ef69-b6ef-4060-b84f-287d98054f50",
-  "total_cost_usd": 0.11858775,
+  "session_id": "810941c7-580e-4427-aa93-d6a60ca7902f",
+  "total_cost_usd": 0.12410025,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "Queue: point-to-point, one consumer processes each message (work distribution, task processing, load balancing across workers).\n\nTopic: pub/sub, every subscriber gets a copy (event broadcasting, fan-out, multiple independent reactions to the same event).\n\nRule of thumb: if adding a second consumer should *split* the work, use a queue; if it should *duplicate* the work, use a topic.",
+  "result": "**Queue**: one consumer processes each message. Use for work distribution — job processing, task assignment, load balancing across workers. Competing-consumers pattern.\n\n**Topic**: every subscriber gets every message. Use for event broadcast — notifying multiple independent systems about the same event (e.g., \"order placed\" → billing, inventory, email, analytics each react).\n\nRule of thumb:\n- \"Do this work once\" → queue\n- \"Tell everyone this happened\" → topic\n\nEdge cases:\n- Need both? Topic with per-subscriber queues (fan-out to queues) — common in SNS→SQS, Kafka consumer groups.\n- Ordering matters? Queues give FIFO per partition more naturally; topics often trade ordering for throughput.\n- Replay/late subscribers? Log-based topics (Kafka) retain history; traditional queues delete on ack.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 4891,
-    "duration_api_ms": 6024,
+    "duration_ms": 9217,
+    "duration_api_ms": 10758,
     "num_turns": 1,
-    "result": "Queue: point-to-point, one consumer processes each message (work distribution, task processing, load balancing across workers).\n\nTopic: pub/sub, every subscriber gets a copy (event broadcasting, fan-out, multiple independent reactions to the same event).\n\nRule of thumb: if adding a second consumer should *split* the work, use a queue; if it should *duplicate* the work, use a topic.",
+    "result": "**Queue**: one consumer processes each message. Use for work distribution — job processing, task assignment, load balancing across workers. Competing-consumers pattern.\n\n**Topic**: every subscriber gets every message. Use for event broadcast — notifying multiple independent systems about the same event (e.g., \"order placed\" → billing, inventory, email, analytics each react).\n\nRule of thumb:\n- \"Do this work once\" → queue\n- \"Tell everyone this happened\" → topic\n\nEdge cases:\n- Need both? Topic with per-subscriber queues (fan-out to queues) — common in SNS→SQS, Kafka consumer groups.\n- Ordering matters? Queues give FIFO per partition more naturally; topics often trade ordering for throughput.\n- Replay/late subscribers? Log-based topics (Kafka) retain history; traditional queues delete on ack.",
     "stop_reason": "end_turn",
-    "session_id": "ae60ef69-b6ef-4060-b84f-287d98054f50",
-    "total_cost_usd": 0.11858775,
+    "session_id": "810941c7-580e-4427-aa93-d6a60ca7902f",
+    "total_cost_usd": 0.12410025,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17027,
+      "cache_creation_input_tokens": 17053,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 133,
+      "output_tokens": 347,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17027,
+        "ephemeral_1h_input_tokens": 17053,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 133,
+          "output_tokens": 347,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17027,
+          "cache_creation_input_tokens": 17053,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17027
+            "ephemeral_1h_input_tokens": 17053
           },
           "type": "message"
         }
@@ -88,11 +88,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 133,
+        "outputTokens": 347,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17027,
+        "cacheCreationInputTokens": 17053,
         "webSearchRequests": 0,
-        "costUSD": 0.11817175,
+        "costUSD": 0.12368425,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "6a174edb-0e1e-4c54-94be-f0c987ee64bb"
+    "uuid": "8c9d7847-f24a-49a5-b1b9-b94ceb796311"
   }
 }

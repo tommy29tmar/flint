@@ -14,62 +14,62 @@
   ],
   "digest_hex": "3191b019d37f08f3d5b68d9000f1aeb1e1a3524225f9daa893803df1e240ffd1",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:42:00.131770+00:00",
-  "session_id_used_for_resume": "a54c782e-344b-4398-9b93-e8973f75e9a0",
-  "output_tokens_tiktoken": 165,
-  "output_tokens_anthropic": 260,
+  "timestamp": "2026-04-22T10:12:42.600737+00:00",
+  "session_id_used_for_resume": "bddbfb84-a1c4-45a2-af56-8b442fa1a621",
+  "output_tokens_tiktoken": 1172,
+  "output_tokens_anthropic": 1952,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 298,
-  "cache_read_input_tokens": 36172,
-  "total_input_tokens": 36476,
+  "cache_creation_input_tokens": 1481,
+  "cache_read_input_tokens": 39521,
+  "total_input_tokens": 41008,
   "cache_state": "warm",
-  "wallclock_ms": 13785.699275991647,
-  "duration_ms": 6911,
-  "duration_api_ms": 6785,
-  "wrapper_overhead_ms": 7000.699275991647,
+  "wallclock_ms": 40544.47637300473,
+  "duration_ms": 34613,
+  "duration_api_ms": 34522,
+  "wrapper_overhead_ms": 6022.476373004727,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "a54c782e-344b-4398-9b93-e8973f75e9a0",
-  "total_cost_usd": 0.0264785,
+  "session_id": "bddbfb84-a1c4-45a2-af56-8b442fa1a621",
+  "total_cost_usd": 0.07784674999999999,
   "model_used": "claude-opus-4-7",
-  "result": "Policy: refund to the gift card first up to the amount consumed from it, then any remainder to the card. This avoids letting users launder expired-soon gift card value into permanent card credit, and keeps the original payment split intact. If the gift card has already expired by refund time, reissue a new code with the same balance rather than pushing it to the card.\n\nCode path: load the original charge's split (gift_card_amount, card_amount), compute refund_to_gift_card = min(refund_total, gift_card_amount_consumed_remaining), refund_to_card = refund_total - refund_to_gift_card. Credit the gift card row under the same FOR UPDATE lock you use for consumption, then issue the card refund via the PSP. Both writes in one transaction so a PSP failure rolls back the balance credit.",
+  "result": "Policy first, because code follows policy.\n\nThree policies exist in the wild:\n\n1. Reverse order of payment (gift card last paid → first refunded).\n   Gift card applied first at checkout, so refund reverses: credit card refunded first, gift card second.\n   Intuition: \"return the money in the order it came in.\"\n   Bad for customers — card refund takes 3-5 days, gift card refund is instant, and they already \"spent\" the gift card value.\n\n2. Proportional split.\n   Refund split across tenders by original ratio.\n   Order was $100 = $40 gift card + $60 card. Partial refund $50 = $20 gift card + $30 card.\n   Fair, symmetric, easy to explain. Hardest to implement cleanly because of rounding.\n\n3. Gift card first (most common in retail).\n   Refund to gift card up to the amount originally debited from it, remainder to card.\n   Customer gets instant usable balance back. Merchant keeps money on platform (gift card balance often gets re-spent → higher LTV).\n   Finance likes it because it reverses the liability cleanly.\n\nPick 3 unless you have a reason not to. I'll walk the code path for 3.\n\nData you need on the order:\n- Redemption record: `{order_id, gift_card_id, amount_debited, idempotency_key, status}`.\n- Payment record: `{order_id, processor_charge_id, amount_charged}`.\n- Sum of both = order total at checkout time.\n\nRefund request: `refund(order_id, refund_amount)`.\n\nCode path:\n\n```\nBEGIN;\n\n-- 1. Load what was paid, lock rows to prevent concurrent refunds\nSELECT amount_debited, amount_already_refunded\nFROM gift_card_redemptions\nWHERE order_id = :oid\nFOR UPDATE;\n\nSELECT amount_charged, amount_already_refunded\nFROM payments\nWHERE order_id = :oid\nFOR UPDATE;\n\n-- 2. Compute split\ngc_remaining = amount_debited - gc_already_refunded\ncard_remaining = amount_charged - card_already_refunded\n\ngc_refund = min(refund_amount, gc_remaining)\ncard_refund = refund_amount - gc_refund\n\n-- 3. Refund gift card (credit balance back)\nSELECT balance, expires_at, status FROM gift_cards\nWHERE id = :gcid FOR UPDATE;\n\nUPDATE gift_cards\nSET balance = balance + :gc_refund\nWHERE id = :gcid;\n\nINSERT INTO gift_card_events (gift_card_id, type, amount, ref_order, idempotency_key)\nVALUES (:gcid, 'refund', :gc_refund, :oid, :idem);\n\nUPDATE gift_card_redemptions\nSET amount_already_refunded = amount_already_refunded + :gc_refund\nWHERE order_id = :oid;\n\n-- 4. Refund card (call processor, then record)\n-- Do the processor call INSIDE the tx only if you can tolerate long tx;\n-- otherwise commit DB state as \"refund_pending\" and settle async.\n\nCOMMIT;\n\n-- 5. Processor call (Stripe/Adyen/whatever) with idempotency key\nprocessor.refund(charge_id, card_refund, idempotency_key=:idem)\n\n-- 6. On processor success, mark card refund settled.\n-- On processor failure, reverse step 3-4 via another tx, or leave in 'pending' and retry.\n```\n\nEdge cases to handle:\n\n- Gift card expired between checkout and refund. Three choices:\n  a. Refund to card anyway (treat expired gift card as cash equivalent). Customer-friendly. Finance doesn't love it because you already recognized breakage.\n  b. Extend the gift card expiry on refund (refund creates a new mini-balance with fresh 12-month expiry). Common compromise.\n  c. Refuse gift card portion, refund to card for full amount. Simple, legally defensible, slightly customer-hostile.\n  Pick (b) for retail, (c) if you're lean.\n\n- Gift card deleted/fraud-flagged. Refund full amount to card, log the discrepancy for ops review.\n\n- Multiple partial refunds. The `amount_already_refunded` counters make this safe. Each refund is bounded by remaining.\n\n- Refund exceeds original tender. Shouldn't happen if `refund_amount <= order_total - total_already_refunded`, but validate at entry.\n\n- Processor call fails after gift card credited. Options: (i) reverse the gift card credit in a compensating tx (cleanest), (ii) leave gift card credited and retry processor with backoff (customer gets partial instant refund, card refund eventually lands). (i) is correct; (ii) is what customer-support-driven teams end up doing because retries usually succeed.\n\n- Idempotency key at the refund level. `refund(order_id, refund_amount, idempotency_key)` — CS tool double-click must not double-refund. Unique constraint on `refunds(order_id, idempotency_key)` or similar. Match the processor's idempotency contract so your key and theirs align.\n\n- Full refund as special case. `refund_amount = order_total - already_refunded`. Same code path, no special case needed if you built it right.\n\n- Store credit / gift cards issued as refunds. Sometimes merchants refund to a new gift card (for return-no-receipt scenarios). Different feature; don't mix into this path.\n\nOperational: build a refunds admin UI that shows the split before confirming. CS reps will ask \"where did the $30 go\" and you want them to see it.\n\nThat closes the loop on the main design surface. Want me to sketch schema DDL, or move to implementation?",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 6911,
-    "duration_api_ms": 6785,
+    "duration_ms": 34613,
+    "duration_api_ms": 34522,
     "num_turns": 1,
-    "result": "Policy: refund to the gift card first up to the amount consumed from it, then any remainder to the card. This avoids letting users launder expired-soon gift card value into permanent card credit, and keeps the original payment split intact. If the gift card has already expired by refund time, reissue a new code with the same balance rather than pushing it to the card.\n\nCode path: load the original charge's split (gift_card_amount, card_amount), compute refund_to_gift_card = min(refund_total, gift_card_amount_consumed_remaining), refund_to_card = refund_total - refund_to_gift_card. Credit the gift card row under the same FOR UPDATE lock you use for consumption, then issue the card refund via the PSP. Both writes in one transaction so a PSP failure rolls back the balance credit.",
+    "result": "Policy first, because code follows policy.\n\nThree policies exist in the wild:\n\n1. Reverse order of payment (gift card last paid → first refunded).\n   Gift card applied first at checkout, so refund reverses: credit card refunded first, gift card second.\n   Intuition: \"return the money in the order it came in.\"\n   Bad for customers — card refund takes 3-5 days, gift card refund is instant, and they already \"spent\" the gift card value.\n\n2. Proportional split.\n   Refund split across tenders by original ratio.\n   Order was $100 = $40 gift card + $60 card. Partial refund $50 = $20 gift card + $30 card.\n   Fair, symmetric, easy to explain. Hardest to implement cleanly because of rounding.\n\n3. Gift card first (most common in retail).\n   Refund to gift card up to the amount originally debited from it, remainder to card.\n   Customer gets instant usable balance back. Merchant keeps money on platform (gift card balance often gets re-spent → higher LTV).\n   Finance likes it because it reverses the liability cleanly.\n\nPick 3 unless you have a reason not to. I'll walk the code path for 3.\n\nData you need on the order:\n- Redemption record: `{order_id, gift_card_id, amount_debited, idempotency_key, status}`.\n- Payment record: `{order_id, processor_charge_id, amount_charged}`.\n- Sum of both = order total at checkout time.\n\nRefund request: `refund(order_id, refund_amount)`.\n\nCode path:\n\n```\nBEGIN;\n\n-- 1. Load what was paid, lock rows to prevent concurrent refunds\nSELECT amount_debited, amount_already_refunded\nFROM gift_card_redemptions\nWHERE order_id = :oid\nFOR UPDATE;\n\nSELECT amount_charged, amount_already_refunded\nFROM payments\nWHERE order_id = :oid\nFOR UPDATE;\n\n-- 2. Compute split\ngc_remaining = amount_debited - gc_already_refunded\ncard_remaining = amount_charged - card_already_refunded\n\ngc_refund = min(refund_amount, gc_remaining)\ncard_refund = refund_amount - gc_refund\n\n-- 3. Refund gift card (credit balance back)\nSELECT balance, expires_at, status FROM gift_cards\nWHERE id = :gcid FOR UPDATE;\n\nUPDATE gift_cards\nSET balance = balance + :gc_refund\nWHERE id = :gcid;\n\nINSERT INTO gift_card_events (gift_card_id, type, amount, ref_order, idempotency_key)\nVALUES (:gcid, 'refund', :gc_refund, :oid, :idem);\n\nUPDATE gift_card_redemptions\nSET amount_already_refunded = amount_already_refunded + :gc_refund\nWHERE order_id = :oid;\n\n-- 4. Refund card (call processor, then record)\n-- Do the processor call INSIDE the tx only if you can tolerate long tx;\n-- otherwise commit DB state as \"refund_pending\" and settle async.\n\nCOMMIT;\n\n-- 5. Processor call (Stripe/Adyen/whatever) with idempotency key\nprocessor.refund(charge_id, card_refund, idempotency_key=:idem)\n\n-- 6. On processor success, mark card refund settled.\n-- On processor failure, reverse step 3-4 via another tx, or leave in 'pending' and retry.\n```\n\nEdge cases to handle:\n\n- Gift card expired between checkout and refund. Three choices:\n  a. Refund to card anyway (treat expired gift card as cash equivalent). Customer-friendly. Finance doesn't love it because you already recognized breakage.\n  b. Extend the gift card expiry on refund (refund creates a new mini-balance with fresh 12-month expiry). Common compromise.\n  c. Refuse gift card portion, refund to card for full amount. Simple, legally defensible, slightly customer-hostile.\n  Pick (b) for retail, (c) if you're lean.\n\n- Gift card deleted/fraud-flagged. Refund full amount to card, log the discrepancy for ops review.\n\n- Multiple partial refunds. The `amount_already_refunded` counters make this safe. Each refund is bounded by remaining.\n\n- Refund exceeds original tender. Shouldn't happen if `refund_amount <= order_total - total_already_refunded`, but validate at entry.\n\n- Processor call fails after gift card credited. Options: (i) reverse the gift card credit in a compensating tx (cleanest), (ii) leave gift card credited and retry processor with backoff (customer gets partial instant refund, card refund eventually lands). (i) is correct; (ii) is what customer-support-driven teams end up doing because retries usually succeed.\n\n- Idempotency key at the refund level. `refund(order_id, refund_amount, idempotency_key)` — CS tool double-click must not double-refund. Unique constraint on `refunds(order_id, idempotency_key)` or similar. Match the processor's idempotency contract so your key and theirs align.\n\n- Full refund as special case. `refund_amount = order_total - already_refunded`. Same code path, no special case needed if you built it right.\n\n- Store credit / gift cards issued as refunds. Sometimes merchants refund to a new gift card (for return-no-receipt scenarios). Different feature; don't mix into this path.\n\nOperational: build a refunds admin UI that shows the split before confirming. CS reps will ask \"where did the $30 go\" and you want them to see it.\n\nThat closes the loop on the main design surface. Want me to sketch schema DDL, or move to implementation?",
     "stop_reason": "end_turn",
-    "session_id": "a54c782e-344b-4398-9b93-e8973f75e9a0",
-    "total_cost_usd": 0.0264785,
+    "session_id": "bddbfb84-a1c4-45a2-af56-8b442fa1a621",
+    "total_cost_usd": 0.07784674999999999,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 298,
-      "cache_read_input_tokens": 36172,
-      "output_tokens": 260,
+      "cache_creation_input_tokens": 1481,
+      "cache_read_input_tokens": 39521,
+      "output_tokens": 1952,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 298,
+        "ephemeral_1h_input_tokens": 1481,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 260,
-          "cache_read_input_tokens": 36172,
-          "cache_creation_input_tokens": 298,
+          "output_tokens": 1952,
+          "cache_read_input_tokens": 39521,
+          "cache_creation_input_tokens": 1481,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 298
+            "ephemeral_1h_input_tokens": 1481
           },
           "type": "message"
         }
@@ -79,11 +79,11 @@
     "modelUsage": {
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 260,
-        "cacheReadInputTokens": 36172,
-        "cacheCreationInputTokens": 298,
+        "outputTokens": 1952,
+        "cacheReadInputTokens": 39521,
+        "cacheCreationInputTokens": 1481,
         "webSearchRequests": 0,
-        "costUSD": 0.0264785,
+        "costUSD": 0.07784674999999999,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -91,6 +91,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "8d38fb7b-09c8-429f-ac35-2438f8e87506"
+    "uuid": "3880157c-5d84-412c-aa3a-f7895b98fafb"
   }
 }

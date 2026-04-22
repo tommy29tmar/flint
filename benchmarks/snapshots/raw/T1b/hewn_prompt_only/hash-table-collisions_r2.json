@@ -14,61 +14,61 @@
   ],
   "digest_hex": "7a7e2664771ede4b86664d7fc5d4494f8f70d62c74a225df1f386f63a681b524",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:04:27.664849+00:00",
-  "output_tokens_tiktoken": 165,
-  "output_tokens_anthropic": 241,
+  "timestamp": "2026-04-22T09:28:32.486099+00:00",
+  "output_tokens_tiktoken": 289,
+  "output_tokens_anthropic": 525,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17020,
+  "cache_creation_input_tokens": 17046,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33822,
+  "total_input_tokens": 33848,
   "cache_state": "warm",
-  "wallclock_ms": 11869.060805009212,
-  "duration_ms": 5826,
-  "duration_api_ms": 6679,
+  "wallclock_ms": 17207.792373985285,
+  "duration_ms": 10796,
+  "duration_api_ms": 11807,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "b3b75b55-a56d-423d-b892-219007118143",
-  "total_cost_usd": 0.12123999999999999,
+  "session_id": "ad15c230-7b46-4d72-82ae-cdc125c81050",
+  "total_cost_usd": 0.1285025,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "A hash table handles collisions using one of two main strategies:\n\n**1. Separate chaining**\nEach bucket holds a linked list (or other structure) of entries. On collision, append to the list. Lookup scans the list for the matching key.\n\n**2. Open addressing**\nOn collision, probe for another empty slot in the same array. Variants:\n- **Linear probing** — try slot i+1, i+2, ... (simple, but clusters)\n- **Quadratic probing** — try i+1², i+2², ... (reduces clustering)\n- **Double hashing** — step size from a second hash function (best distribution)\n\nWhen load factor exceeds a threshold (~0.75), the table resizes and rehashes all entries to keep operations amortized O(1).",
+  "result": "Two main strategies:\n\n**Chaining (separate chaining)**\nEach bucket holds a linked list (or small array/tree) of entries whose keys hash to that slot. On collision, append to the bucket's list. Lookup walks the list comparing keys. Java's `HashMap` uses this (and upgrades long chains to red-black trees).\n\n**Open addressing**\nAll entries live in the table array itself. On collision, probe for another slot using a deterministic sequence:\n- *Linear probing*: try `h+1, h+2, …` — cache-friendly but suffers clustering.\n- *Quadratic probing*: try `h+1, h+4, h+9, …` — reduces clustering.\n- *Double hashing*: step size from a second hash function — best distribution.\n\nPython's `dict` and Go's `map` use open-addressing variants.\n\n**Supporting mechanics**\n- **Load factor**: collisions grow with `n/capacity`. Most implementations resize (rehash into a larger table) when load exceeds a threshold (~0.7 for open addressing, ~0.75 for chaining).\n- **Good hash function**: spreads keys uniformly so collisions stay rare in the first place.\n- **Deletion** in open addressing needs tombstones so probe chains don't break.\n\nWorst case is O(n) if everything collides; with a decent hash and bounded load factor, expected operations stay O(1).",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 5826,
-    "duration_api_ms": 6679,
+    "duration_ms": 10796,
+    "duration_api_ms": 11807,
     "num_turns": 1,
-    "result": "A hash table handles collisions using one of two main strategies:\n\n**1. Separate chaining**\nEach bucket holds a linked list (or other structure) of entries. On collision, append to the list. Lookup scans the list for the matching key.\n\n**2. Open addressing**\nOn collision, probe for another empty slot in the same array. Variants:\n- **Linear probing** — try slot i+1, i+2, ... (simple, but clusters)\n- **Quadratic probing** — try i+1², i+2², ... (reduces clustering)\n- **Double hashing** — step size from a second hash function (best distribution)\n\nWhen load factor exceeds a threshold (~0.75), the table resizes and rehashes all entries to keep operations amortized O(1).",
+    "result": "Two main strategies:\n\n**Chaining (separate chaining)**\nEach bucket holds a linked list (or small array/tree) of entries whose keys hash to that slot. On collision, append to the bucket's list. Lookup walks the list comparing keys. Java's `HashMap` uses this (and upgrades long chains to red-black trees).\n\n**Open addressing**\nAll entries live in the table array itself. On collision, probe for another slot using a deterministic sequence:\n- *Linear probing*: try `h+1, h+2, …` — cache-friendly but suffers clustering.\n- *Quadratic probing*: try `h+1, h+4, h+9, …` — reduces clustering.\n- *Double hashing*: step size from a second hash function — best distribution.\n\nPython's `dict` and Go's `map` use open-addressing variants.\n\n**Supporting mechanics**\n- **Load factor**: collisions grow with `n/capacity`. Most implementations resize (rehash into a larger table) when load exceeds a threshold (~0.7 for open addressing, ~0.75 for chaining).\n- **Good hash function**: spreads keys uniformly so collisions stay rare in the first place.\n- **Deletion** in open addressing needs tombstones so probe chains don't break.\n\nWorst case is O(n) if everything collides; with a decent hash and bounded load factor, expected operations stay O(1).",
     "stop_reason": "end_turn",
-    "session_id": "b3b75b55-a56d-423d-b892-219007118143",
-    "total_cost_usd": 0.12123999999999999,
+    "session_id": "ad15c230-7b46-4d72-82ae-cdc125c81050",
+    "total_cost_usd": 0.1285025,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17020,
+      "cache_creation_input_tokens": 17046,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 241,
+      "output_tokens": 525,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17020,
+        "ephemeral_1h_input_tokens": 17046,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 241,
+          "output_tokens": 525,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17020,
+          "cache_creation_input_tokens": 17046,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17020
+            "ephemeral_1h_input_tokens": 17046
           },
           "type": "message"
         }
@@ -88,11 +88,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 241,
+        "outputTokens": 525,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17020,
+        "cacheCreationInputTokens": 17046,
         "webSearchRequests": 0,
-        "costUSD": 0.12082799999999999,
+        "costUSD": 0.1280905,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "687936ef-da5a-4c3f-9af0-625e952fdd86"
+    "uuid": "b7814e5b-c463-49fe-95be-ec5d4dc4acfb"
   }
 }

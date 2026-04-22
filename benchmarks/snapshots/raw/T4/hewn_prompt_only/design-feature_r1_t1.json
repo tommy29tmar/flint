@@ -14,62 +14,62 @@
   ],
   "digest_hex": "30a2f9a62df0d790c0598917c3ab42509bbadd672a0a484741ea201d2da3b44f",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:31:44.496842+00:00",
+  "timestamp": "2026-04-22T10:01:19.014866+00:00",
   "session_id_used_for_resume": null,
-  "output_tokens_tiktoken": 408,
-  "output_tokens_anthropic": 1725,
+  "output_tokens_tiktoken": 396,
+  "output_tokens_anthropic": 1035,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17079,
+  "cache_creation_input_tokens": 17105,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33881,
+  "total_input_tokens": 33907,
   "cache_state": "warm",
-  "wallclock_ms": 36583.87115399819,
-  "duration_ms": 30347,
-  "duration_api_ms": 32031,
+  "wallclock_ms": 27242.324229009682,
+  "duration_ms": 21406,
+  "duration_api_ms": 22492,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "dbae8038-082c-4770-a429-b9b4f798bbc6",
-  "total_cost_usd": 0.15875774999999998,
+  "session_id": "dc1168d0-f9c6-48dd-9150-791599c75151",
+  "total_cost_usd": 0.14167025,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "Main design decisions, roughly in order of impact:\n\n1. **Balance model** — single balance field on the card vs. append-only ledger of debits/credits/holds. Ledger costs more upfront but pays back on audits, disputes, and partial refunds; a single field will bite you the first time a refund reverses a multi-card order.\n\n2. **Redemption timing** — debit at order placement, payment auth, or capture? Determines what happens on cancel/failure/refund (restore to same card? issue new code? cash?).\n\n3. **Concurrency** — two sessions redeeming the same code must not double-spend. Pick a mechanism: row lock on redeem, optimistic version, or two-phase reserve→commit tied to the order lifecycle.\n\n4. **Tax and fee ordering** — is the gift card *tender* (applied after tax, like cash) or a *discount* (reduces taxable amount)? US generally treats it as tender, EU varies. Wrong choice silently under/over-collects tax.\n\n5. **Stacking rules** — multiple gift cards per order? Combined with promo codes? Define application order explicitly; it changes the final card charge.\n\n6. **Code storage and abuse** — store codes hashed (like passwords), not plaintext. Rate-limit redemption attempts per IP/account/card to block enumeration. Decide whether a wrong code reveals \"invalid\" vs \"already redeemed\".\n\n7. **Lifecycle and compliance** — expiry, dormancy fees, currency scoping, unclaimed-property/escheatment rules. Several jurisdictions ban expiry and fees outright; this is a legal decision, not a product one.\n\n8. **Split tender at the PSP** — how the \"balance covers X, card covers remainder\" flow is expressed to your payment processor. One payment with two tenders, or auth card for full amount and void the covered portion on success? Affects reconciliation and chargeback handling.\n\nTell me which of these you've already decided and I can dig into the rest.",
+  "result": "Main decisions, roughly in order of how much they constrain the rest:\n\n1. **Ledger vs. balance column.** A ledger of debit/credit entries (current balance = sum) gives you audit trail, idempotency, and sane refunds. A single `balance` column is simpler but painful the first time a charge fails mid-flight or a refund needs to reverse a partial redemption. Pick ledger unless you're sure you'll never need either.\n\n2. **Redemption atomicity / split-tender flow.** Gift card covers $30 of a $50 order; card auth for the remaining $20 fails — what happens to the $30? Two shapes: (a) **reserve** the gift card balance, auth the card, then commit both, or (b) deduct the gift card on capture only after card auth succeeds. (a) handles concurrent checkouts cleanly; (b) is simpler but leaks balance under races. Also decide: can one order consume multiple gift cards?\n\n3. **Refund semantics.** Refund a mixed-tender order — does the gift-card portion go back to gift-card balance (and which code?) or to the card? Most teams return to original tender proportionally; say so explicitly before you build it.\n\n4. **Code generation & abuse.** High-entropy codes (≥128 bits), rate-limit redemption attempts per IP/user, constant-time lookup. Gift card codes are bearer instruments — anyone with the code spends the balance — so treat enumeration as the threat model.\n\n5. **Expiry, currency, non-transferability.** Expiration rules vary by jurisdiction (some US states prohibit expiry on retail gift cards). Single-currency only, or FX at redemption? Tied to an account or bearer?\n\nThe ledger + reserve-then-commit pair is the one I'd push hardest on — everything else is tunable later, those two are expensive to retrofit.\n\nWant me to sketch a schema and the redemption flow for your stack?",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 30347,
-    "duration_api_ms": 32031,
+    "duration_ms": 21406,
+    "duration_api_ms": 22492,
     "num_turns": 1,
-    "result": "Main design decisions, roughly in order of impact:\n\n1. **Balance model** — single balance field on the card vs. append-only ledger of debits/credits/holds. Ledger costs more upfront but pays back on audits, disputes, and partial refunds; a single field will bite you the first time a refund reverses a multi-card order.\n\n2. **Redemption timing** — debit at order placement, payment auth, or capture? Determines what happens on cancel/failure/refund (restore to same card? issue new code? cash?).\n\n3. **Concurrency** — two sessions redeeming the same code must not double-spend. Pick a mechanism: row lock on redeem, optimistic version, or two-phase reserve→commit tied to the order lifecycle.\n\n4. **Tax and fee ordering** — is the gift card *tender* (applied after tax, like cash) or a *discount* (reduces taxable amount)? US generally treats it as tender, EU varies. Wrong choice silently under/over-collects tax.\n\n5. **Stacking rules** — multiple gift cards per order? Combined with promo codes? Define application order explicitly; it changes the final card charge.\n\n6. **Code storage and abuse** — store codes hashed (like passwords), not plaintext. Rate-limit redemption attempts per IP/account/card to block enumeration. Decide whether a wrong code reveals \"invalid\" vs \"already redeemed\".\n\n7. **Lifecycle and compliance** — expiry, dormancy fees, currency scoping, unclaimed-property/escheatment rules. Several jurisdictions ban expiry and fees outright; this is a legal decision, not a product one.\n\n8. **Split tender at the PSP** — how the \"balance covers X, card covers remainder\" flow is expressed to your payment processor. One payment with two tenders, or auth card for full amount and void the covered portion on success? Affects reconciliation and chargeback handling.\n\nTell me which of these you've already decided and I can dig into the rest.",
+    "result": "Main decisions, roughly in order of how much they constrain the rest:\n\n1. **Ledger vs. balance column.** A ledger of debit/credit entries (current balance = sum) gives you audit trail, idempotency, and sane refunds. A single `balance` column is simpler but painful the first time a charge fails mid-flight or a refund needs to reverse a partial redemption. Pick ledger unless you're sure you'll never need either.\n\n2. **Redemption atomicity / split-tender flow.** Gift card covers $30 of a $50 order; card auth for the remaining $20 fails — what happens to the $30? Two shapes: (a) **reserve** the gift card balance, auth the card, then commit both, or (b) deduct the gift card on capture only after card auth succeeds. (a) handles concurrent checkouts cleanly; (b) is simpler but leaks balance under races. Also decide: can one order consume multiple gift cards?\n\n3. **Refund semantics.** Refund a mixed-tender order — does the gift-card portion go back to gift-card balance (and which code?) or to the card? Most teams return to original tender proportionally; say so explicitly before you build it.\n\n4. **Code generation & abuse.** High-entropy codes (≥128 bits), rate-limit redemption attempts per IP/user, constant-time lookup. Gift card codes are bearer instruments — anyone with the code spends the balance — so treat enumeration as the threat model.\n\n5. **Expiry, currency, non-transferability.** Expiration rules vary by jurisdiction (some US states prohibit expiry on retail gift cards). Single-currency only, or FX at redemption? Tied to an account or bearer?\n\nThe ledger + reserve-then-commit pair is the one I'd push hardest on — everything else is tunable later, those two are expensive to retrofit.\n\nWant me to sketch a schema and the redemption flow for your stack?",
     "stop_reason": "end_turn",
-    "session_id": "dbae8038-082c-4770-a429-b9b4f798bbc6",
-    "total_cost_usd": 0.15875774999999998,
+    "session_id": "dc1168d0-f9c6-48dd-9150-791599c75151",
+    "total_cost_usd": 0.14167025,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17079,
+      "cache_creation_input_tokens": 17105,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 1725,
+      "output_tokens": 1035,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17079,
+        "ephemeral_1h_input_tokens": 17105,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 1725,
+          "output_tokens": 1035,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17079,
+          "cache_creation_input_tokens": 17105,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17079
+            "ephemeral_1h_input_tokens": 17105
           },
           "type": "message"
         }
@@ -89,11 +89,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 1725,
+        "outputTokens": 1035,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17079,
+        "cacheCreationInputTokens": 17105,
         "webSearchRequests": 0,
-        "costUSD": 0.15829674999999999,
+        "costUSD": 0.14120925,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -101,6 +101,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "845781f3-1c3a-418d-a78f-5c898c7583cd"
+    "uuid": "c48e1b81-29e7-4513-96d8-36d5a031c602"
   }
 }

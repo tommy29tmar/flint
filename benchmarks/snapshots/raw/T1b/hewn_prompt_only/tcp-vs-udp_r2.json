@@ -14,61 +14,61 @@
   ],
   "digest_hex": "f12180983420f4a94b3592c84a1684c904419bcb9246fe5b531e2451e68c7956",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:03:07.004086+00:00",
-  "output_tokens_tiktoken": 116,
-  "output_tokens_anthropic": 210,
+  "timestamp": "2026-04-22T09:27:08.897860+00:00",
+  "output_tokens_tiktoken": 88,
+  "output_tokens_anthropic": 164,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17022,
+  "cache_creation_input_tokens": 17048,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33824,
+  "total_input_tokens": 33850,
   "cache_state": "warm",
-  "wallclock_ms": 11403.969489998417,
-  "duration_ms": 5109,
-  "duration_api_ms": 6503,
+  "wallclock_ms": 10088.080485991668,
+  "duration_ms": 3815,
+  "duration_api_ms": 4727,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "1cb64217-c6fa-4977-9960-902f38c8a2a3",
-  "total_cost_usd": 0.12047749999999999,
+  "session_id": "5eaeef61-c52a-49f7-8799-16c0da945c48",
+  "total_cost_usd": 0.119495,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "TCP is connection-oriented and reliable: it establishes a session (3-way handshake), guarantees ordered delivery, retransmits lost packets, and does flow/congestion control. Use it when correctness matters (HTTP, SSH, databases).\n\nUDP is connectionless and best-effort: no handshake, no ordering, no retransmission, minimal overhead. Use it when speed or low latency beats reliability (DNS, video/voice, game netcode, QUIC's substrate).\n\nKey tradeoff: TCP trades latency for reliability; UDP trades reliability for latency — and leaves any guarantees to the application layer.",
+  "result": "TCP is connection-oriented and reliable: it establishes a handshake, guarantees in-order delivery, retransmits lost packets, and does flow/congestion control. UDP is connectionless and fire-and-forget: no handshake, no delivery guarantees, no ordering, minimal overhead.\n\nUse TCP when correctness matters (HTTP, SSH, file transfer). Use UDP when latency matters more than reliability (DNS, video/voice, games, QUIC's base layer).",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 5109,
-    "duration_api_ms": 6503,
+    "duration_ms": 3815,
+    "duration_api_ms": 4727,
     "num_turns": 1,
-    "result": "TCP is connection-oriented and reliable: it establishes a session (3-way handshake), guarantees ordered delivery, retransmits lost packets, and does flow/congestion control. Use it when correctness matters (HTTP, SSH, databases).\n\nUDP is connectionless and best-effort: no handshake, no ordering, no retransmission, minimal overhead. Use it when speed or low latency beats reliability (DNS, video/voice, game netcode, QUIC's substrate).\n\nKey tradeoff: TCP trades latency for reliability; UDP trades reliability for latency — and leaves any guarantees to the application layer.",
+    "result": "TCP is connection-oriented and reliable: it establishes a handshake, guarantees in-order delivery, retransmits lost packets, and does flow/congestion control. UDP is connectionless and fire-and-forget: no handshake, no delivery guarantees, no ordering, minimal overhead.\n\nUse TCP when correctness matters (HTTP, SSH, file transfer). Use UDP when latency matters more than reliability (DNS, video/voice, games, QUIC's base layer).",
     "stop_reason": "end_turn",
-    "session_id": "1cb64217-c6fa-4977-9960-902f38c8a2a3",
-    "total_cost_usd": 0.12047749999999999,
+    "session_id": "5eaeef61-c52a-49f7-8799-16c0da945c48",
+    "total_cost_usd": 0.119495,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17022,
+      "cache_creation_input_tokens": 17048,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 210,
+      "output_tokens": 164,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17022,
+        "ephemeral_1h_input_tokens": 17048,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 210,
+          "output_tokens": 164,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17022,
+          "cache_creation_input_tokens": 17048,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17022
+            "ephemeral_1h_input_tokens": 17048
           },
           "type": "message"
         }
@@ -78,21 +78,21 @@
     "modelUsage": {
       "claude-haiku-4-5-20251001": {
         "inputTokens": 347,
-        "outputTokens": 13,
+        "outputTokens": 14,
         "cacheReadInputTokens": 0,
         "cacheCreationInputTokens": 0,
         "webSearchRequests": 0,
-        "costUSD": 0.000412,
+        "costUSD": 0.00041699999999999994,
         "contextWindow": 200000,
         "maxOutputTokens": 32000
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 210,
+        "outputTokens": 164,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17022,
+        "cacheCreationInputTokens": 17048,
         "webSearchRequests": 0,
-        "costUSD": 0.12006549999999999,
+        "costUSD": 0.119078,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "9639a019-24eb-4c90-8fe7-741d2572aaa3"
+    "uuid": "0fb12469-c0e0-4ba5-88fa-67dcdbcc55fa"
   }
 }

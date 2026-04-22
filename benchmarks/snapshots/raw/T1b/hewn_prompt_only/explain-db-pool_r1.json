@@ -14,61 +14,61 @@
   ],
   "digest_hex": "2b21fc020c9f9514ecfb89de5292bc8e27d0913b3aa966344ba89e05bc88db91",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T07:58:29.014152+00:00",
-  "output_tokens_tiktoken": 271,
-  "output_tokens_anthropic": 425,
+  "timestamp": "2026-04-22T09:21:49.805937+00:00",
+  "output_tokens_tiktoken": 342,
+  "output_tokens_anthropic": 607,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17018,
+  "cache_creation_input_tokens": 17044,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33820,
+  "total_input_tokens": 33846,
   "cache_state": "warm",
-  "wallclock_ms": 17827.788361988496,
-  "duration_ms": 11681,
-  "duration_api_ms": 14619,
+  "wallclock_ms": 17838.130406977143,
+  "duration_ms": 10837,
+  "duration_api_ms": 12062,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "16eb442d-5c5a-4b2c-aa95-d2afcab170ce",
-  "total_cost_usd": 0.12582549999999998,
+  "session_id": "f97f7df6-a805-4b39-9395-5f9cda50e556",
+  "total_cost_usd": 0.130543,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "A connection pool keeps a set of open DB connections alive and hands them out to requests instead of opening a new TCP+auth handshake each time.\n\n**Why**: Opening a Postgres/MySQL connection is expensive — TCP handshake, TLS, auth, session setup. Per-request connections collapse under load.\n\n**How it works**:\n- Pool holds N idle connections.\n- Request checks out a connection → runs query → returns it to the pool.\n- If all N are busy, request waits (or errors on timeout).\n- Idle connections are periodically health-checked and recycled.\n\n**Key knobs**:\n- `max` — ceiling on concurrent connections (must stay under the DB's `max_connections`).\n- `min` — warm connections kept ready.\n- `idleTimeout` — when to close unused ones.\n- `acquireTimeout` — how long a request waits before failing.\n\n**Where it lives**: In-process (pg-pool, HikariCP) or external (PgBouncer, RDS Proxy). External pools matter when you have many app instances — each process pool × N pods can blow past the DB limit.\n\n**Common failure**: pool size too large → DB runs out of connections; too small → requests queue and time out. Tune `max` to `(DB_max_connections - overhead) / num_app_instances`.",
+  "result": "A **connection pool** is a cache of open database connections the app reuses instead of opening/closing one per query.\n\n**Why:** TCP handshake + TLS + auth per connection is slow (10–100ms). Pooling amortizes that cost across many queries.\n\n**How it works:**\n1. On startup, pool opens N connections to the DB.\n2. App code calls `pool.acquire()` → gets an idle connection (or waits if all busy).\n3. Runs query, then `release()` returns it to the pool.\n4. Idle connections stay open, ready for the next request.\n\n**Key knobs:**\n- `max` — ceiling on concurrent connections. Too high = DB runs out of memory/file descriptors.\n- `min` — warm connections kept alive.\n- `idleTimeout` — close connections unused for X seconds.\n- `acquireTimeout` — fail fast if pool is exhausted.\n\n**Sizing:** `max` should be ≤ DB's `max_connections` ÷ number of app instances. Postgres default is 100; a typical web app runs 10–20 per instance.\n\n**Common pitfalls:**\n- Leaked connections (forgot to `release()` in an error path) → pool exhaustion, requests hang.\n- Long-running transactions hold a connection, starving others.\n- Per-request pools (creating a new pool each handler) defeat the point.\n- Serverless + pooling is awkward — use a proxy like PgBouncer or RDS Proxy since function instances don't share state.\n\n**Tools:** HikariCP (Java), pgbouncer (external, Postgres), `pg.Pool` (Node), SQLAlchemy's `QueuePool` (Python).",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 11681,
-    "duration_api_ms": 14619,
+    "duration_ms": 10837,
+    "duration_api_ms": 12062,
     "num_turns": 1,
-    "result": "A connection pool keeps a set of open DB connections alive and hands them out to requests instead of opening a new TCP+auth handshake each time.\n\n**Why**: Opening a Postgres/MySQL connection is expensive — TCP handshake, TLS, auth, session setup. Per-request connections collapse under load.\n\n**How it works**:\n- Pool holds N idle connections.\n- Request checks out a connection → runs query → returns it to the pool.\n- If all N are busy, request waits (or errors on timeout).\n- Idle connections are periodically health-checked and recycled.\n\n**Key knobs**:\n- `max` — ceiling on concurrent connections (must stay under the DB's `max_connections`).\n- `min` — warm connections kept ready.\n- `idleTimeout` — when to close unused ones.\n- `acquireTimeout` — how long a request waits before failing.\n\n**Where it lives**: In-process (pg-pool, HikariCP) or external (PgBouncer, RDS Proxy). External pools matter when you have many app instances — each process pool × N pods can blow past the DB limit.\n\n**Common failure**: pool size too large → DB runs out of connections; too small → requests queue and time out. Tune `max` to `(DB_max_connections - overhead) / num_app_instances`.",
+    "result": "A **connection pool** is a cache of open database connections the app reuses instead of opening/closing one per query.\n\n**Why:** TCP handshake + TLS + auth per connection is slow (10–100ms). Pooling amortizes that cost across many queries.\n\n**How it works:**\n1. On startup, pool opens N connections to the DB.\n2. App code calls `pool.acquire()` → gets an idle connection (or waits if all busy).\n3. Runs query, then `release()` returns it to the pool.\n4. Idle connections stay open, ready for the next request.\n\n**Key knobs:**\n- `max` — ceiling on concurrent connections. Too high = DB runs out of memory/file descriptors.\n- `min` — warm connections kept alive.\n- `idleTimeout` — close connections unused for X seconds.\n- `acquireTimeout` — fail fast if pool is exhausted.\n\n**Sizing:** `max` should be ≤ DB's `max_connections` ÷ number of app instances. Postgres default is 100; a typical web app runs 10–20 per instance.\n\n**Common pitfalls:**\n- Leaked connections (forgot to `release()` in an error path) → pool exhaustion, requests hang.\n- Long-running transactions hold a connection, starving others.\n- Per-request pools (creating a new pool each handler) defeat the point.\n- Serverless + pooling is awkward — use a proxy like PgBouncer or RDS Proxy since function instances don't share state.\n\n**Tools:** HikariCP (Java), pgbouncer (external, Postgres), `pg.Pool` (Node), SQLAlchemy's `QueuePool` (Python).",
     "stop_reason": "end_turn",
-    "session_id": "16eb442d-5c5a-4b2c-aa95-d2afcab170ce",
-    "total_cost_usd": 0.12582549999999998,
+    "session_id": "f97f7df6-a805-4b39-9395-5f9cda50e556",
+    "total_cost_usd": 0.130543,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17018,
+      "cache_creation_input_tokens": 17044,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 425,
+      "output_tokens": 607,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17018,
+        "ephemeral_1h_input_tokens": 17044,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 425,
+          "output_tokens": 607,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17018,
+          "cache_creation_input_tokens": 17044,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17018
+            "ephemeral_1h_input_tokens": 17044
           },
           "type": "message"
         }
@@ -78,21 +78,21 @@
     "modelUsage": {
       "claude-haiku-4-5-20251001": {
         "inputTokens": 345,
-        "outputTokens": 13,
+        "outputTokens": 14,
         "cacheReadInputTokens": 0,
         "cacheCreationInputTokens": 0,
         "webSearchRequests": 0,
-        "costUSD": 0.00041,
+        "costUSD": 0.000415,
         "contextWindow": 200000,
         "maxOutputTokens": 32000
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 425,
+        "outputTokens": 607,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17018,
+        "cacheCreationInputTokens": 17044,
         "webSearchRequests": 0,
-        "costUSD": 0.12541549999999999,
+        "costUSD": 0.130128,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "d6cb8505-46a2-49e3-a922-2925b4c80f66"
+    "uuid": "e03b04f1-a77d-4a01-be79-33d25af42c89"
   }
 }

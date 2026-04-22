@@ -1,0 +1,106 @@
+{
+  "track": "T4",
+  "arm": "hewn_prompt_only",
+  "sequence_id": "debug-prod-incident",
+  "run_index": 1,
+  "turn": 1,
+  "arm_order_index": 2,
+  "arm_order_full": [
+    "baseline",
+    "hewn_full",
+    "hewn_prompt_only",
+    "caveman_full",
+    "terse"
+  ],
+  "digest_hex": "c436155c1e87e76d88e6f2c66d47c90c16ae78237b0a8de1b93824cf92fb5c9b",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:28:59.905252+00:00",
+  "session_id_used_for_resume": null,
+  "output_tokens_tiktoken": 83,
+  "output_tokens_anthropic": 134,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 17092,
+  "cache_read_input_tokens": 16796,
+  "total_input_tokens": 33894,
+  "cache_state": "warm",
+  "wallclock_ms": 11164.570406981511,
+  "duration_ms": 4546,
+  "duration_api_ms": 5615,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "8acb082e-5568-4113-ae2d-3cb9f4fcb062",
+  "total_cost_usd": 0.119084,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "Roll back the 14:18 deploy, then investigate. It's the shortest path to stop bleeding — `git diff <prev>..<deploy-sha> -- **/createOrder*` will show you what changed to make `req.body.items` (or the upstream object) undefined. Most likely: a renamed field, a middleware that stopped parsing JSON, or a schema validator moved before a defaulting step.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 4546,
+    "duration_api_ms": 5615,
+    "num_turns": 1,
+    "result": "Roll back the 14:18 deploy, then investigate. It's the shortest path to stop bleeding — `git diff <prev>..<deploy-sha> -- **/createOrder*` will show you what changed to make `req.body.items` (or the upstream object) undefined. Most likely: a renamed field, a middleware that stopped parsing JSON, or a schema validator moved before a defaulting step.",
+    "stop_reason": "end_turn",
+    "session_id": "8acb082e-5568-4113-ae2d-3cb9f4fcb062",
+    "total_cost_usd": 0.119084,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 17092,
+      "cache_read_input_tokens": 16796,
+      "output_tokens": 134,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 17092,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 134,
+          "cache_read_input_tokens": 16796,
+          "cache_creation_input_tokens": 17092,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 17092
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 396,
+        "outputTokens": 17,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.000481,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 134,
+        "cacheReadInputTokens": 16796,
+        "cacheCreationInputTokens": 17092,
+        "webSearchRequests": 0,
+        "costUSD": 0.118603,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "3aa17daf-4787-4a8e-90e9-57097f2b0c93"
+  }
+}

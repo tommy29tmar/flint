@@ -14,61 +14,61 @@
   ],
   "digest_hex": "258887ceb8366586f3dea59b17c1ef6a12bb3fbc92c09a2a53837c2cc3a1ccbf",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:05:04.347862+00:00",
-  "output_tokens_tiktoken": 35,
-  "output_tokens_anthropic": 57,
+  "timestamp": "2026-04-22T09:29:20.139066+00:00",
+  "output_tokens_tiktoken": 98,
+  "output_tokens_anthropic": 175,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 18759,
+  "cache_creation_input_tokens": 18487,
   "cache_read_input_tokens": 16805,
-  "total_input_tokens": 35570,
+  "total_input_tokens": 35298,
   "cache_state": "warm",
-  "wallclock_ms": 9495.644854992861,
-  "duration_ms": 3096,
-  "duration_api_ms": 4130,
-  "wrapper_overhead_ms": 5365.644854992861,
+  "wallclock_ms": 11118.053309997777,
+  "duration_ms": 4833,
+  "duration_api_ms": 7042,
+  "wrapper_overhead_ms": 4076.0533099977765,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "92f75952-239d-40d6-b579-0b608b39b942",
-  "total_cost_usd": 0.12752625,
+  "session_id": "68d9bd5d-3766-4d88-a76d-f79cb33d0c1d",
+  "total_cost_usd": 0.12877125,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "@hewn v0 hybrid\nG: cors_error\nC: origin_mismatch\nP: preflight_check\nV: allow_origin\nA: set_cors_header",
+  "result": "CORS errors mean browser blocked cross-origin request. Server must send `Access-Control-Allow-Origin` header matching your origin (or `*` for public APIs).\n\nCommon causes:\n- Server missing CORS headers entirely\n- `Allow-Origin` doesn't match request origin\n- Preflight (OPTIONS) not handled for non-simple requests\n- Credentials mode requires explicit origin (not `*`) + `Allow-Credentials: true`\n\nShare exact console error + request/response headers for specific fix.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 3096,
-    "duration_api_ms": 4130,
+    "duration_ms": 4833,
+    "duration_api_ms": 7042,
     "num_turns": 1,
-    "result": "@hewn v0 hybrid\nG: cors_error\nC: origin_mismatch\nP: preflight_check\nV: allow_origin\nA: set_cors_header",
+    "result": "CORS errors mean browser blocked cross-origin request. Server must send `Access-Control-Allow-Origin` header matching your origin (or `*` for public APIs).\n\nCommon causes:\n- Server missing CORS headers entirely\n- `Allow-Origin` doesn't match request origin\n- Preflight (OPTIONS) not handled for non-simple requests\n- Credentials mode requires explicit origin (not `*`) + `Allow-Credentials: true`\n\nShare exact console error + request/response headers for specific fix.",
     "stop_reason": "end_turn",
-    "session_id": "92f75952-239d-40d6-b579-0b608b39b942",
-    "total_cost_usd": 0.12752625,
+    "session_id": "68d9bd5d-3766-4d88-a76d-f79cb33d0c1d",
+    "total_cost_usd": 0.12877125,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 18759,
+      "cache_creation_input_tokens": 18487,
       "cache_read_input_tokens": 16805,
-      "output_tokens": 57,
+      "output_tokens": 175,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 18759,
+        "ephemeral_1h_input_tokens": 18487,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 57,
+          "output_tokens": 175,
           "cache_read_input_tokens": 16805,
-          "cache_creation_input_tokens": 18759,
+          "cache_creation_input_tokens": 18487,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 18759
+            "ephemeral_1h_input_tokens": 18487
           },
           "type": "message"
         }
@@ -78,21 +78,21 @@
     "modelUsage": {
       "claude-haiku-4-5-20251001": {
         "inputTokens": 350,
-        "outputTokens": 15,
+        "outputTokens": 14,
         "cacheReadInputTokens": 0,
         "cacheCreationInputTokens": 0,
         "webSearchRequests": 0,
-        "costUSD": 0.00042500000000000003,
+        "costUSD": 0.00042,
         "contextWindow": 200000,
         "maxOutputTokens": 32000
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 57,
+        "outputTokens": 175,
         "cacheReadInputTokens": 16805,
-        "cacheCreationInputTokens": 18759,
+        "cacheCreationInputTokens": 18487,
         "webSearchRequests": 0,
-        "costUSD": 0.12710125,
+        "costUSD": 0.12835125,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "6227a5bb-1d25-4225-b82a-adc39bab91ae"
+    "uuid": "7ed07e20-6840-48ed-b422-4c368eb737de"
   }
 }

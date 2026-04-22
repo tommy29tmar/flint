@@ -1,0 +1,105 @@
+{
+  "track": "T1b",
+  "arm": "hewn_prompt_only",
+  "prompt_id": "debounce-search",
+  "run_index": 1,
+  "arm_order_index": 2,
+  "arm_order_full": [
+    "baseline",
+    "caveman_full_plus_ultra_directive",
+    "hewn_prompt_only",
+    "caveman_full",
+    "terse",
+    "hewn_full"
+  ],
+  "digest_hex": "37dcfc04f7f9bb03f94bf4fe2a87d8ed70cc588f0bfaceb0e1c634e40f418a20",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:01:00.013983+00:00",
+  "output_tokens_tiktoken": 178,
+  "output_tokens_anthropic": 273,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 17024,
+  "cache_read_input_tokens": 16796,
+  "total_input_tokens": 33826,
+  "cache_state": "warm",
+  "wallclock_ms": 13535.520186997019,
+  "duration_ms": 7558,
+  "duration_api_ms": 8825,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "60fbe610-46d2-4e09-988f-3591a595c6ab",
+  "total_cost_usd": 0.12208600000000001,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "A debouncer delays running the search until the user stops typing for some short window (e.g. 300ms). Without it, every keystroke fires a request — so typing \"react\" sends 5 queries in quick succession, most of which are wasted.\n\nBenefits:\n- **Fewer network/API calls** — only the final query after the pause actually runs.\n- **Less backend/DB load** — no hammering the server with per-keystroke requests.\n- **Cheaper rendering** — skips intermediate result lists the user never sees.\n- **Avoids race conditions** — stale in-flight responses arriving out of order can overwrite fresher ones; fewer requests = fewer races (though you still want cancellation for correctness).\n\nThrottling is the cousin: fires at a max rate rather than waiting for silence. For search-as-you-type, debounce is the right default.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 7558,
+    "duration_api_ms": 8825,
+    "num_turns": 1,
+    "result": "A debouncer delays running the search until the user stops typing for some short window (e.g. 300ms). Without it, every keystroke fires a request — so typing \"react\" sends 5 queries in quick succession, most of which are wasted.\n\nBenefits:\n- **Fewer network/API calls** — only the final query after the pause actually runs.\n- **Less backend/DB load** — no hammering the server with per-keystroke requests.\n- **Cheaper rendering** — skips intermediate result lists the user never sees.\n- **Avoids race conditions** — stale in-flight responses arriving out of order can overwrite fresher ones; fewer requests = fewer races (though you still want cancellation for correctness).\n\nThrottling is the cousin: fires at a max rate rather than waiting for silence. For search-as-you-type, debounce is the right default.",
+    "stop_reason": "end_turn",
+    "session_id": "60fbe610-46d2-4e09-988f-3591a595c6ab",
+    "total_cost_usd": 0.12208600000000001,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 17024,
+      "cache_read_input_tokens": 16796,
+      "output_tokens": 273,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 17024,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 273,
+          "cache_read_input_tokens": 16796,
+          "cache_creation_input_tokens": 17024,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 17024
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 353,
+        "outputTokens": 16,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.000433,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 273,
+        "cacheReadInputTokens": 16796,
+        "cacheCreationInputTokens": 17024,
+        "webSearchRequests": 0,
+        "costUSD": 0.12165300000000001,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "29958b3b-f751-4f24-b9d3-d9a4a48385d1"
+  }
+}

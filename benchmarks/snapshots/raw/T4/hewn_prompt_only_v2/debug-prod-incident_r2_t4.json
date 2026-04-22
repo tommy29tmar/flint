@@ -1,0 +1,96 @@
+{
+  "track": "T4",
+  "arm": "hewn_prompt_only",
+  "sequence_id": "debug-prod-incident",
+  "run_index": 2,
+  "turn": 4,
+  "arm_order_index": 3,
+  "arm_order_full": [
+    "caveman_full",
+    "terse",
+    "hewn_full",
+    "hewn_prompt_only",
+    "baseline"
+  ],
+  "digest_hex": "522341918a5177210ef438fa55486ec5b622aaa576febbd731536d82595ec31b",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:37:07.150771+00:00",
+  "session_id_used_for_resume": "f349cd15-26d0-4a3f-979a-a8e27980ef9b",
+  "output_tokens_tiktoken": 257,
+  "output_tokens_anthropic": 746,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 617,
+  "cache_read_input_tokens": 34938,
+  "total_input_tokens": 35561,
+  "cache_state": "warm",
+  "wallclock_ms": 21157.43644000031,
+  "duration_ms": 14988,
+  "duration_api_ms": 14963,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "f349cd15-26d0-4a3f-979a-a8e27980ef9b",
+  "total_cost_usd": 0.04000525,
+  "model_used": "claude-opus-4-7",
+  "result": "Not safe under load. Two failure modes:\n\n1. **Pool starvation.** Cart with N items → N concurrent queries. 5 simultaneous orders × 10 items = 50 queries racing for 20 connections. Other endpoints sharing the pool stall.\n2. **Unbounded fan-out.** No cap on cart size. A 100-item cart holds 20 connections for itself and blocks everything else until it drains.\n\nThe sequential loop was slow but bounded — 1 connection at a time per request.\n\nBetter options, in order:\n\n1. **Single batched query.** `SELECT ... WHERE sku IN ($1, $2, ...)` — one round trip, one connection. Almost always the right call for N lookups of the same shape. Promise.all over individual queries is a code smell when the queries are homogeneous.\n2. **Bounded concurrency** if for some reason you can't batch: `p-limit(5)` or similar. Picks a ceiling well below pool size, leaves headroom for other traffic.\n3. **Keep sequential** if N is small and latency isn't a problem.\n\nAsk the PR author which one they considered. If the answer is \"none, Promise.all was faster in local testing,\" that's the bug — local testing doesn't exercise pool contention.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 14988,
+    "duration_api_ms": 14963,
+    "num_turns": 1,
+    "result": "Not safe under load. Two failure modes:\n\n1. **Pool starvation.** Cart with N items → N concurrent queries. 5 simultaneous orders × 10 items = 50 queries racing for 20 connections. Other endpoints sharing the pool stall.\n2. **Unbounded fan-out.** No cap on cart size. A 100-item cart holds 20 connections for itself and blocks everything else until it drains.\n\nThe sequential loop was slow but bounded — 1 connection at a time per request.\n\nBetter options, in order:\n\n1. **Single batched query.** `SELECT ... WHERE sku IN ($1, $2, ...)` — one round trip, one connection. Almost always the right call for N lookups of the same shape. Promise.all over individual queries is a code smell when the queries are homogeneous.\n2. **Bounded concurrency** if for some reason you can't batch: `p-limit(5)` or similar. Picks a ceiling well below pool size, leaves headroom for other traffic.\n3. **Keep sequential** if N is small and latency isn't a problem.\n\nAsk the PR author which one they considered. If the answer is \"none, Promise.all was faster in local testing,\" that's the bug — local testing doesn't exercise pool contention.",
+    "stop_reason": "end_turn",
+    "session_id": "f349cd15-26d0-4a3f-979a-a8e27980ef9b",
+    "total_cost_usd": 0.04000525,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 617,
+      "cache_read_input_tokens": 34938,
+      "output_tokens": 746,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 617,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 746,
+          "cache_read_input_tokens": 34938,
+          "cache_creation_input_tokens": 617,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 617
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 746,
+        "cacheReadInputTokens": 34938,
+        "cacheCreationInputTokens": 617,
+        "webSearchRequests": 0,
+        "costUSD": 0.04000525,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "4630e501-7dc2-4c15-951e-c854c9c8dea5"
+  }
+}

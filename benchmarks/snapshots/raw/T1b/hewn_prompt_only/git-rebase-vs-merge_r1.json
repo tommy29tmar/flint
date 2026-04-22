@@ -14,61 +14,61 @@
   ],
   "digest_hex": "0db86ef9039b5089d2e722b87250da0e6caef801039c526c02d2b461a0eb6acc",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:01:23.310170+00:00",
-  "output_tokens_tiktoken": 254,
-  "output_tokens_anthropic": 396,
+  "timestamp": "2026-04-22T09:25:10.543132+00:00",
+  "output_tokens_tiktoken": 185,
+  "output_tokens_anthropic": 293,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17021,
+  "cache_creation_input_tokens": 17047,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33823,
+  "total_input_tokens": 33849,
   "cache_state": "warm",
-  "wallclock_ms": 19586.761518992716,
-  "duration_ms": 13761,
-  "duration_api_ms": 19541,
+  "wallclock_ms": 16589.795620006043,
+  "duration_ms": 10143,
+  "duration_api_ms": 11179,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "5d743fe1-f34d-4613-82b6-97153318b695",
-  "total_cost_usd": 0.12512725,
+  "session_id": "0429ca63-52c8-46ad-ade0-2002f0104f05",
+  "total_cost_usd": 0.12271475,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "Both integrate changes from one branch into another, but they produce different histories:\n\n**Merge** — creates a new \"merge commit\" that ties the two branch tips together. History keeps the full topology: you see that a branch existed, when it diverged, and when it rejoined. Non-destructive; existing commits are untouched.\n\n**Rebase** — replays your branch's commits on top of the target branch, producing new commits with new hashes. History becomes linear, as if you'd written your work directly on top of the latest target. Cleaner log, but rewrites commits.\n\nKey tradeoffs:\n- **Shared branches**: never rebase commits others have based work on — the hash change forces them to reconcile. Merge is safe.\n- **Conflicts**: merge resolves once; rebase may replay the conflict per commit.\n- **Bisecting / blame**: linear (rebase) history is easier to bisect; merge history preserves the actual sequence of events.\n- **Reverting**: reverting a merge commit undoes the whole branch in one shot; reverting a rebase means reverting each replayed commit.\n\nCommon rule of thumb: rebase locally before pushing to keep your feature branch tidy, merge when integrating into a shared branch.",
+  "result": "Both integrate changes from one branch into another, but differently:\n\n**merge** — creates a new merge commit that ties the two histories together. Preserves the exact history, including the branch topology. Non-destructive.\n\n**rebase** — replays your commits one-by-one onto the tip of the target branch, rewriting them with new SHAs. Produces a linear history with no merge commit. Destructive to commit identity.\n\n**Practical tradeoffs:**\n- Merge keeps true history but clutters `git log` with merge commits.\n- Rebase gives a clean linear log but rewrites commits — never rebase a branch others have pulled, or they'll have to recover from the SHA changes.\n- Conflicts: merge resolves once; rebase may resolve the same conflict per-commit as it replays.\n\n**Rule of thumb:** rebase local/private branches before sharing; merge when integrating into a shared branch.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 13761,
-    "duration_api_ms": 19541,
+    "duration_ms": 10143,
+    "duration_api_ms": 11179,
     "num_turns": 1,
-    "result": "Both integrate changes from one branch into another, but they produce different histories:\n\n**Merge** — creates a new \"merge commit\" that ties the two branch tips together. History keeps the full topology: you see that a branch existed, when it diverged, and when it rejoined. Non-destructive; existing commits are untouched.\n\n**Rebase** — replays your branch's commits on top of the target branch, producing new commits with new hashes. History becomes linear, as if you'd written your work directly on top of the latest target. Cleaner log, but rewrites commits.\n\nKey tradeoffs:\n- **Shared branches**: never rebase commits others have based work on — the hash change forces them to reconcile. Merge is safe.\n- **Conflicts**: merge resolves once; rebase may replay the conflict per commit.\n- **Bisecting / blame**: linear (rebase) history is easier to bisect; merge history preserves the actual sequence of events.\n- **Reverting**: reverting a merge commit undoes the whole branch in one shot; reverting a rebase means reverting each replayed commit.\n\nCommon rule of thumb: rebase locally before pushing to keep your feature branch tidy, merge when integrating into a shared branch.",
+    "result": "Both integrate changes from one branch into another, but differently:\n\n**merge** — creates a new merge commit that ties the two histories together. Preserves the exact history, including the branch topology. Non-destructive.\n\n**rebase** — replays your commits one-by-one onto the tip of the target branch, rewriting them with new SHAs. Produces a linear history with no merge commit. Destructive to commit identity.\n\n**Practical tradeoffs:**\n- Merge keeps true history but clutters `git log` with merge commits.\n- Rebase gives a clean linear log but rewrites commits — never rebase a branch others have pulled, or they'll have to recover from the SHA changes.\n- Conflicts: merge resolves once; rebase may resolve the same conflict per-commit as it replays.\n\n**Rule of thumb:** rebase local/private branches before sharing; merge when integrating into a shared branch.",
     "stop_reason": "end_turn",
-    "session_id": "5d743fe1-f34d-4613-82b6-97153318b695",
-    "total_cost_usd": 0.12512725,
+    "session_id": "0429ca63-52c8-46ad-ade0-2002f0104f05",
+    "total_cost_usd": 0.12271475,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17021,
+      "cache_creation_input_tokens": 17047,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 396,
+      "output_tokens": 293,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17021,
+        "ephemeral_1h_input_tokens": 17047,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 396,
+          "output_tokens": 293,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17021,
+          "cache_creation_input_tokens": 17047,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17021
+            "ephemeral_1h_input_tokens": 17047
           },
           "type": "message"
         }
@@ -88,11 +88,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 396,
+        "outputTokens": 293,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17021,
+        "cacheCreationInputTokens": 17047,
         "webSearchRequests": 0,
-        "costUSD": 0.12470925000000001,
+        "costUSD": 0.12229675,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "567b6da5-6cbf-4c18-a1f9-5ba29069fba3"
+    "uuid": "809d87df-c079-4c3b-bcb1-477761be242f"
   }
 }

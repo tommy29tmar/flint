@@ -1,0 +1,96 @@
+{
+  "track": "T4",
+  "arm": "hewn_prompt_only",
+  "sequence_id": "debug-prod-incident",
+  "run_index": 1,
+  "turn": 3,
+  "arm_order_index": 2,
+  "arm_order_full": [
+    "baseline",
+    "hewn_full",
+    "hewn_prompt_only",
+    "caveman_full",
+    "terse"
+  ],
+  "digest_hex": "c436155c1e87e76d88e6f2c66d47c90c16ae78237b0a8de1b93824cf92fb5c9b",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:29:23.224469+00:00",
+  "session_id_used_for_resume": "8acb082e-5568-4113-ae2d-3cb9f4fcb062",
+  "output_tokens_tiktoken": 209,
+  "output_tokens_anthropic": 355,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 198,
+  "cache_read_input_tokens": 34216,
+  "total_input_tokens": 34420,
+  "cache_state": "warm",
+  "wallclock_ms": 13393.274116999237,
+  "duration_ms": 6969,
+  "duration_api_ms": 6941,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "8acb082e-5568-4113-ae2d-3cb9f4fcb062",
+  "total_cost_usd": 0.0272505,
+  "model_used": "claude-opus-4-7",
+  "result": "Contract test on `buildCart`'s return shape — not a test of `createOrder`. The bug was the serializer silently dropping a field its consumers rely on.\n\n```js\ndescribe('buildCart', () => {\n  it('returns items, id, and total', () => {\n    const cart = { id: 'c1', items: [{ price: 10, qty: 2 }] };\n    const out = buildCart(cart);\n    expect(out).toEqual({\n      id: 'c1',\n      items: [{ price: 10, qty: 2 }],\n      total: 20,\n    });\n  });\n});\n```\n\n`toEqual` with the full expected object fails if a field is added, removed, or renamed — which is exactly the class of bug you just hit. Avoid `toMatchObject` here; it permits missing keys and wouldn't have caught this.\n\nIf multiple services consume `buildCart`, consider one `it` per consumer-required field so the failure message names which contract broke.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 6969,
+    "duration_api_ms": 6941,
+    "num_turns": 1,
+    "result": "Contract test on `buildCart`'s return shape — not a test of `createOrder`. The bug was the serializer silently dropping a field its consumers rely on.\n\n```js\ndescribe('buildCart', () => {\n  it('returns items, id, and total', () => {\n    const cart = { id: 'c1', items: [{ price: 10, qty: 2 }] };\n    const out = buildCart(cart);\n    expect(out).toEqual({\n      id: 'c1',\n      items: [{ price: 10, qty: 2 }],\n      total: 20,\n    });\n  });\n});\n```\n\n`toEqual` with the full expected object fails if a field is added, removed, or renamed — which is exactly the class of bug you just hit. Avoid `toMatchObject` here; it permits missing keys and wouldn't have caught this.\n\nIf multiple services consume `buildCart`, consider one `it` per consumer-required field so the failure message names which contract broke.",
+    "stop_reason": "end_turn",
+    "session_id": "8acb082e-5568-4113-ae2d-3cb9f4fcb062",
+    "total_cost_usd": 0.0272505,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 198,
+      "cache_read_input_tokens": 34216,
+      "output_tokens": 355,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 198,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 355,
+          "cache_read_input_tokens": 34216,
+          "cache_creation_input_tokens": 198,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 198
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 355,
+        "cacheReadInputTokens": 34216,
+        "cacheCreationInputTokens": 198,
+        "webSearchRequests": 0,
+        "costUSD": 0.0272505,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "abe0d542-b287-4a2e-8add-f6fe5e3621b0"
+  }
+}

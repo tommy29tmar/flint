@@ -1,0 +1,96 @@
+{
+  "track": "T4",
+  "arm": "hewn_full",
+  "sequence_id": "design-feature",
+  "run_index": 2,
+  "turn": 2,
+  "arm_order_index": 4,
+  "arm_order_full": [
+    "baseline",
+    "caveman_full",
+    "hewn_prompt_only",
+    "terse",
+    "hewn_full"
+  ],
+  "digest_hex": "3191b019d37f08f3d5b68d9000f1aeb1e1a3524225f9daa893803df1e240ffd1",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:41:24.079643+00:00",
+  "session_id_used_for_resume": "a54c782e-344b-4398-9b93-e8973f75e9a0",
+  "output_tokens_tiktoken": 97,
+  "output_tokens_anthropic": 178,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 355,
+  "cache_read_input_tokens": 35053,
+  "total_input_tokens": 35414,
+  "cache_state": "warm",
+  "wallclock_ms": 12603.043720999267,
+  "duration_ms": 5556,
+  "duration_api_ms": 5451,
+  "wrapper_overhead_ms": 7152.043720999267,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "a54c782e-344b-4398-9b93-e8973f75e9a0",
+  "total_cost_usd": 0.024225249999999997,
+  "model_used": "claude-opus-4-7",
+  "result": "Mutable row is simpler and matches your wallet code, but reconstructing history, auditing disputes, and handling partial-redemption reversals all rely on a separate transaction log you'll end up building anyway. Event-sourced ledger makes balance = sum(events), so refunds, chargebacks, and double-spend investigations fall out naturally — at the cost of one extra join and stricter write discipline. Given gift cards attract more fraud and accounting scrutiny than wallets, I'd lean ledger even if wallets stay mutable.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 5556,
+    "duration_api_ms": 5451,
+    "num_turns": 1,
+    "result": "Mutable row is simpler and matches your wallet code, but reconstructing history, auditing disputes, and handling partial-redemption reversals all rely on a separate transaction log you'll end up building anyway. Event-sourced ledger makes balance = sum(events), so refunds, chargebacks, and double-spend investigations fall out naturally — at the cost of one extra join and stricter write discipline. Given gift cards attract more fraud and accounting scrutiny than wallets, I'd lean ledger even if wallets stay mutable.",
+    "stop_reason": "end_turn",
+    "session_id": "a54c782e-344b-4398-9b93-e8973f75e9a0",
+    "total_cost_usd": 0.024225249999999997,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 355,
+      "cache_read_input_tokens": 35053,
+      "output_tokens": 178,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 355,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 178,
+          "cache_read_input_tokens": 35053,
+          "cache_creation_input_tokens": 355,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 355
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 178,
+        "cacheReadInputTokens": 35053,
+        "cacheCreationInputTokens": 355,
+        "webSearchRequests": 0,
+        "costUSD": 0.024225249999999997,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "690b2f79-2c9c-414c-b35a-ac1c146fa65b"
+  }
+}

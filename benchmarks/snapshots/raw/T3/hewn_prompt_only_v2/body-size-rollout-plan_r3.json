@@ -1,0 +1,105 @@
+{
+  "track": "T3",
+  "arm": "hewn_prompt_only",
+  "prompt_id": "body-size-rollout-plan",
+  "run_index": 3,
+  "arm_order_index": 1,
+  "arm_order_full": [
+    "hewn_full",
+    "hewn_prompt_only",
+    "baseline",
+    "terse",
+    "caveman_full_plus_ultra_directive",
+    "caveman_full"
+  ],
+  "digest_hex": "83cf61101f93c83952a720a1c10bb2b89a0fe33cd226823e26742150e5132c55",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:24:56.644055+00:00",
+  "output_tokens_tiktoken": 1028,
+  "output_tokens_anthropic": 3322,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 41219,
+  "total_input_tokens": 41225,
+  "cache_state": "warm",
+  "wallclock_ms": 63268.91105499817,
+  "duration_ms": 56996,
+  "duration_api_ms": 58136,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "ca357567-3192-4eb2-9f8e-3df74ccc904e",
+  "total_cost_usd": 0.10943750000000001,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "## Critical (P0, security)\n\n**1. Trusts client-supplied `x-user-id` header.**\nViolates Section 2 rule 1. Even though `header_sanitize` strips it, if this handler is ever mounted outside the pipeline or the middleware order regresses, this is an auth-bypass: any client sets `X-User-Id: <victim>` and drains their accounts.\nFix: read from `req.user.sub` set by `auth_jwt`. Never read identity from raw request headers.\nVerify: `curl -H 'X-User-Id: victim' ...` must 401, not succeed.\n\n**2. No org-scoped authorization.**\nNothing checks that `req.user.org === req.params.org_id`, or that the user has a role permitting transfers. An authenticated user in Org A can POST to `/v1/orgs/<Org-B-id>/transfer` and move Org B's money. Classic IDOR.\nFix: assert `req.user.org === req.params.org_id` and that `req.user.roles` includes the transfer permission. Reject with `403` (RFC 7807 body) otherwise.\nVerify: integration test where a user from another org gets `403`.\n\n**3. No input validation on `from`, `to`, `amount`.**\nAmount could be negative, a string, `NaN`, `1e308`, or a non-integer. `from`/`to` could be accounts from other orgs. Passes straight into `txSvc.transfer`.\nFix: validate with zod/ajv — `amount` positive integer (minor units) within a sane cap, `from`/`to` UUIDs belonging to `org_id`. Reject `from === to`.\nVerify: unit tests on the schema + an integration test that `amount: -100` returns `400`.\n\n## High (correctness / ops)\n\n**4. Not idempotent.**\nClient retry on a timed-out request will double-transfer. Section 10 has no prior incident for this, but it's the standard finance footgun.\nFix: require an `Idempotency-Key` header; dedupe in `tx-svc` or at the edge with a short-TTL Redis key.\n\n**5. No route-specific rate limit.**\nFalls back to the default `30/min/IP` for POST (Section 4). For a money-movement endpoint that's far too generous, and it's IP-keyed — one logged-in attacker behind one NAT has 30 tries/min against an org's balance.\nFix: add an entry in `config/rate_limits.json` keyed by `user_id` + `org_id`, e.g. 5/min, with an alert on throttled spikes.\n\n**6. No error handling; stacktraces can leak.**\nIf `txSvc.transfer` rejects, Express 5 will surface it, but this handler never calls `next(err)` and doesn't force the RFC 7807 shape. Section 2 rule 6: no stacktrace / internal host / library string in the body; `request_id` must be present.\nFix: wrap in `try/catch` and `next(err)`, rely on `src/edge/errorHandler.ts` to emit the `problem+json`. Map known `tx-svc` error codes (`insufficient_funds`, `account_frozen`) to `409`/`422` explicitly.\n\n**7. Missing audit log record.**\nFinancial mutations must land in the 365-day audit bucket (Section 9), not just the 14-day Loki stream. The generic `audit_log` middleware logs the request line; it won't capture `{from, to, amount, result}` structured fields.\nFix: explicit `auditLogger.record('transfer', {...})` after success, before responding.\n\n## Medium\n\n**8. No CODEOWNERS gating / always-trace entry.**\nSection 6 lists auth / rate-limit / header-sanitize files as CODEOWNERS-required. A new money-movement route deserves the same treatment. Also add the route to `config/always_trace_routes.json` so it's 100% sampled.\n\n**9. Response shape is uninformative.**\n`{ok: true}` gives the client nothing to reconcile against. Return `{transfer_id, status, request_id}` so clients (and support) can trace a specific movement.\n\n**10. Integration test coverage missing.**\nPer Section 11: no DB mocks. Needs real-Redis/real-PG tests for: cross-org rejection, negative amount, idempotency-key replay, downstream `tx-svc` 5xx surfaces as `502` with sanitized body, rate-limit throttling path.\n\n## Main remaining risks after fixes\n\n- `tx-svc` itself must enforce the same org-scope check (defense in depth — handbook §2 says downstreams re-authorize).\n- Idempotency-key store needs its own `EXPIRE` (Section 4 lesson, SEV2 2025-11).",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 56996,
+    "duration_api_ms": 58136,
+    "num_turns": 1,
+    "result": "## Critical (P0, security)\n\n**1. Trusts client-supplied `x-user-id` header.**\nViolates Section 2 rule 1. Even though `header_sanitize` strips it, if this handler is ever mounted outside the pipeline or the middleware order regresses, this is an auth-bypass: any client sets `X-User-Id: <victim>` and drains their accounts.\nFix: read from `req.user.sub` set by `auth_jwt`. Never read identity from raw request headers.\nVerify: `curl -H 'X-User-Id: victim' ...` must 401, not succeed.\n\n**2. No org-scoped authorization.**\nNothing checks that `req.user.org === req.params.org_id`, or that the user has a role permitting transfers. An authenticated user in Org A can POST to `/v1/orgs/<Org-B-id>/transfer` and move Org B's money. Classic IDOR.\nFix: assert `req.user.org === req.params.org_id` and that `req.user.roles` includes the transfer permission. Reject with `403` (RFC 7807 body) otherwise.\nVerify: integration test where a user from another org gets `403`.\n\n**3. No input validation on `from`, `to`, `amount`.**\nAmount could be negative, a string, `NaN`, `1e308`, or a non-integer. `from`/`to` could be accounts from other orgs. Passes straight into `txSvc.transfer`.\nFix: validate with zod/ajv — `amount` positive integer (minor units) within a sane cap, `from`/`to` UUIDs belonging to `org_id`. Reject `from === to`.\nVerify: unit tests on the schema + an integration test that `amount: -100` returns `400`.\n\n## High (correctness / ops)\n\n**4. Not idempotent.**\nClient retry on a timed-out request will double-transfer. Section 10 has no prior incident for this, but it's the standard finance footgun.\nFix: require an `Idempotency-Key` header; dedupe in `tx-svc` or at the edge with a short-TTL Redis key.\n\n**5. No route-specific rate limit.**\nFalls back to the default `30/min/IP` for POST (Section 4). For a money-movement endpoint that's far too generous, and it's IP-keyed — one logged-in attacker behind one NAT has 30 tries/min against an org's balance.\nFix: add an entry in `config/rate_limits.json` keyed by `user_id` + `org_id`, e.g. 5/min, with an alert on throttled spikes.\n\n**6. No error handling; stacktraces can leak.**\nIf `txSvc.transfer` rejects, Express 5 will surface it, but this handler never calls `next(err)` and doesn't force the RFC 7807 shape. Section 2 rule 6: no stacktrace / internal host / library string in the body; `request_id` must be present.\nFix: wrap in `try/catch` and `next(err)`, rely on `src/edge/errorHandler.ts` to emit the `problem+json`. Map known `tx-svc` error codes (`insufficient_funds`, `account_frozen`) to `409`/`422` explicitly.\n\n**7. Missing audit log record.**\nFinancial mutations must land in the 365-day audit bucket (Section 9), not just the 14-day Loki stream. The generic `audit_log` middleware logs the request line; it won't capture `{from, to, amount, result}` structured fields.\nFix: explicit `auditLogger.record('transfer', {...})` after success, before responding.\n\n## Medium\n\n**8. No CODEOWNERS gating / always-trace entry.**\nSection 6 lists auth / rate-limit / header-sanitize files as CODEOWNERS-required. A new money-movement route deserves the same treatment. Also add the route to `config/always_trace_routes.json` so it's 100% sampled.\n\n**9. Response shape is uninformative.**\n`{ok: true}` gives the client nothing to reconcile against. Return `{transfer_id, status, request_id}` so clients (and support) can trace a specific movement.\n\n**10. Integration test coverage missing.**\nPer Section 11: no DB mocks. Needs real-Redis/real-PG tests for: cross-org rejection, negative amount, idempotency-key replay, downstream `tx-svc` 5xx surfaces as `502` with sanitized body, rate-limit throttling path.\n\n## Main remaining risks after fixes\n\n- `tx-svc` itself must enforce the same org-scope check (defense in depth — handbook §2 says downstreams re-authorize).\n- Idempotency-key store needs its own `EXPIRE` (Section 4 lesson, SEV2 2025-11).",
+    "stop_reason": "end_turn",
+    "session_id": "ca357567-3192-4eb2-9f8e-3df74ccc904e",
+    "total_cost_usd": 0.10943750000000001,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 41219,
+      "output_tokens": 3322,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 3322,
+          "cache_read_input_tokens": 41219,
+          "cache_creation_input_tokens": 0,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 5668,
+        "outputTokens": 16,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.0057480000000000005,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 3322,
+        "cacheReadInputTokens": 41219,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.1036895,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "cb9bf66f-57c4-4bfb-a657-05690fcd24a2"
+  }
+}

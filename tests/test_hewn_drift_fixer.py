@@ -55,6 +55,10 @@ EN_IR_PROMPTS = [
     "Propose the minimal fix that prevents recurrence",
     "What specific attack vectors does this JWT implementation expose?",
     "```python\ndef verify(tok): jwt.decode(tok, SECRET)\n```\nWhat's wrong here?",
+]
+
+# v3 — Q&A explanations stay in prose-caveman, not IR (see locales/en.py)
+EN_CAVEMAN_QA_PROMPTS = [
     "Why does my React component re-render every time the parent updates?",
     "Explain database connection pooling.",
     "What's the difference between TCP and UDP?",
@@ -157,6 +161,11 @@ class ClassifyTests(unittest.TestCase):
 
     def test_prose_caveman_prompts(self):
         self._expect(EN_PROSE_CAVEMAN_PROMPTS, "prose_caveman")
+
+    def test_qa_explanations_route_to_prose_caveman(self):
+        # v3 — Q&A explanations stay prose-caveman (v2 routed them to IR which
+        # crushed concept coverage; see benchmarks/report/COMPARISON_v1_v2.md)
+        self._expect(EN_CAVEMAN_QA_PROMPTS, "prose_caveman")
 
     def test_prose_findings_prompts(self):
         self._expect(EN_PROSE_FINDINGS_PROMPTS, "prose_findings")
@@ -348,8 +357,10 @@ class BuildOutputTests(unittest.TestCase):
 
     def test_prose_caveman(self):
         ctx = hook.build_output("prose_caveman")["hookSpecificOutput"]["additionalContext"]
-        self.assertIn("MICRO_PROSE_MODE", ctx)
-        self.assertIn("plain prose", ctx)
+        self.assertIn("prose-caveman", ctx)
+        self.assertIn("drop articles", ctx)
+        self.assertIn("Do NOT emit Hewn IR", ctx)
+        self.assertIn("micro-prose", ctx)
 
     def test_prose_findings(self):
         ctx = hook.build_output("prose_findings")["hookSpecificOutput"]["additionalContext"]
@@ -374,7 +385,8 @@ class BuildOutputTests(unittest.TestCase):
 
     def test_unknown_label_falls_back_to_caveman(self):
         ctx = hook.build_output("unknown")["hookSpecificOutput"]["additionalContext"]
-        self.assertIn("MICRO_PROSE_MODE", ctx)
+        self.assertIn("prose-caveman", ctx)
+        self.assertIn("drop articles", ctx)
 
 
 class MainTests(unittest.TestCase):
@@ -396,7 +408,7 @@ class MainTests(unittest.TestCase):
             rc = hook.main()
         self.assertEqual(rc, 0)
         out = json.loads(captured.getvalue())
-        self.assertIn("MICRO_PROSE_MODE", out["hookSpecificOutput"]["additionalContext"])
+        self.assertIn("prose-caveman", out["hookSpecificOutput"]["additionalContext"])
 
 
 if __name__ == "__main__":

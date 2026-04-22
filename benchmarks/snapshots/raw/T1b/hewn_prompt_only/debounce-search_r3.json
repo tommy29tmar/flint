@@ -14,61 +14,61 @@
   ],
   "digest_hex": "b0eeadf6370d53c38ab46c1c682c894eb1c04899ce7fb9c5cde713f602ef439d",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:09:27.208547+00:00",
-  "output_tokens_tiktoken": 137,
-  "output_tokens_anthropic": 208,
+  "timestamp": "2026-04-22T09:34:28.285071+00:00",
+  "output_tokens_tiktoken": 170,
+  "output_tokens_anthropic": 263,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17024,
+  "cache_creation_input_tokens": 17050,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33826,
+  "total_input_tokens": 33852,
   "cache_state": "warm",
-  "wallclock_ms": 11939.22186898999,
-  "duration_ms": 5982,
-  "duration_api_ms": 7531,
+  "wallclock_ms": 13044.813671003794,
+  "duration_ms": 6715,
+  "duration_api_ms": 7656,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "57ab03f4-4fd2-41e0-b661-bd8d30e79b2b",
-  "total_cost_usd": 0.12046100000000001,
+  "session_id": "94bf352c-124e-4fcb-9db6-365d3e4fbdf5",
+  "total_cost_usd": 0.1219985,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "A debouncer delays firing the search until the user stops typing for a short window (e.g. 300ms). Without it, every keystroke triggers a request — so typing \"claude\" fires 6 searches, most of which are wasted because the user hasn't finished the word yet.\n\nMain wins:\n- Fewer network requests (cost, rate limits, server load)\n- No race conditions where an earlier, slower response overwrites a later one\n- Less UI churn from rapid re-renders of result lists\n\nThrottling is the sibling tool — fires at most once per interval instead of waiting for silence. Debounce fits search; throttle fits scroll/resize.",
+  "result": "A debouncer delays firing the search until the user stops typing for a short window (e.g. 300ms). Without it, every keystroke triggers a request — so typing \"react\" fires 5 queries, most of which are wasted and can race each other.\n\nBenefits:\n- **Fewer requests** — cuts load on your API/DB and avoids rate limits.\n- **No race conditions** — an earlier slow response can't overwrite a later one if only the final query fires.\n- **Smoother UI** — no flicker from intermediate result sets.\n- **Cheaper** — fewer calls to paid APIs, fewer DB queries.\n\nTrade-off: adds ~200–400ms of perceived latency after the last keystroke. Use throttling instead when you *do* want intermediate updates (e.g. scroll handlers).",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 5982,
-    "duration_api_ms": 7531,
+    "duration_ms": 6715,
+    "duration_api_ms": 7656,
     "num_turns": 1,
-    "result": "A debouncer delays firing the search until the user stops typing for a short window (e.g. 300ms). Without it, every keystroke triggers a request — so typing \"claude\" fires 6 searches, most of which are wasted because the user hasn't finished the word yet.\n\nMain wins:\n- Fewer network requests (cost, rate limits, server load)\n- No race conditions where an earlier, slower response overwrites a later one\n- Less UI churn from rapid re-renders of result lists\n\nThrottling is the sibling tool — fires at most once per interval instead of waiting for silence. Debounce fits search; throttle fits scroll/resize.",
+    "result": "A debouncer delays firing the search until the user stops typing for a short window (e.g. 300ms). Without it, every keystroke triggers a request — so typing \"react\" fires 5 queries, most of which are wasted and can race each other.\n\nBenefits:\n- **Fewer requests** — cuts load on your API/DB and avoids rate limits.\n- **No race conditions** — an earlier slow response can't overwrite a later one if only the final query fires.\n- **Smoother UI** — no flicker from intermediate result sets.\n- **Cheaper** — fewer calls to paid APIs, fewer DB queries.\n\nTrade-off: adds ~200–400ms of perceived latency after the last keystroke. Use throttling instead when you *do* want intermediate updates (e.g. scroll handlers).",
     "stop_reason": "end_turn",
-    "session_id": "57ab03f4-4fd2-41e0-b661-bd8d30e79b2b",
-    "total_cost_usd": 0.12046100000000001,
+    "session_id": "94bf352c-124e-4fcb-9db6-365d3e4fbdf5",
+    "total_cost_usd": 0.1219985,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17024,
+      "cache_creation_input_tokens": 17050,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 208,
+      "output_tokens": 263,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17024,
+        "ephemeral_1h_input_tokens": 17050,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 208,
+          "output_tokens": 263,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17024,
+          "cache_creation_input_tokens": 17050,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17024
+            "ephemeral_1h_input_tokens": 17050
           },
           "type": "message"
         }
@@ -88,11 +88,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 208,
+        "outputTokens": 263,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17024,
+        "cacheCreationInputTokens": 17050,
         "webSearchRequests": 0,
-        "costUSD": 0.12002800000000001,
+        "costUSD": 0.12156549999999999,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "c671debb-ff6b-4653-8060-8c7ddebee81a"
+    "uuid": "a6c60296-d0e0-4f5a-9d66-b4b6b9defabe"
   }
 }

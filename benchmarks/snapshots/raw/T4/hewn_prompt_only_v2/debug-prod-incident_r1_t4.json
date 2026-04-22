@@ -1,0 +1,96 @@
+{
+  "track": "T4",
+  "arm": "hewn_prompt_only",
+  "sequence_id": "debug-prod-incident",
+  "run_index": 1,
+  "turn": 4,
+  "arm_order_index": 2,
+  "arm_order_full": [
+    "baseline",
+    "hewn_full",
+    "hewn_prompt_only",
+    "caveman_full",
+    "terse"
+  ],
+  "digest_hex": "c436155c1e87e76d88e6f2c66d47c90c16ae78237b0a8de1b93824cf92fb5c9b",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:29:41.153381+00:00",
+  "session_id_used_for_resume": "8acb082e-5568-4113-ae2d-3cb9f4fcb062",
+  "output_tokens_tiktoken": 182,
+  "output_tokens_anthropic": 487,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 442,
+  "cache_read_input_tokens": 34414,
+  "total_input_tokens": 34862,
+  "cache_state": "warm",
+  "wallclock_ms": 17928.09122201288,
+  "duration_ms": 11633,
+  "duration_api_ms": 11613,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "8acb082e-5568-4113-ae2d-3cb9f4fcb062",
+  "total_cost_usd": 0.0321745,
+  "model_used": "claude-opus-4-7",
+  "result": "Not safe as-is. `Promise.all` fires all SKU lookups concurrently — a cart with 25 items saturates the pool from a single request, and two concurrent orders with 10 items each will contend. Under load you'll see pool timeouts, not just slowness.\n\nThe old sequential loop was pool-safe by accident. The right shape is bounded concurrency:\n\n```js\nimport pLimit from 'p-limit';\nconst limit = pLimit(5);\nconst results = await Promise.all(skus.map(sku => limit(() => lookup(sku))));\n```\n\nPick the bound based on pool size ÷ expected concurrent request count, with headroom. With pool=20 and, say, ~4 concurrent order requests typical, 3–5 per request is reasonable.\n\nCheck whether your ORM/driver queues on pool exhaustion or throws — that determines whether the symptom would be latency or 500s.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 11633,
+    "duration_api_ms": 11613,
+    "num_turns": 1,
+    "result": "Not safe as-is. `Promise.all` fires all SKU lookups concurrently — a cart with 25 items saturates the pool from a single request, and two concurrent orders with 10 items each will contend. Under load you'll see pool timeouts, not just slowness.\n\nThe old sequential loop was pool-safe by accident. The right shape is bounded concurrency:\n\n```js\nimport pLimit from 'p-limit';\nconst limit = pLimit(5);\nconst results = await Promise.all(skus.map(sku => limit(() => lookup(sku))));\n```\n\nPick the bound based on pool size ÷ expected concurrent request count, with headroom. With pool=20 and, say, ~4 concurrent order requests typical, 3–5 per request is reasonable.\n\nCheck whether your ORM/driver queues on pool exhaustion or throws — that determines whether the symptom would be latency or 500s.",
+    "stop_reason": "end_turn",
+    "session_id": "8acb082e-5568-4113-ae2d-3cb9f4fcb062",
+    "total_cost_usd": 0.0321745,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 442,
+      "cache_read_input_tokens": 34414,
+      "output_tokens": 487,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 442,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 487,
+          "cache_read_input_tokens": 34414,
+          "cache_creation_input_tokens": 442,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 442
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 487,
+        "cacheReadInputTokens": 34414,
+        "cacheCreationInputTokens": 442,
+        "webSearchRequests": 0,
+        "costUSD": 0.0321745,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "7cdbc6f6-a1c7-43d8-a8e0-aab2f97ed470"
+  }
+}

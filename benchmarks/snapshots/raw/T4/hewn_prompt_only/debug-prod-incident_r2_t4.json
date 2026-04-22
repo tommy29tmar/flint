@@ -14,62 +14,62 @@
   ],
   "digest_hex": "522341918a5177210ef438fa55486ec5b622aaa576febbd731536d82595ec31b",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:37:07.150771+00:00",
-  "session_id_used_for_resume": "f349cd15-26d0-4a3f-979a-a8e27980ef9b",
-  "output_tokens_tiktoken": 257,
-  "output_tokens_anthropic": 746,
+  "timestamp": "2026-04-22T10:06:41.363529+00:00",
+  "session_id_used_for_resume": "946b8940-22b4-481f-950e-511305adddcd",
+  "output_tokens_tiktoken": 365,
+  "output_tokens_anthropic": 1016,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 617,
-  "cache_read_input_tokens": 34938,
-  "total_input_tokens": 35561,
+  "cache_creation_input_tokens": 646,
+  "cache_read_input_tokens": 34802,
+  "total_input_tokens": 35454,
   "cache_state": "warm",
-  "wallclock_ms": 21157.43644000031,
-  "duration_ms": 14988,
-  "duration_api_ms": 14963,
+  "wallclock_ms": 24617.9080310103,
+  "duration_ms": 18319,
+  "duration_api_ms": 18293,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "f349cd15-26d0-4a3f-979a-a8e27980ef9b",
-  "total_cost_usd": 0.04000525,
+  "session_id": "946b8940-22b4-481f-950e-511305adddcd",
+  "total_cost_usd": 0.046868499999999993,
   "model_used": "claude-opus-4-7",
-  "result": "Not safe under load. Two failure modes:\n\n1. **Pool starvation.** Cart with N items → N concurrent queries. 5 simultaneous orders × 10 items = 50 queries racing for 20 connections. Other endpoints sharing the pool stall.\n2. **Unbounded fan-out.** No cap on cart size. A 100-item cart holds 20 connections for itself and blocks everything else until it drains.\n\nThe sequential loop was slow but bounded — 1 connection at a time per request.\n\nBetter options, in order:\n\n1. **Single batched query.** `SELECT ... WHERE sku IN ($1, $2, ...)` — one round trip, one connection. Almost always the right call for N lookups of the same shape. Promise.all over individual queries is a code smell when the queries are homogeneous.\n2. **Bounded concurrency** if for some reason you can't batch: `p-limit(5)` or similar. Picks a ceiling well below pool size, leaves headroom for other traffic.\n3. **Keep sequential** if N is small and latency isn't a problem.\n\nAsk the PR author which one they considered. If the answer is \"none, Promise.all was faster in local testing,\" that's the bug — local testing doesn't exercise pool contention.",
+  "result": "Depends on three things. Check them in order:\n\n1. **Is `createOrder` inside a DB transaction?** If yes, that handler already holds one connection. `Promise.all` over SKU lookups then tries to acquire *additional* connections in parallel while holding the transaction's connection. Under concurrent orders, this deadlocks or times out on pool acquire. Sequential reuses the same connection — safe. **This is the biggest risk.** If the answer is yes, the parallel version is broken regardless of cart size.\n\n2. **Cart size bound.** If carts are capped at, say, 50 items, 20-item carts × a few concurrent requests already saturate the pool. What's the max? If unbounded (user-controlled), an attacker or a bulk order blows the pool. Cap concurrency with `p-limit` or similar — `Promise.all` with `pLimit(5)` is the usual fix.\n\n3. **Baseline concurrent order rate.** Pool of 20 is tight. If you run, say, 10 req/s of orders and each now fans out to 10 parallel queries, you're at 100 in-flight queries per second against 20 slots. Pool queue depth and acquire timeout matter — check your pool config (`acquireTimeoutMillis`, `max`).\n\nPractical recommendation: keep the parallelism but bound it. Use `Promise.all(skus.map(limit(() => lookup(sku))))` with a limit of 4–5. Gets most of the latency win, caps pool pressure, won't deadlock if someone later wraps the handler in a transaction.\n\nAlso worth a single batched query: `SELECT ... WHERE sku IN (...)` — one connection, one round trip, beats both approaches. If the lookups hit the same table, that's the real fix.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 14988,
-    "duration_api_ms": 14963,
+    "duration_ms": 18319,
+    "duration_api_ms": 18293,
     "num_turns": 1,
-    "result": "Not safe under load. Two failure modes:\n\n1. **Pool starvation.** Cart with N items → N concurrent queries. 5 simultaneous orders × 10 items = 50 queries racing for 20 connections. Other endpoints sharing the pool stall.\n2. **Unbounded fan-out.** No cap on cart size. A 100-item cart holds 20 connections for itself and blocks everything else until it drains.\n\nThe sequential loop was slow but bounded — 1 connection at a time per request.\n\nBetter options, in order:\n\n1. **Single batched query.** `SELECT ... WHERE sku IN ($1, $2, ...)` — one round trip, one connection. Almost always the right call for N lookups of the same shape. Promise.all over individual queries is a code smell when the queries are homogeneous.\n2. **Bounded concurrency** if for some reason you can't batch: `p-limit(5)` or similar. Picks a ceiling well below pool size, leaves headroom for other traffic.\n3. **Keep sequential** if N is small and latency isn't a problem.\n\nAsk the PR author which one they considered. If the answer is \"none, Promise.all was faster in local testing,\" that's the bug — local testing doesn't exercise pool contention.",
+    "result": "Depends on three things. Check them in order:\n\n1. **Is `createOrder` inside a DB transaction?** If yes, that handler already holds one connection. `Promise.all` over SKU lookups then tries to acquire *additional* connections in parallel while holding the transaction's connection. Under concurrent orders, this deadlocks or times out on pool acquire. Sequential reuses the same connection — safe. **This is the biggest risk.** If the answer is yes, the parallel version is broken regardless of cart size.\n\n2. **Cart size bound.** If carts are capped at, say, 50 items, 20-item carts × a few concurrent requests already saturate the pool. What's the max? If unbounded (user-controlled), an attacker or a bulk order blows the pool. Cap concurrency with `p-limit` or similar — `Promise.all` with `pLimit(5)` is the usual fix.\n\n3. **Baseline concurrent order rate.** Pool of 20 is tight. If you run, say, 10 req/s of orders and each now fans out to 10 parallel queries, you're at 100 in-flight queries per second against 20 slots. Pool queue depth and acquire timeout matter — check your pool config (`acquireTimeoutMillis`, `max`).\n\nPractical recommendation: keep the parallelism but bound it. Use `Promise.all(skus.map(limit(() => lookup(sku))))` with a limit of 4–5. Gets most of the latency win, caps pool pressure, won't deadlock if someone later wraps the handler in a transaction.\n\nAlso worth a single batched query: `SELECT ... WHERE sku IN (...)` — one connection, one round trip, beats both approaches. If the lookups hit the same table, that's the real fix.",
     "stop_reason": "end_turn",
-    "session_id": "f349cd15-26d0-4a3f-979a-a8e27980ef9b",
-    "total_cost_usd": 0.04000525,
+    "session_id": "946b8940-22b4-481f-950e-511305adddcd",
+    "total_cost_usd": 0.046868499999999993,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 617,
-      "cache_read_input_tokens": 34938,
-      "output_tokens": 746,
+      "cache_creation_input_tokens": 646,
+      "cache_read_input_tokens": 34802,
+      "output_tokens": 1016,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 617,
+        "ephemeral_1h_input_tokens": 646,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 746,
-          "cache_read_input_tokens": 34938,
-          "cache_creation_input_tokens": 617,
+          "output_tokens": 1016,
+          "cache_read_input_tokens": 34802,
+          "cache_creation_input_tokens": 646,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 617
+            "ephemeral_1h_input_tokens": 646
           },
           "type": "message"
         }
@@ -79,11 +79,11 @@
     "modelUsage": {
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 746,
-        "cacheReadInputTokens": 34938,
-        "cacheCreationInputTokens": 617,
+        "outputTokens": 1016,
+        "cacheReadInputTokens": 34802,
+        "cacheCreationInputTokens": 646,
         "webSearchRequests": 0,
-        "costUSD": 0.04000525,
+        "costUSD": 0.046868499999999993,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -91,6 +91,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "4630e501-7dc2-4c15-951e-c854c9c8dea5"
+    "uuid": "730b2fb8-ecee-48c4-9a44-23e870c9d3e7"
   }
 }

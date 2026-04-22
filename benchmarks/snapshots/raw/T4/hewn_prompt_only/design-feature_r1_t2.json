@@ -14,62 +14,62 @@
   ],
   "digest_hex": "30a2f9a62df0d790c0598917c3ab42509bbadd672a0a484741ea201d2da3b44f",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:32:22.168275+00:00",
-  "session_id_used_for_resume": "dbae8038-082c-4770-a429-b9b4f798bbc6",
-  "output_tokens_tiktoken": 593,
-  "output_tokens_anthropic": 1654,
+  "timestamp": "2026-04-22T10:01:53.804097+00:00",
+  "session_id_used_for_resume": "dc1168d0-f9c6-48dd-9150-791599c75151",
+  "output_tokens_tiktoken": 480,
+  "output_tokens_anthropic": 1622,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 1805,
-  "cache_read_input_tokens": 33875,
-  "total_input_tokens": 35686,
+  "cache_creation_input_tokens": 1115,
+  "cache_read_input_tokens": 33901,
+  "total_input_tokens": 35022,
   "cache_state": "warm",
-  "wallclock_ms": 37670.137663022615,
-  "duration_ms": 31523,
-  "duration_api_ms": 31499,
+  "wallclock_ms": 34787.942229013424,
+  "duration_ms": 28733,
+  "duration_api_ms": 28710,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "dbae8038-082c-4770-a429-b9b4f798bbc6",
-  "total_cost_usd": 0.06959875000000001,
+  "session_id": "dc1168d0-f9c6-48dd-9150-791599c75151",
+  "total_cost_usd": 0.06449925,
   "model_used": "claude-opus-4-7",
-  "result": "Short version: for gift cards I'd lean **event-sourced ledger with a cached balance column**, even though wallets are mutable. Here's why the tradeoff tips differently for gift cards.\n\n**Mutable balance row**\n- Pros: simple; one row, one update, fast reads. Matches your existing wallet code, tooling, and ops runbooks — one mental model, one set of queries, one monitoring surface. Fastest to ship.\n- Cons: no history. You cannot answer \"why is this balance $12.34\" without rebuilding it from orders/refunds elsewhere. Refunds are destructive writes; a bug or a bad migration silently corrupts balances with no way to reconstruct. Concurrent redemption requires explicit locking. Disputes (\"I didn't use that $50\") are hard to defend.\n\n**Event-sourced (append-only ledger of debits/credits/holds)**\n- Pros: the balance *is* the sum of events, so every movement is auditable by construction. Refunds and reversals are new compensating entries, not overwrites — good for accounting and chargebacks. Idempotency is natural (dedupe on event id, so retried PSP webhooks don't double-spend). Concurrency is an append, not a lock. Regulators and escheatment reporting (dormancy, state unclaimed-property filings) want this shape anyway.\n- Cons: reads need aggregation — solved by a denormalized `balance` column updated in the same transaction as the event, but now you have two things to keep in sync. More code. Diverges from your wallet pattern, so ops people now hold two models.\n\n**Why gift cards tip further toward ledger than wallets do:**\n- Higher regulatory exposure (escheatment, some states require redemption/balance-inquiry history).\n- Refund/reversal volume is higher — items get returned, orders get canceled post-capture.\n- Codes are bearer instruments: fraud and dispute investigations are routine, and a ledger is your evidence.\n- Tax treatment as tender means the gift-card movement sits next to the payment record in reconciliation; accounting teams strongly prefer append-only there.\n\n**Pragmatic middle ground** if full event-sourcing feels heavy: keep the mutable `gift_card.balance` row, but pair it with an immutable `gift_card_transactions` table that records every debit/credit/hold with `(id, card_id, delta, reason, order_id, created_at)`, written in the same DB transaction as the balance update. You get the audit trail and idempotency without the \"balance is a projection\" machinery. This is probably the right spot for you given the wallet precedent.\n\nOne question that decides it: **do you expect to ever need to reconstruct a card's balance from scratch** (migration, corruption, audit)? If yes, you need the log regardless — at which point the log is the source of truth and the balance column is just a cache.",
+  "result": "Short version: for gift cards you probably want **mutable balance + a sibling transaction log table**, not pure event sourcing. Here's why.\n\n**Pure event-sourced (balance = SUM(events))**\n- Pros: Audit trail is free — it *is* the data. Refunds are new events, history never mutates. Idempotency via event IDs is trivial. Finance/accounting reconciliation is easier. Debugging \"where did $5 go\" is just a SELECT.\n- Cons: Diverges from your wallet pattern — two mental models for \"value held by user\" is a real maintenance tax. Reads are more expensive unless you cache balance (and the cache is... a mutable row, so you end up with both anyway). More code, more ops surface.\n\n**Mutable balance row (wallet-style)**\n- Pros: Consistent with wallets — same locking strategy, same mental model, same tooling. Fast O(1) reads. Less code.\n- Cons: You still need a transaction log, because gift cards are bearer instruments and customer service *will* ask \"when was this redeemed, against which order, and by whom\" — disputes are more frequent than with wallets. Concurrent redemptions need row-level locking or optimistic concurrency (same as wallets, presumably already solved). Refund reversals are awkward if the balance has since been spent.\n\n**Why the hybrid wins here:** \"event-sourced\" in the strict sense (no stored balance, always recompute) is overkill unless you've been bitten by balance drift or have heavy accounting requirements. But a plain mutable balance with no transaction log is under-built for gift cards specifically, because of the audit/dispute profile. Mutable `gift_card.balance` + append-only `gift_card_transaction(id, gift_card_id, order_id, delta, type, created_at)` gives you the wallet-consistent model plus the audit trail, and the log doubles as your idempotency key store (unique `(gift_card_id, order_id, type)`).\n\nThe one case I'd flip to pure event sourcing: if finance has told you gift cards need GAAP-grade deferred-revenue tracking and breakage recognition. That's a different product than \"checkout discount with a balance,\" and the ledger becomes load-bearing for accounting, not just support.\n\nWhich world are you in — mostly checkout mechanics, or is finance going to need to reconcile this against deferred revenue?",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 31523,
-    "duration_api_ms": 31499,
+    "duration_ms": 28733,
+    "duration_api_ms": 28710,
     "num_turns": 1,
-    "result": "Short version: for gift cards I'd lean **event-sourced ledger with a cached balance column**, even though wallets are mutable. Here's why the tradeoff tips differently for gift cards.\n\n**Mutable balance row**\n- Pros: simple; one row, one update, fast reads. Matches your existing wallet code, tooling, and ops runbooks — one mental model, one set of queries, one monitoring surface. Fastest to ship.\n- Cons: no history. You cannot answer \"why is this balance $12.34\" without rebuilding it from orders/refunds elsewhere. Refunds are destructive writes; a bug or a bad migration silently corrupts balances with no way to reconstruct. Concurrent redemption requires explicit locking. Disputes (\"I didn't use that $50\") are hard to defend.\n\n**Event-sourced (append-only ledger of debits/credits/holds)**\n- Pros: the balance *is* the sum of events, so every movement is auditable by construction. Refunds and reversals are new compensating entries, not overwrites — good for accounting and chargebacks. Idempotency is natural (dedupe on event id, so retried PSP webhooks don't double-spend). Concurrency is an append, not a lock. Regulators and escheatment reporting (dormancy, state unclaimed-property filings) want this shape anyway.\n- Cons: reads need aggregation — solved by a denormalized `balance` column updated in the same transaction as the event, but now you have two things to keep in sync. More code. Diverges from your wallet pattern, so ops people now hold two models.\n\n**Why gift cards tip further toward ledger than wallets do:**\n- Higher regulatory exposure (escheatment, some states require redemption/balance-inquiry history).\n- Refund/reversal volume is higher — items get returned, orders get canceled post-capture.\n- Codes are bearer instruments: fraud and dispute investigations are routine, and a ledger is your evidence.\n- Tax treatment as tender means the gift-card movement sits next to the payment record in reconciliation; accounting teams strongly prefer append-only there.\n\n**Pragmatic middle ground** if full event-sourcing feels heavy: keep the mutable `gift_card.balance` row, but pair it with an immutable `gift_card_transactions` table that records every debit/credit/hold with `(id, card_id, delta, reason, order_id, created_at)`, written in the same DB transaction as the balance update. You get the audit trail and idempotency without the \"balance is a projection\" machinery. This is probably the right spot for you given the wallet precedent.\n\nOne question that decides it: **do you expect to ever need to reconstruct a card's balance from scratch** (migration, corruption, audit)? If yes, you need the log regardless — at which point the log is the source of truth and the balance column is just a cache.",
+    "result": "Short version: for gift cards you probably want **mutable balance + a sibling transaction log table**, not pure event sourcing. Here's why.\n\n**Pure event-sourced (balance = SUM(events))**\n- Pros: Audit trail is free — it *is* the data. Refunds are new events, history never mutates. Idempotency via event IDs is trivial. Finance/accounting reconciliation is easier. Debugging \"where did $5 go\" is just a SELECT.\n- Cons: Diverges from your wallet pattern — two mental models for \"value held by user\" is a real maintenance tax. Reads are more expensive unless you cache balance (and the cache is... a mutable row, so you end up with both anyway). More code, more ops surface.\n\n**Mutable balance row (wallet-style)**\n- Pros: Consistent with wallets — same locking strategy, same mental model, same tooling. Fast O(1) reads. Less code.\n- Cons: You still need a transaction log, because gift cards are bearer instruments and customer service *will* ask \"when was this redeemed, against which order, and by whom\" — disputes are more frequent than with wallets. Concurrent redemptions need row-level locking or optimistic concurrency (same as wallets, presumably already solved). Refund reversals are awkward if the balance has since been spent.\n\n**Why the hybrid wins here:** \"event-sourced\" in the strict sense (no stored balance, always recompute) is overkill unless you've been bitten by balance drift or have heavy accounting requirements. But a plain mutable balance with no transaction log is under-built for gift cards specifically, because of the audit/dispute profile. Mutable `gift_card.balance` + append-only `gift_card_transaction(id, gift_card_id, order_id, delta, type, created_at)` gives you the wallet-consistent model plus the audit trail, and the log doubles as your idempotency key store (unique `(gift_card_id, order_id, type)`).\n\nThe one case I'd flip to pure event sourcing: if finance has told you gift cards need GAAP-grade deferred-revenue tracking and breakage recognition. That's a different product than \"checkout discount with a balance,\" and the ledger becomes load-bearing for accounting, not just support.\n\nWhich world are you in — mostly checkout mechanics, or is finance going to need to reconcile this against deferred revenue?",
     "stop_reason": "end_turn",
-    "session_id": "dbae8038-082c-4770-a429-b9b4f798bbc6",
-    "total_cost_usd": 0.06959875000000001,
+    "session_id": "dc1168d0-f9c6-48dd-9150-791599c75151",
+    "total_cost_usd": 0.06449925,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 1805,
-      "cache_read_input_tokens": 33875,
-      "output_tokens": 1654,
+      "cache_creation_input_tokens": 1115,
+      "cache_read_input_tokens": 33901,
+      "output_tokens": 1622,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 1805,
+        "ephemeral_1h_input_tokens": 1115,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 1654,
-          "cache_read_input_tokens": 33875,
-          "cache_creation_input_tokens": 1805,
+          "output_tokens": 1622,
+          "cache_read_input_tokens": 33901,
+          "cache_creation_input_tokens": 1115,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 1805
+            "ephemeral_1h_input_tokens": 1115
           },
           "type": "message"
         }
@@ -79,11 +79,11 @@
     "modelUsage": {
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 1654,
-        "cacheReadInputTokens": 33875,
-        "cacheCreationInputTokens": 1805,
+        "outputTokens": 1622,
+        "cacheReadInputTokens": 33901,
+        "cacheCreationInputTokens": 1115,
         "webSearchRequests": 0,
-        "costUSD": 0.06959875000000001,
+        "costUSD": 0.06449925,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -91,6 +91,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "c3089871-37f6-458f-bd7c-995c88190a37"
+    "uuid": "0b242125-8132-452a-97d6-8ade08d60e34"
   }
 }

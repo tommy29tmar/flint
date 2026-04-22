@@ -14,62 +14,62 @@
   ],
   "digest_hex": "3191b019d37f08f3d5b68d9000f1aeb1e1a3524225f9daa893803df1e240ffd1",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:40:59.447083+00:00",
-  "session_id_used_for_resume": "ca9e1511-157b-402b-982e-a059f045fd4d",
-  "output_tokens_tiktoken": 1146,
-  "output_tokens_anthropic": 3935,
+  "timestamp": "2026-04-22T10:10:18.881107+00:00",
+  "session_id_used_for_resume": "8dc1bbb1-b63e-45ed-98f1-6fda973ed692",
+  "output_tokens_tiktoken": 793,
+  "output_tokens_anthropic": 3232,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 2136,
-  "cache_read_input_tokens": 38573,
-  "total_input_tokens": 40715,
+  "cache_creation_input_tokens": 2359,
+  "cache_read_input_tokens": 37919,
+  "total_input_tokens": 40284,
   "cache_state": "warm",
-  "wallclock_ms": 67669.87774701556,
-  "duration_ms": 61297,
-  "duration_api_ms": 61262,
+  "wallclock_ms": 61967.05070900498,
+  "duration_ms": 55750,
+  "duration_api_ms": 55720,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "ca9e1511-157b-402b-982e-a059f045fd4d",
-  "total_cost_usd": 0.1310415,
+  "session_id": "8dc1bbb1-b63e-45ed-98f1-6fda973ed692",
+  "total_cost_usd": 0.11453325,
   "model_used": "claude-opus-4-7",
-  "result": "**Policy: proportional refund to original tenders.**\n\nRefund amount splits across gift card and credit card in the same ratio as the original payment. $100 order paid $40 GC + $60 card; a $25 refund goes $10 GC + $15 card.\n\nWhy proportional over alternatives:\n- **Refund-card-first** (cash-back to customer first) is generous but enables arbitrage: buy with mixed tender, partial-refund, walk away with cash + unspent gift card balance.\n- **Refund-GC-first** (protect merchant) fails when the GC is expired or closed, and surprises customers who expect cash back.\n- Proportional is predictable, defensible (\"we refund how you paid\"), handles N partial refunds cleanly, and matches what Shopify / Stripe / most e-commerce stacks do.\n\n**Edge cases the policy has to name:**\n\n1. **GC expired or closed since purchase.** Don't credit it — issue a *new* gift card for the GC portion with a fresh 12-month expiry. This keeps the customer whole without un-expiring a card (which would break the audit trail and your breakage accounting).\n2. **Card declined / closed.** Stripe will usually still accept the refund and push it via the card network; if that fails, you have a manual-intervention queue. Not a code-path problem.\n3. **Rounding.** Integer cents. `gc_portion = floor(refund * ratio)`, card absorbs the residue. Means the GC never ends up with a weird fractional balance.\n4. **Over-refund guard.** `sum(refunds) ≤ order.total` enforced at write time.\n\n**Code path**\n\n```python\ndef refund_order(order_id, amount, reason, idempotency_key):\n    with tx():  # postgres tx\n        order = db.execute(\n            \"SELECT * FROM orders WHERE id = %s FOR UPDATE\", order_id\n        )\n        already = db.execute(\n            \"SELECT COALESCE(SUM(amount), 0) FROM order_refunds WHERE order_id = %s\",\n            order_id\n        )\n        if amount > order.total - already:\n            raise RefundExceedsOrder\n\n        # proportional split against ORIGINAL tender amounts\n        gc_portion = (amount * order.gift_card_amount) // order.total\n        card_portion = amount - gc_portion  # card absorbs rounding\n\n        refund_id = insert_order_refund(\n            order_id, amount, gc_portion, card_portion,\n            reason, idempotency_key, status='pending'\n        )\n\n        # --- gift card leg ---\n        if gc_portion > 0:\n            gc = db.execute(\n                \"SELECT * FROM gift_cards WHERE id = %s FOR UPDATE\",\n                order.gift_card_id\n            )\n            if gc.status != 'active' or gc.expires_at <= now():\n                new_gc = issue_gift_card(\n                    amount=gc_portion,\n                    owner=order.user_id,\n                    source=f\"refund:{refund_id}\"\n                )\n                ledger_insert(new_gc.id, +gc_portion, 'refund_replacement', refund_id)\n            else:\n                db.execute(\n                    \"UPDATE gift_cards SET balance = balance + %s WHERE id = %s\",\n                    gc_portion, gc.id\n                )\n                ledger_insert(gc.id, +gc_portion, 'refund', refund_id)\n\n        update_refund_status(refund_id, 'gc_done')\n    # tx commits here — GC leg is durable before we call the PSP\n\n    # --- card leg, OUTSIDE the db tx ---\n    if card_portion > 0:\n        psp.refund(\n            charge=order.charge_id,\n            amount=card_portion,\n            idempotency_key=f\"refund:{refund_id}\",\n        )\n\n    update_refund_status(refund_id, 'complete')\n```\n\n**The shape matters, not just the code.**\n\n- **GC leg inside the DB tx, card leg outside.** Don't hold a row lock across a network call to Stripe. The tx commits the GC credit and the `order_refunds` row together; the card leg is a separate step driven off that row.\n- **Idempotency key = the refund row's ID.** Passed to Stripe so retries don't double-refund; also means if the card leg fails and a worker retries it, it's safe.\n- **What if the card leg fails permanently?** The refund row sits in `gc_done` status. A retry worker picks it up; after N failures it goes to a manual queue. The GC was credited — that's fine, the customer got *something*, and the remaining card refund is tracked explicitly. Do not \"undo\" the GC credit on card failure; that just creates a second bug.\n- **Order of legs.** GC first (local, reversible via ledger) then card (external, harder to reverse) is the standard saga ordering for this shape. The opposite order — card first, GC second — leaves you exposed if your own DB write fails after an external success.\n- **Read paths for \"amount refunded per tender\"** should sum `order_refunds.gc_portion` and `order_refunds.card_portion`, not re-derive from the current GC balance (which changes for lots of reasons).\n\n**One thing to decide now, not later:** when you issue a *replacement* gift card (expired-card case), does it inherit the original expiry rules, or start a fresh 12 months? Fresh is simpler and customer-friendly; inherited is more conservative on liability. Pick one and write it into the policy doc.",
+  "result": "**Policy: proportional split.** Refund follows the original tender ratio. Order paid $30 gift + $20 card → $25 refund returns $15 to gift card, $10 to card.\n\nWhy proportional beats the alternatives:\n- **Gift-card-first** lets the customer's \"real money\" sit unrefunded — bad CX, and breaks down weirdly on small residual card charges.\n- **Card-first** is nice to customers but can exhaust the card's refund capacity before covering the gift-card portion, leaving you owing money to a card that may have expired or been drained elsewhere.\n- **Proportional** is symmetric, auditable, generalizes to multi-item partial refunds, and matches Shopify/Amazon/Stripe Terminal behavior (so it's what customers expect).\n\nTwo edge cases you need a policy decision on upfront:\n\n1. **Gift card expired since purchase.** Cleanest default: refund that portion to the original card instead. Avoid re-activating expired balances — some jurisdictions forbid it, and it creates a \"zombie card\" support headache. Only revive if legal + product have explicitly signed off.\n2. **Rounding cents.** Allocate the remainder to the card (customer-friendly, one consistent rule). Document it.\n\n**Code path:**\n\n```\nrefund(order_id, refund_amount):\n  # 1. Load original tender breakdown (stored at checkout time)\n  tender = load_order_tenders(order_id)\n  # tender = { gift_card_id, gift_paid, card_charge_id, card_paid, total }\n\n  # 2. Compute allocation\n  gift_portion = round_down(refund_amount * tender.gift_paid / tender.total)\n  card_portion = refund_amount - gift_portion   # remainder → card\n\n  # 3. If gift card expired, reroute its portion to the card\n  if gift_card_expired_or_missing(tender.gift_card_id):\n      card_portion += gift_portion\n      gift_portion = 0\n\n  # 4. Write refund intent atomically (this is the source of truth)\n  BEGIN;\n    INSERT INTO refunds (id, order_id, amount, gift_portion, card_portion,\n                         status='pending') ...;\n    -- outbox rows for each leg, idempotency keys pinned to refund.id\n    INSERT INTO outbox (refund_id, leg='gift_card', ...);\n    INSERT INTO outbox (refund_id, leg='card', ...);\n  COMMIT;\n\n  # 5. Worker drains outbox (retryable, idempotent)\n  #    gift leg: UPDATE gift_cards SET balance = balance + :gift_portion ...\n  #              + ledger row, same txn\n  #    card leg: stripe.refunds.create(charge=..., amount=card_portion,\n  #                                    idempotency_key=refund.id + ':card')\n```\n\n**Key failure modes the outbox pattern handles:**\n\n- **Process crash between gift credit and card refund.** Both legs are outbox rows; the worker resumes and completes whichever is pending. Idempotency keys prevent double-refund.\n- **Card refund API fails transiently.** Worker retries with the same idempotency key; Stripe (or equivalent) dedupes.\n- **Card refund fails permanently** (card closed, etc.). Surface to ops — human decides: store credit, new gift card, check mailed. Don't let the system silently reroute.\n\n**One thing to pre-compute at checkout, not at refund time:** store `gift_paid` and `card_paid` on the order. Don't try to reconstruct the split from gift-card and payment events later — it gets ambiguous fast with multi-item orders, discounts, and taxes.\n\nThat's the whole loop. Want me to sketch the schema (orders, order_tenders, refunds, outbox) next, or stop here since this is still design not implementation?",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 61297,
-    "duration_api_ms": 61262,
+    "duration_ms": 55750,
+    "duration_api_ms": 55720,
     "num_turns": 1,
-    "result": "**Policy: proportional refund to original tenders.**\n\nRefund amount splits across gift card and credit card in the same ratio as the original payment. $100 order paid $40 GC + $60 card; a $25 refund goes $10 GC + $15 card.\n\nWhy proportional over alternatives:\n- **Refund-card-first** (cash-back to customer first) is generous but enables arbitrage: buy with mixed tender, partial-refund, walk away with cash + unspent gift card balance.\n- **Refund-GC-first** (protect merchant) fails when the GC is expired or closed, and surprises customers who expect cash back.\n- Proportional is predictable, defensible (\"we refund how you paid\"), handles N partial refunds cleanly, and matches what Shopify / Stripe / most e-commerce stacks do.\n\n**Edge cases the policy has to name:**\n\n1. **GC expired or closed since purchase.** Don't credit it — issue a *new* gift card for the GC portion with a fresh 12-month expiry. This keeps the customer whole without un-expiring a card (which would break the audit trail and your breakage accounting).\n2. **Card declined / closed.** Stripe will usually still accept the refund and push it via the card network; if that fails, you have a manual-intervention queue. Not a code-path problem.\n3. **Rounding.** Integer cents. `gc_portion = floor(refund * ratio)`, card absorbs the residue. Means the GC never ends up with a weird fractional balance.\n4. **Over-refund guard.** `sum(refunds) ≤ order.total` enforced at write time.\n\n**Code path**\n\n```python\ndef refund_order(order_id, amount, reason, idempotency_key):\n    with tx():  # postgres tx\n        order = db.execute(\n            \"SELECT * FROM orders WHERE id = %s FOR UPDATE\", order_id\n        )\n        already = db.execute(\n            \"SELECT COALESCE(SUM(amount), 0) FROM order_refunds WHERE order_id = %s\",\n            order_id\n        )\n        if amount > order.total - already:\n            raise RefundExceedsOrder\n\n        # proportional split against ORIGINAL tender amounts\n        gc_portion = (amount * order.gift_card_amount) // order.total\n        card_portion = amount - gc_portion  # card absorbs rounding\n\n        refund_id = insert_order_refund(\n            order_id, amount, gc_portion, card_portion,\n            reason, idempotency_key, status='pending'\n        )\n\n        # --- gift card leg ---\n        if gc_portion > 0:\n            gc = db.execute(\n                \"SELECT * FROM gift_cards WHERE id = %s FOR UPDATE\",\n                order.gift_card_id\n            )\n            if gc.status != 'active' or gc.expires_at <= now():\n                new_gc = issue_gift_card(\n                    amount=gc_portion,\n                    owner=order.user_id,\n                    source=f\"refund:{refund_id}\"\n                )\n                ledger_insert(new_gc.id, +gc_portion, 'refund_replacement', refund_id)\n            else:\n                db.execute(\n                    \"UPDATE gift_cards SET balance = balance + %s WHERE id = %s\",\n                    gc_portion, gc.id\n                )\n                ledger_insert(gc.id, +gc_portion, 'refund', refund_id)\n\n        update_refund_status(refund_id, 'gc_done')\n    # tx commits here — GC leg is durable before we call the PSP\n\n    # --- card leg, OUTSIDE the db tx ---\n    if card_portion > 0:\n        psp.refund(\n            charge=order.charge_id,\n            amount=card_portion,\n            idempotency_key=f\"refund:{refund_id}\",\n        )\n\n    update_refund_status(refund_id, 'complete')\n```\n\n**The shape matters, not just the code.**\n\n- **GC leg inside the DB tx, card leg outside.** Don't hold a row lock across a network call to Stripe. The tx commits the GC credit and the `order_refunds` row together; the card leg is a separate step driven off that row.\n- **Idempotency key = the refund row's ID.** Passed to Stripe so retries don't double-refund; also means if the card leg fails and a worker retries it, it's safe.\n- **What if the card leg fails permanently?** The refund row sits in `gc_done` status. A retry worker picks it up; after N failures it goes to a manual queue. The GC was credited — that's fine, the customer got *something*, and the remaining card refund is tracked explicitly. Do not \"undo\" the GC credit on card failure; that just creates a second bug.\n- **Order of legs.** GC first (local, reversible via ledger) then card (external, harder to reverse) is the standard saga ordering for this shape. The opposite order — card first, GC second — leaves you exposed if your own DB write fails after an external success.\n- **Read paths for \"amount refunded per tender\"** should sum `order_refunds.gc_portion` and `order_refunds.card_portion`, not re-derive from the current GC balance (which changes for lots of reasons).\n\n**One thing to decide now, not later:** when you issue a *replacement* gift card (expired-card case), does it inherit the original expiry rules, or start a fresh 12 months? Fresh is simpler and customer-friendly; inherited is more conservative on liability. Pick one and write it into the policy doc.",
+    "result": "**Policy: proportional split.** Refund follows the original tender ratio. Order paid $30 gift + $20 card → $25 refund returns $15 to gift card, $10 to card.\n\nWhy proportional beats the alternatives:\n- **Gift-card-first** lets the customer's \"real money\" sit unrefunded — bad CX, and breaks down weirdly on small residual card charges.\n- **Card-first** is nice to customers but can exhaust the card's refund capacity before covering the gift-card portion, leaving you owing money to a card that may have expired or been drained elsewhere.\n- **Proportional** is symmetric, auditable, generalizes to multi-item partial refunds, and matches Shopify/Amazon/Stripe Terminal behavior (so it's what customers expect).\n\nTwo edge cases you need a policy decision on upfront:\n\n1. **Gift card expired since purchase.** Cleanest default: refund that portion to the original card instead. Avoid re-activating expired balances — some jurisdictions forbid it, and it creates a \"zombie card\" support headache. Only revive if legal + product have explicitly signed off.\n2. **Rounding cents.** Allocate the remainder to the card (customer-friendly, one consistent rule). Document it.\n\n**Code path:**\n\n```\nrefund(order_id, refund_amount):\n  # 1. Load original tender breakdown (stored at checkout time)\n  tender = load_order_tenders(order_id)\n  # tender = { gift_card_id, gift_paid, card_charge_id, card_paid, total }\n\n  # 2. Compute allocation\n  gift_portion = round_down(refund_amount * tender.gift_paid / tender.total)\n  card_portion = refund_amount - gift_portion   # remainder → card\n\n  # 3. If gift card expired, reroute its portion to the card\n  if gift_card_expired_or_missing(tender.gift_card_id):\n      card_portion += gift_portion\n      gift_portion = 0\n\n  # 4. Write refund intent atomically (this is the source of truth)\n  BEGIN;\n    INSERT INTO refunds (id, order_id, amount, gift_portion, card_portion,\n                         status='pending') ...;\n    -- outbox rows for each leg, idempotency keys pinned to refund.id\n    INSERT INTO outbox (refund_id, leg='gift_card', ...);\n    INSERT INTO outbox (refund_id, leg='card', ...);\n  COMMIT;\n\n  # 5. Worker drains outbox (retryable, idempotent)\n  #    gift leg: UPDATE gift_cards SET balance = balance + :gift_portion ...\n  #              + ledger row, same txn\n  #    card leg: stripe.refunds.create(charge=..., amount=card_portion,\n  #                                    idempotency_key=refund.id + ':card')\n```\n\n**Key failure modes the outbox pattern handles:**\n\n- **Process crash between gift credit and card refund.** Both legs are outbox rows; the worker resumes and completes whichever is pending. Idempotency keys prevent double-refund.\n- **Card refund API fails transiently.** Worker retries with the same idempotency key; Stripe (or equivalent) dedupes.\n- **Card refund fails permanently** (card closed, etc.). Surface to ops — human decides: store credit, new gift card, check mailed. Don't let the system silently reroute.\n\n**One thing to pre-compute at checkout, not at refund time:** store `gift_paid` and `card_paid` on the order. Don't try to reconstruct the split from gift-card and payment events later — it gets ambiguous fast with multi-item orders, discounts, and taxes.\n\nThat's the whole loop. Want me to sketch the schema (orders, order_tenders, refunds, outbox) next, or stop here since this is still design not implementation?",
     "stop_reason": "end_turn",
-    "session_id": "ca9e1511-157b-402b-982e-a059f045fd4d",
-    "total_cost_usd": 0.1310415,
+    "session_id": "8dc1bbb1-b63e-45ed-98f1-6fda973ed692",
+    "total_cost_usd": 0.11453325,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 2136,
-      "cache_read_input_tokens": 38573,
-      "output_tokens": 3935,
+      "cache_creation_input_tokens": 2359,
+      "cache_read_input_tokens": 37919,
+      "output_tokens": 3232,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 2136,
+        "ephemeral_1h_input_tokens": 2359,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 3935,
-          "cache_read_input_tokens": 38573,
-          "cache_creation_input_tokens": 2136,
+          "output_tokens": 3232,
+          "cache_read_input_tokens": 37919,
+          "cache_creation_input_tokens": 2359,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 2136
+            "ephemeral_1h_input_tokens": 2359
           },
           "type": "message"
         }
@@ -79,11 +79,11 @@
     "modelUsage": {
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 3935,
-        "cacheReadInputTokens": 38573,
-        "cacheCreationInputTokens": 2136,
+        "outputTokens": 3232,
+        "cacheReadInputTokens": 37919,
+        "cacheCreationInputTokens": 2359,
         "webSearchRequests": 0,
-        "costUSD": 0.1310415,
+        "costUSD": 0.11453325,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -91,6 +91,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "f5b2d645-0b04-4a28-9a0d-93bca6942981"
+    "uuid": "a54e8324-9a77-4e2e-b7df-30540dfe3255"
   }
 }

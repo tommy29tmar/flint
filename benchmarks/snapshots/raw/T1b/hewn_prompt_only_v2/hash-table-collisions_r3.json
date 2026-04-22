@@ -1,0 +1,105 @@
+{
+  "track": "T1b",
+  "arm": "hewn_prompt_only",
+  "prompt_id": "hash-table-collisions",
+  "run_index": 3,
+  "arm_order_index": 1,
+  "arm_order_full": [
+    "hewn_full",
+    "hewn_prompt_only",
+    "terse",
+    "baseline",
+    "caveman_full",
+    "caveman_full_plus_ultra_directive"
+  ],
+  "digest_hex": "dd0de5b36562eee233e96607f6b16004e23554c44ac346d467b78d873739dd7b",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:08:42.321051+00:00",
+  "output_tokens_tiktoken": 311,
+  "output_tokens_anthropic": 506,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 17020,
+  "cache_read_input_tokens": 16796,
+  "total_input_tokens": 33822,
+  "cache_state": "warm",
+  "wallclock_ms": 18257.993893988896,
+  "duration_ms": 11226,
+  "duration_api_ms": 14071,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "6bbe5fb8-d1af-457a-889a-66190e843554",
+  "total_cost_usd": 0.12786499999999998,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "Hash tables handle collisions (two keys hashing to the same bucket) with two main strategies:\n\n**1. Separate chaining**\nEach bucket holds a secondary structure (linked list, or a tree for high-collision buckets). Colliding entries are appended. Lookup = hash → walk the chain comparing keys.\n- Simple, tolerates high load factors.\n- Java's `HashMap` uses this (converts chain to red-black tree past 8 entries).\n\n**2. Open addressing**\nAll entries live in the bucket array itself. On collision, probe for another slot:\n- **Linear probing**: try `i+1, i+2, …` — cache-friendly, suffers from clustering.\n- **Quadratic probing**: try `i+1², i+2², …` — reduces primary clustering.\n- **Double hashing**: step size from a second hash — best distribution.\n\nDeletion needs tombstones so probe sequences aren't broken. Python's `dict` and Go's `map` use open addressing variants.\n\n**Keeping collisions rare**\n- Good hash function (avalanche, uniform distribution).\n- Resize when load factor exceeds a threshold (~0.75 chaining, ~0.5–0.7 open addressing).\n- Randomized seed (hash-DoS defense) — Python, Rust, and others seed per-process.\n\n**Worst case**\nWith an adversarial or broken hash, lookups degrade to O(n). Tree-bucket fallback (Java) or keyed hashes (SipHash in Python/Rust) bound this.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 11226,
+    "duration_api_ms": 14071,
+    "num_turns": 1,
+    "result": "Hash tables handle collisions (two keys hashing to the same bucket) with two main strategies:\n\n**1. Separate chaining**\nEach bucket holds a secondary structure (linked list, or a tree for high-collision buckets). Colliding entries are appended. Lookup = hash → walk the chain comparing keys.\n- Simple, tolerates high load factors.\n- Java's `HashMap` uses this (converts chain to red-black tree past 8 entries).\n\n**2. Open addressing**\nAll entries live in the bucket array itself. On collision, probe for another slot:\n- **Linear probing**: try `i+1, i+2, …` — cache-friendly, suffers from clustering.\n- **Quadratic probing**: try `i+1², i+2², …` — reduces primary clustering.\n- **Double hashing**: step size from a second hash — best distribution.\n\nDeletion needs tombstones so probe sequences aren't broken. Python's `dict` and Go's `map` use open addressing variants.\n\n**Keeping collisions rare**\n- Good hash function (avalanche, uniform distribution).\n- Resize when load factor exceeds a threshold (~0.75 chaining, ~0.5–0.7 open addressing).\n- Randomized seed (hash-DoS defense) — Python, Rust, and others seed per-process.\n\n**Worst case**\nWith an adversarial or broken hash, lookups degrade to O(n). Tree-bucket fallback (Java) or keyed hashes (SipHash in Python/Rust) bound this.",
+    "stop_reason": "end_turn",
+    "session_id": "6bbe5fb8-d1af-457a-889a-66190e843554",
+    "total_cost_usd": 0.12786499999999998,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 17020,
+      "cache_read_input_tokens": 16796,
+      "output_tokens": 506,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 17020,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 506,
+          "cache_read_input_tokens": 16796,
+          "cache_creation_input_tokens": 17020,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 17020
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 347,
+        "outputTokens": 13,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.000412,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 506,
+        "cacheReadInputTokens": 16796,
+        "cacheCreationInputTokens": 17020,
+        "webSearchRequests": 0,
+        "costUSD": 0.12745299999999998,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "19597e82-33bf-4257-a9a5-14b2dbe3ffaf"
+  }
+}

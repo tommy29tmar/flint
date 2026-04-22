@@ -14,61 +14,61 @@
   ],
   "digest_hex": "2b21fc020c9f9514ecfb89de5292bc8e27d0913b3aa966344ba89e05bc88db91",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T07:58:18.901255+00:00",
-  "output_tokens_tiktoken": 32,
-  "output_tokens_anthropic": 56,
+  "timestamp": "2026-04-22T09:21:34.769528+00:00",
+  "output_tokens_tiktoken": 200,
+  "output_tokens_anthropic": 330,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 18752,
+  "cache_creation_input_tokens": 18480,
   "cache_read_input_tokens": 16805,
-  "total_input_tokens": 35563,
+  "total_input_tokens": 35291,
   "cache_state": "warm",
-  "wallclock_ms": 10112.173300003633,
-  "duration_ms": 3589,
-  "duration_api_ms": 4355,
-  "wrapper_overhead_ms": 5757.173300003633,
+  "wallclock_ms": 15035.40649099159,
+  "duration_ms": 7973,
+  "duration_api_ms": 8600,
+  "wrapper_overhead_ms": 6435.4064909915905,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "92597031-b3c9-443c-9296-0fba010f4daf",
-  "total_cost_usd": 0.12744750000000002,
+  "session_id": "664a3c48-28a9-449e-87a5-108b13676ac0",
+  "total_cost_usd": 0.1325975,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "@hewn v0 hybrid\nG: db_pool\nC: conn_open_cost\nP: reuse_conn\nV: lower_latency\nA: tune_size",
+  "result": "Connection pool = reusable set of open DB connections.\n\nWhy: opening TCP+auth per query slow (10-100ms). Pool keeps N connections warm, hands one to each request, returns on release.\n\nKnobs:\n- min/max size — floor/ceiling of open conns\n- idle timeout — close conn after X sec unused\n- max lifetime — recycle conn after Y sec (avoid stale)\n- acquire timeout — fail fast if pool exhausted\n\nFlow: app asks pool → pool gives free conn or waits → app runs query → app returns conn → pool keeps or closes.\n\nGotchas:\n- pool size > DB max_connections = errors\n- long-held transactions starve pool\n- per-process pool, not per-thread — multiply by worker count\n- serverless: pool dies with process, use external pooler (pgbouncer)\n\nCommon libs: HikariCP (Java), pgbouncer (Postgres proxy), SQLAlchemy pool (Python), pg-pool (Node).",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 3589,
-    "duration_api_ms": 4355,
+    "duration_ms": 7973,
+    "duration_api_ms": 8600,
     "num_turns": 1,
-    "result": "@hewn v0 hybrid\nG: db_pool\nC: conn_open_cost\nP: reuse_conn\nV: lower_latency\nA: tune_size",
+    "result": "Connection pool = reusable set of open DB connections.\n\nWhy: opening TCP+auth per query slow (10-100ms). Pool keeps N connections warm, hands one to each request, returns on release.\n\nKnobs:\n- min/max size — floor/ceiling of open conns\n- idle timeout — close conn after X sec unused\n- max lifetime — recycle conn after Y sec (avoid stale)\n- acquire timeout — fail fast if pool exhausted\n\nFlow: app asks pool → pool gives free conn or waits → app runs query → app returns conn → pool keeps or closes.\n\nGotchas:\n- pool size > DB max_connections = errors\n- long-held transactions starve pool\n- per-process pool, not per-thread — multiply by worker count\n- serverless: pool dies with process, use external pooler (pgbouncer)\n\nCommon libs: HikariCP (Java), pgbouncer (Postgres proxy), SQLAlchemy pool (Python), pg-pool (Node).",
     "stop_reason": "end_turn",
-    "session_id": "92597031-b3c9-443c-9296-0fba010f4daf",
-    "total_cost_usd": 0.12744750000000002,
+    "session_id": "664a3c48-28a9-449e-87a5-108b13676ac0",
+    "total_cost_usd": 0.1325975,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 18752,
+      "cache_creation_input_tokens": 18480,
       "cache_read_input_tokens": 16805,
-      "output_tokens": 56,
+      "output_tokens": 330,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 18752,
+        "ephemeral_1h_input_tokens": 18480,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 56,
+          "output_tokens": 330,
           "cache_read_input_tokens": 16805,
-          "cache_creation_input_tokens": 18752,
+          "cache_creation_input_tokens": 18480,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 18752
+            "ephemeral_1h_input_tokens": 18480
           },
           "type": "message"
         }
@@ -88,11 +88,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 56,
+        "outputTokens": 330,
         "cacheReadInputTokens": 16805,
-        "cacheCreationInputTokens": 18752,
+        "cacheCreationInputTokens": 18480,
         "webSearchRequests": 0,
-        "costUSD": 0.12703250000000002,
+        "costUSD": 0.1321825,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "e47948c5-7320-4385-8a08-71e420a1c432"
+    "uuid": "a2ec859b-f49b-47fc-95ab-fe73e756185f"
   }
 }

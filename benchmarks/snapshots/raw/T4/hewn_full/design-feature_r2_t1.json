@@ -14,62 +14,62 @@
   ],
   "digest_hex": "3191b019d37f08f3d5b68d9000f1aeb1e1a3524225f9daa893803df1e240ffd1",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:41:11.475937+00:00",
+  "timestamp": "2026-04-22T10:10:37.086999+00:00",
   "session_id_used_for_resume": null,
-  "output_tokens_tiktoken": 78,
-  "output_tokens_anthropic": 137,
+  "output_tokens_tiktoken": 275,
+  "output_tokens_anthropic": 529,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 0,
-  "cache_read_input_tokens": 35053,
-  "total_input_tokens": 35059,
+  "cache_creation_input_tokens": 18541,
+  "cache_read_input_tokens": 16805,
+  "total_input_tokens": 35352,
   "cache_state": "warm",
-  "wallclock_ms": 12027.961579995463,
-  "duration_ms": 5406,
-  "duration_api_ms": 6382,
-  "wrapper_overhead_ms": 5645.961579995463,
+  "wallclock_ms": 18204.7846679925,
+  "duration_ms": 12233,
+  "duration_api_ms": 12944,
+  "wrapper_overhead_ms": 5260.784667992499,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "a54c782e-344b-4398-9b93-e8973f75e9a0",
-  "total_cost_usd": 0.0214425,
+  "session_id": "bddbfb84-a1c4-45a2-af56-8b442fa1a621",
+  "total_cost_usd": 0.13799974999999998,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "Scope: single-use vs reusable, partial redemption, expiry? Stacking with promos/other gift cards allowed?\n\nMoney model: separate gift-card ledger or just a payment method? How to handle refunds back to card (original balance restored or new code)?\n\nConcurrency + fraud: lock balance at auth vs capture, rate-limit code guessing, code entropy/format, PCI scope if card stores value.",
+  "result": "Main calls to make:\n\n- Storage model: code = single balance record, or code = funding source with ledger of debits? Ledger wins for refunds/audits.\n- Uniqueness + redemption atomicity: how prevent double-spend under concurrent checkouts? Row lock on balance or decrement-where-balance>=amount.\n- Code format + lookup: plaintext vs hashed at rest. Hash if codes are bearer tokens (anyone with code can spend).\n- Scope: one code per order, or stackable? Order of application vs promo codes/tax/shipping.\n- Partial redemption: when balance < total, do you authorize card for remainder atomically or split-tender? Payment processor support matters.\n- Refund path: refund to gift card first, card second? Or card first? Affects ledger.\n- Expiry + inactivity: legal varies by jurisdiction (US state law, EU). Decide upfront.\n- Issuance: purchased vs promotional vs refund-issued. Different tax/revenue-recognition treatment (purchased = liability, not revenue, until redeemed).\n- Failure modes: card decline after gift card debited — do you rollback the debit or hold it?\n- Fraud: rate-limit code guessing, lockout, code entropy.\n\nWhich of these do you want to dig into? Storage+atomicity and split-tender auth are usually the load-bearing ones.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 5406,
-    "duration_api_ms": 6382,
+    "duration_ms": 12233,
+    "duration_api_ms": 12944,
     "num_turns": 1,
-    "result": "Scope: single-use vs reusable, partial redemption, expiry? Stacking with promos/other gift cards allowed?\n\nMoney model: separate gift-card ledger or just a payment method? How to handle refunds back to card (original balance restored or new code)?\n\nConcurrency + fraud: lock balance at auth vs capture, rate-limit code guessing, code entropy/format, PCI scope if card stores value.",
+    "result": "Main calls to make:\n\n- Storage model: code = single balance record, or code = funding source with ledger of debits? Ledger wins for refunds/audits.\n- Uniqueness + redemption atomicity: how prevent double-spend under concurrent checkouts? Row lock on balance or decrement-where-balance>=amount.\n- Code format + lookup: plaintext vs hashed at rest. Hash if codes are bearer tokens (anyone with code can spend).\n- Scope: one code per order, or stackable? Order of application vs promo codes/tax/shipping.\n- Partial redemption: when balance < total, do you authorize card for remainder atomically or split-tender? Payment processor support matters.\n- Refund path: refund to gift card first, card second? Or card first? Affects ledger.\n- Expiry + inactivity: legal varies by jurisdiction (US state law, EU). Decide upfront.\n- Issuance: purchased vs promotional vs refund-issued. Different tax/revenue-recognition treatment (purchased = liability, not revenue, until redeemed).\n- Failure modes: card decline after gift card debited — do you rollback the debit or hold it?\n- Fraud: rate-limit code guessing, lockout, code entropy.\n\nWhich of these do you want to dig into? Storage+atomicity and split-tender auth are usually the load-bearing ones.",
     "stop_reason": "end_turn",
-    "session_id": "a54c782e-344b-4398-9b93-e8973f75e9a0",
-    "total_cost_usd": 0.0214425,
+    "session_id": "bddbfb84-a1c4-45a2-af56-8b442fa1a621",
+    "total_cost_usd": 0.13799974999999998,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 0,
-      "cache_read_input_tokens": 35053,
-      "output_tokens": 137,
+      "cache_creation_input_tokens": 18541,
+      "cache_read_input_tokens": 16805,
+      "output_tokens": 529,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 18541,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 137,
-          "cache_read_input_tokens": 35053,
-          "cache_creation_input_tokens": 0,
+          "output_tokens": 529,
+          "cache_read_input_tokens": 16805,
+          "cache_creation_input_tokens": 18541,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 0
+            "ephemeral_1h_input_tokens": 18541
           },
           "type": "message"
         }
@@ -89,11 +89,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 137,
-        "cacheReadInputTokens": 35053,
-        "cacheCreationInputTokens": 0,
+        "outputTokens": 529,
+        "cacheReadInputTokens": 16805,
+        "cacheCreationInputTokens": 18541,
         "webSearchRequests": 0,
-        "costUSD": 0.0209815,
+        "costUSD": 0.13753875,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -101,6 +101,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "9a7d0ddc-bacd-49c4-a107-334322d71ae7"
+    "uuid": "fb9a05dc-e8b2-46b1-a8a4-0eef7e3f244f"
   }
 }

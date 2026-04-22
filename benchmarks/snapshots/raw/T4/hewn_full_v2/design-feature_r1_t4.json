@@ -1,0 +1,96 @@
+{
+  "track": "T4",
+  "arm": "hewn_full",
+  "sequence_id": "design-feature",
+  "run_index": 1,
+  "turn": 4,
+  "arm_order_index": 0,
+  "arm_order_full": [
+    "hewn_full",
+    "hewn_prompt_only",
+    "terse",
+    "baseline",
+    "caveman_full"
+  ],
+  "digest_hex": "30a2f9a62df0d790c0598917c3ab42509bbadd672a0a484741ea201d2da3b44f",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:30:51.529155+00:00",
+  "session_id_used_for_resume": "a5b861a6-3ae3-47ab-bc99-1526aaf8a5f4",
+  "output_tokens_tiktoken": 131,
+  "output_tokens_anthropic": 198,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 468,
+  "cache_read_input_tokens": 35848,
+  "total_input_tokens": 36322,
+  "cache_state": "warm",
+  "wallclock_ms": 11626.436521008145,
+  "duration_ms": 5194,
+  "duration_api_ms": 5103,
+  "wrapper_overhead_ms": 6523.436521008145,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "a5b861a6-3ae3-47ab-bc99-1526aaf8a5f4",
+  "total_cost_usd": 0.025828999999999998,
+  "model_used": "claude-opus-4-7",
+  "result": "Both, but for different reasons. Consumption-path check is the source of truth — it's what prevents an expired card from being spent, and it's the only check that matters for correctness. The batch job is housekeeping: flip a status flag, zero the balance, emit analytics, send \"your card expired\" emails.\n\nIf you skip the consumption check and rely on the batch, you have a race window where a card expires at midnight and someone redeems it at 00:00:01 before the job runs. If you skip the batch, expired cards sit with non-zero balances forever, which confuses reporting and makes \"outstanding liability\" reports wrong.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 5194,
+    "duration_api_ms": 5103,
+    "num_turns": 1,
+    "result": "Both, but for different reasons. Consumption-path check is the source of truth — it's what prevents an expired card from being spent, and it's the only check that matters for correctness. The batch job is housekeeping: flip a status flag, zero the balance, emit analytics, send \"your card expired\" emails.\n\nIf you skip the consumption check and rely on the batch, you have a race window where a card expires at midnight and someone redeems it at 00:00:01 before the job runs. If you skip the batch, expired cards sit with non-zero balances forever, which confuses reporting and makes \"outstanding liability\" reports wrong.",
+    "stop_reason": "end_turn",
+    "session_id": "a5b861a6-3ae3-47ab-bc99-1526aaf8a5f4",
+    "total_cost_usd": 0.025828999999999998,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 468,
+      "cache_read_input_tokens": 35848,
+      "output_tokens": 198,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 468,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 198,
+          "cache_read_input_tokens": 35848,
+          "cache_creation_input_tokens": 468,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 468
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 198,
+        "cacheReadInputTokens": 35848,
+        "cacheCreationInputTokens": 468,
+        "webSearchRequests": 0,
+        "costUSD": 0.025828999999999998,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "0ee02fbe-a040-479a-a27b-4f60a57d34e1"
+  }
+}

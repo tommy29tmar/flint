@@ -1,0 +1,96 @@
+{
+  "track": "T4",
+  "arm": "hewn_prompt_only",
+  "sequence_id": "design-feature",
+  "run_index": 2,
+  "turn": 2,
+  "arm_order_index": 2,
+  "arm_order_full": [
+    "baseline",
+    "caveman_full",
+    "hewn_prompt_only",
+    "terse",
+    "hewn_full"
+  ],
+  "digest_hex": "3191b019d37f08f3d5b68d9000f1aeb1e1a3524225f9daa893803df1e240ffd1",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:38:35.221872+00:00",
+  "session_id_used_for_resume": "ca9e1511-157b-402b-982e-a059f045fd4d",
+  "output_tokens_tiktoken": 542,
+  "output_tokens_anthropic": 1648,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 1285,
+  "cache_read_input_tokens": 33875,
+  "total_input_tokens": 35166,
+  "cache_state": "warm",
+  "wallclock_ms": 36752.03055300517,
+  "duration_ms": 29641,
+  "duration_api_ms": 29614,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "ca9e1511-157b-402b-982e-a059f045fd4d",
+  "total_cost_usd": 0.06619875,
+  "model_used": "claude-opus-4-7",
+  "result": "For gift cards specifically, I'd lean event-sourced — the regulatory and dispute profile is meaningfully different from internal wallets. But the consistency argument for matching wallets is real. Details:\n\n**Event-sourced (append-only ledger)**\n\nPros:\n- Audit trail is the data, not a parallel log that can drift. This matters for gift cards because (a) customer disputes (\"I had $40, why $20?\") are common and (b) in many jurisdictions unclaimed gift card balances are subject to escheatment, which requires per-card history.\n- Idempotency is natural: every redemption event has a unique ID, so retries/double-submits are a primary-key conflict instead of a race.\n- Refunds, reversals, promotional top-ups are just compensating events — no in-place math, so bugs don't corrupt state permanently.\n- Point-in-time balance is trivial (sum up to timestamp T), which accounting will want for deferred-revenue cutoffs.\n\nCons:\n- Reads need a sum or a materialized balance cache; slightly more plumbing.\n- Diverges from your wallet pattern — two mental models, two sets of tooling, more for reviewers to keep straight.\n- Concurrency isn't free: you still need \"is current sum ≥ debit?\" to be atomic (serializable tx, advisory lock, or balance cache with optimistic concurrency).\n\n**Mutable balance row (your current wallet pattern)**\n\nPros:\n- One model across wallets + gift cards. Shared tooling, shared reviewers, less surface area.\n- Reads and updates are obvious SQL.\n- Row-level `SELECT … FOR UPDATE` on redemption is straightforward.\n\nCons:\n- Audit trail lives in a separate table that *must* be written in the same transaction as the balance mutation. Easy to forget, easy to drift. Every \"balance doesn't match history\" incident you'll ever have comes from here.\n- Reversals and adjustments mutate state, which makes \"what was this card's balance on March 14\" a genuinely hard query.\n- Disputes and fraud investigations are slower because you're reconstructing history from a secondary table that may or may not be complete.\n\n**My take:** gift cards see customer-initiated disputes, chargebacks, and regulatory reporting that internal wallets don't. That tips me toward event-sourced here even though it breaks pattern. A reasonable hybrid: ledger is source of truth, `gift_cards.current_balance` is a cached materialized value updated in the same tx as the ledger insert (gives you both fast reads *and* the audit trail as data).\n\nHow important is wallet-pattern consistency to your team — is it \"nice to have\" or \"we have shared infra/ops around it\"?",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 29641,
+    "duration_api_ms": 29614,
+    "num_turns": 1,
+    "result": "For gift cards specifically, I'd lean event-sourced — the regulatory and dispute profile is meaningfully different from internal wallets. But the consistency argument for matching wallets is real. Details:\n\n**Event-sourced (append-only ledger)**\n\nPros:\n- Audit trail is the data, not a parallel log that can drift. This matters for gift cards because (a) customer disputes (\"I had $40, why $20?\") are common and (b) in many jurisdictions unclaimed gift card balances are subject to escheatment, which requires per-card history.\n- Idempotency is natural: every redemption event has a unique ID, so retries/double-submits are a primary-key conflict instead of a race.\n- Refunds, reversals, promotional top-ups are just compensating events — no in-place math, so bugs don't corrupt state permanently.\n- Point-in-time balance is trivial (sum up to timestamp T), which accounting will want for deferred-revenue cutoffs.\n\nCons:\n- Reads need a sum or a materialized balance cache; slightly more plumbing.\n- Diverges from your wallet pattern — two mental models, two sets of tooling, more for reviewers to keep straight.\n- Concurrency isn't free: you still need \"is current sum ≥ debit?\" to be atomic (serializable tx, advisory lock, or balance cache with optimistic concurrency).\n\n**Mutable balance row (your current wallet pattern)**\n\nPros:\n- One model across wallets + gift cards. Shared tooling, shared reviewers, less surface area.\n- Reads and updates are obvious SQL.\n- Row-level `SELECT … FOR UPDATE` on redemption is straightforward.\n\nCons:\n- Audit trail lives in a separate table that *must* be written in the same transaction as the balance mutation. Easy to forget, easy to drift. Every \"balance doesn't match history\" incident you'll ever have comes from here.\n- Reversals and adjustments mutate state, which makes \"what was this card's balance on March 14\" a genuinely hard query.\n- Disputes and fraud investigations are slower because you're reconstructing history from a secondary table that may or may not be complete.\n\n**My take:** gift cards see customer-initiated disputes, chargebacks, and regulatory reporting that internal wallets don't. That tips me toward event-sourced here even though it breaks pattern. A reasonable hybrid: ledger is source of truth, `gift_cards.current_balance` is a cached materialized value updated in the same tx as the ledger insert (gives you both fast reads *and* the audit trail as data).\n\nHow important is wallet-pattern consistency to your team — is it \"nice to have\" or \"we have shared infra/ops around it\"?",
+    "stop_reason": "end_turn",
+    "session_id": "ca9e1511-157b-402b-982e-a059f045fd4d",
+    "total_cost_usd": 0.06619875,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 1285,
+      "cache_read_input_tokens": 33875,
+      "output_tokens": 1648,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 1285,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 1648,
+          "cache_read_input_tokens": 33875,
+          "cache_creation_input_tokens": 1285,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 1285
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 1648,
+        "cacheReadInputTokens": 33875,
+        "cacheCreationInputTokens": 1285,
+        "webSearchRequests": 0,
+        "costUSD": 0.06619875,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "c6703a86-2c9e-47b2-950b-39deeca2ca89"
+  }
+}

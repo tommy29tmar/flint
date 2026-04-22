@@ -1,0 +1,105 @@
+{
+  "track": "T3",
+  "arm": "hewn_full",
+  "prompt_id": "body-size-rollout-plan",
+  "run_index": 2,
+  "arm_order_index": 3,
+  "arm_order_full": [
+    "hewn_prompt_only",
+    "baseline",
+    "caveman_full",
+    "hewn_full",
+    "terse",
+    "caveman_full_plus_ultra_directive"
+  ],
+  "digest_hex": "1bd4b0373727fd4210ef8de0e1bbabf2ae481acfbad8df43e44c0380c5d0b4d2",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:22:43.681137+00:00",
+  "output_tokens_tiktoken": 885,
+  "output_tokens_anthropic": 1385,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 42506,
+  "total_input_tokens": 42512,
+  "cache_state": "warm",
+  "wallclock_ms": 34362.96282001422,
+  "duration_ms": 27953,
+  "duration_api_ms": 29011,
+  "wrapper_overhead_ms": 5351.962820014218,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "0ebadb0b-2d5b-4e7f-b11e-066b80787d34",
+  "total_cost_usd": 0.061646,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "1. Trusts client-supplied `X-User-Id` for identity — Section 2 rule 1, Section 5. Handler reads `req.headers['x-user-id']` directly; attacker sends any user id, impersonates anyone in the org. Must use `req.user.sub` populated by `auth_jwt` middleware after JWT verification; internal identity header is `X-Internal-User-Id`, set only post-auth and stripped on ingress.\n\n2. No authorization check that caller belongs to `:org_id` — Section 12 priority 1. Even with validated `userId`, handler forwards to `tx-svc` without verifying user is member of `req.params.org_id` or has transfer role. Cross-org fund movement possible. Check `req.user.org` matches `:org_id` and `req.user.roles` includes transfer capability before dispatch.\n\n3. Bypasses the middleware pipeline — Section 3. Registered as `app.post(...)` directly, skipping `header_sanitize`, `rate_limit`, `body_size_guard`, `auth_jwt`, `route_dispatcher`, `response_filter`, `audit_log`. Must go through `src/edge/pipeline.ts` — not a raw `app.post`. Money-movement endpoint with no rate limit + no body guard + no audit log is a P0.\n\n4. No input validation on `from`, `to`, `amount` — Section 12 priority 2. `amount` could be negative, string, NaN, huge; `from`/`to` could be account ids outside the org or malformed. Validate types, positive amount, account ownership within `:org_id`, reject with RFC 7807 `400` on failure.\n\n5. No idempotency key for a money-moving POST — Section 12 priority 2, operational. Client retry on network blip double-transfers. Require `Idempotency-Key` header, dedupe at edge or forward to `tx-svc` with request_id binding.\n\n6. Unhandled errors leak via default Express handler — Section 2 rule 6, Section 11. `await txSvc.transfer(...)` rejection falls through to default handler which can expose stack/library strings. Wrap in try/catch and `next(err)` to `src/edge/errorHandler.ts`; success/error bodies must be RFC 7807 shaped with `request_id`.\n\n7. Response not RFC 7807 and missing `request_id` — Section 2 rule 6. `{ok: true}` is fine for success but any non-2xx must be problem+json with `type/title/status/detail/instance` + `request_id` matching OTel trace.\n\n8. No audit log entry for a security-relevant action — Section 3 step 9, Section 9. Fund transfers must emit structured audit log (caller, org, from, to, amount, request_id, result); currently silent. Belongs in audit bucket with 365-day retention, not just edge logs.\n\n9. Route not registered via `route_dispatcher` to downstream over mTLS — Section 3 steps 6–7. Direct `txSvc.transfer` call bypasses Envoy mTLS egress and the internal-header contract (`X-Internal-User-Id/Org-Id/Roles/Auth-Method`). Use dispatcher so `tx-svc` receives validated internal headers, not trusts edge-local function call semantics.\n\n10. No rate-limit entry for this route — Section 4. Falls to default `30/min/IP` for POST, which is too loose for money movement and too tight if legitimate batch flows exist. Add explicit entry in `config/rate_limits.json` keyed by route prefix, consider per-user-per-org key in addition to per-IP.\n\n11. CODEOWNERS / review gate — Section 6. New money-moving endpoint touching auth trust should require human approval path similar to `auth_jwt.ts`/`rate_limit.ts` changes; confirm reviewers include security + tx-svc owners.\n\n12. Missing integration tests against real Redis + Postgres — Section 6, Section 11. No tests shown; team rule is integration tests must not mock DB. Need tests for: unauthorized caller, cross-org attempt, negative/huge amount, idempotency replay, rate-limit trip, audit log emitted.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 27953,
+    "duration_api_ms": 29011,
+    "num_turns": 1,
+    "result": "1. Trusts client-supplied `X-User-Id` for identity — Section 2 rule 1, Section 5. Handler reads `req.headers['x-user-id']` directly; attacker sends any user id, impersonates anyone in the org. Must use `req.user.sub` populated by `auth_jwt` middleware after JWT verification; internal identity header is `X-Internal-User-Id`, set only post-auth and stripped on ingress.\n\n2. No authorization check that caller belongs to `:org_id` — Section 12 priority 1. Even with validated `userId`, handler forwards to `tx-svc` without verifying user is member of `req.params.org_id` or has transfer role. Cross-org fund movement possible. Check `req.user.org` matches `:org_id` and `req.user.roles` includes transfer capability before dispatch.\n\n3. Bypasses the middleware pipeline — Section 3. Registered as `app.post(...)` directly, skipping `header_sanitize`, `rate_limit`, `body_size_guard`, `auth_jwt`, `route_dispatcher`, `response_filter`, `audit_log`. Must go through `src/edge/pipeline.ts` — not a raw `app.post`. Money-movement endpoint with no rate limit + no body guard + no audit log is a P0.\n\n4. No input validation on `from`, `to`, `amount` — Section 12 priority 2. `amount` could be negative, string, NaN, huge; `from`/`to` could be account ids outside the org or malformed. Validate types, positive amount, account ownership within `:org_id`, reject with RFC 7807 `400` on failure.\n\n5. No idempotency key for a money-moving POST — Section 12 priority 2, operational. Client retry on network blip double-transfers. Require `Idempotency-Key` header, dedupe at edge or forward to `tx-svc` with request_id binding.\n\n6. Unhandled errors leak via default Express handler — Section 2 rule 6, Section 11. `await txSvc.transfer(...)` rejection falls through to default handler which can expose stack/library strings. Wrap in try/catch and `next(err)` to `src/edge/errorHandler.ts`; success/error bodies must be RFC 7807 shaped with `request_id`.\n\n7. Response not RFC 7807 and missing `request_id` — Section 2 rule 6. `{ok: true}` is fine for success but any non-2xx must be problem+json with `type/title/status/detail/instance` + `request_id` matching OTel trace.\n\n8. No audit log entry for a security-relevant action — Section 3 step 9, Section 9. Fund transfers must emit structured audit log (caller, org, from, to, amount, request_id, result); currently silent. Belongs in audit bucket with 365-day retention, not just edge logs.\n\n9. Route not registered via `route_dispatcher` to downstream over mTLS — Section 3 steps 6–7. Direct `txSvc.transfer` call bypasses Envoy mTLS egress and the internal-header contract (`X-Internal-User-Id/Org-Id/Roles/Auth-Method`). Use dispatcher so `tx-svc` receives validated internal headers, not trusts edge-local function call semantics.\n\n10. No rate-limit entry for this route — Section 4. Falls to default `30/min/IP` for POST, which is too loose for money movement and too tight if legitimate batch flows exist. Add explicit entry in `config/rate_limits.json` keyed by route prefix, consider per-user-per-org key in addition to per-IP.\n\n11. CODEOWNERS / review gate — Section 6. New money-moving endpoint touching auth trust should require human approval path similar to `auth_jwt.ts`/`rate_limit.ts` changes; confirm reviewers include security + tx-svc owners.\n\n12. Missing integration tests against real Redis + Postgres — Section 6, Section 11. No tests shown; team rule is integration tests must not mock DB. Need tests for: unauthorized caller, cross-org attempt, negative/huge amount, idempotency replay, rate-limit trip, audit log emitted.",
+    "stop_reason": "end_turn",
+    "session_id": "0ebadb0b-2d5b-4e7f-b11e-066b80787d34",
+    "total_cost_usd": 0.061646,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 42506,
+      "output_tokens": 1385,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 1385,
+          "cache_read_input_tokens": 42506,
+          "cache_creation_input_tokens": 0,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 5668,
+        "outputTokens": 14,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.005738,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 1385,
+        "cacheReadInputTokens": 42506,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.055908,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "666f95db-db83-4285-b5c2-ecba64404e43"
+  }
+}

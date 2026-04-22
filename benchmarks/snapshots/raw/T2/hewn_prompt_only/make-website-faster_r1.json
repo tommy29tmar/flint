@@ -14,61 +14,61 @@
   ],
   "digest_hex": "7f50b87761132f5aa42b93557a015fe57f3c5214edc0baf0cfc53704c3da3593",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:10:47.770588+00:00",
-  "output_tokens_tiktoken": 52,
-  "output_tokens_anthropic": 79,
+  "timestamp": "2026-04-22T09:35:53.149757+00:00",
+  "output_tokens_tiktoken": 33,
+  "output_tokens_anthropic": 256,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17019,
+  "cache_creation_input_tokens": 17045,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33821,
+  "total_input_tokens": 33847,
   "cache_state": "warm",
-  "wallclock_ms": 11968.308862007689,
-  "duration_ms": 4690,
-  "duration_api_ms": 6139,
+  "wallclock_ms": 11700.123916001758,
+  "duration_ms": 5470,
+  "duration_api_ms": 6358,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "7b59eef4-4f65-4b45-b76a-ab95bcb826a5",
-  "total_cost_usd": 0.11717875,
+  "session_id": "f79fb2f8-c3b5-4867-bc08-179c26dfe50e",
+  "total_cost_usd": 0.12177625,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "Which website, and where's the code? I don't see a web project in this repo (SIGIL is a Claude Code CLI wrapper). Point me at the directory or URL and tell me what \"slow\" means — initial load, interactions, API calls?",
+  "result": "There's no website in this repo — SIGIL/ is Hewn, a Claude Code CLI wrapper. Which site do you mean, and where does the code live?",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 4690,
-    "duration_api_ms": 6139,
+    "duration_ms": 5470,
+    "duration_api_ms": 6358,
     "num_turns": 1,
-    "result": "Which website, and where's the code? I don't see a web project in this repo (SIGIL is a Claude Code CLI wrapper). Point me at the directory or URL and tell me what \"slow\" means — initial load, interactions, API calls?",
+    "result": "There's no website in this repo — SIGIL/ is Hewn, a Claude Code CLI wrapper. Which site do you mean, and where does the code live?",
     "stop_reason": "end_turn",
-    "session_id": "7b59eef4-4f65-4b45-b76a-ab95bcb826a5",
-    "total_cost_usd": 0.11717875,
+    "session_id": "f79fb2f8-c3b5-4867-bc08-179c26dfe50e",
+    "total_cost_usd": 0.12177625,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17019,
+      "cache_creation_input_tokens": 17045,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 79,
+      "output_tokens": 256,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17019,
+        "ephemeral_1h_input_tokens": 17045,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 79,
+          "output_tokens": 256,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17019,
+          "cache_creation_input_tokens": 17045,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17019
+            "ephemeral_1h_input_tokens": 17045
           },
           "type": "message"
         }
@@ -78,21 +78,21 @@
     "modelUsage": {
       "claude-haiku-4-5-20251001": {
         "inputTokens": 347,
-        "outputTokens": 12,
+        "outputTokens": 14,
         "cacheReadInputTokens": 0,
         "cacheCreationInputTokens": 0,
         "webSearchRequests": 0,
-        "costUSD": 0.00040699999999999997,
+        "costUSD": 0.00041699999999999994,
         "contextWindow": 200000,
         "maxOutputTokens": 32000
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 79,
+        "outputTokens": 256,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17019,
+        "cacheCreationInputTokens": 17045,
         "webSearchRequests": 0,
-        "costUSD": 0.11677175,
+        "costUSD": 0.12135925,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "0125b955-7d31-4956-ac62-cbc345d4c193"
+    "uuid": "393d6a17-495e-4a4b-a389-bd59e6575907"
   }
 }

@@ -14,61 +14,61 @@
   ],
   "digest_hex": "e4d553ad3e355ccffc56234ee1f9b935b3963f152f24e81c5cb452140df74b94",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:13:19.931092+00:00",
-  "output_tokens_tiktoken": 23,
-  "output_tokens_anthropic": 38,
+  "timestamp": "2026-04-22T09:38:24.985959+00:00",
+  "output_tokens_tiktoken": 22,
+  "output_tokens_anthropic": 35,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 18192,
-  "cache_read_input_tokens": 16805,
-  "total_input_tokens": 35003,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 35290,
+  "total_input_tokens": 35296,
   "cache_state": "warm",
-  "wallclock_ms": 11781.362932990305,
-  "duration_ms": 5305,
-  "duration_api_ms": 6551,
-  "wrapper_overhead_ms": 5230.362932990305,
+  "wallclock_ms": 8801.547218987253,
+  "duration_ms": 2490,
+  "duration_api_ms": 3750,
+  "wrapper_overhead_ms": 5051.547218987253,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "eadf8130-e097-40f1-98f4-8335d728ed98",
-  "total_cost_usd": 0.1234995,
+  "session_id": "8251d148-d812-4abc-8dc7-7505254f6a5f",
+  "total_cost_usd": 0.018967,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "Need stack + where search lives. Frontend framework? Searching what data (list in memory, API, DB)?",
+  "result": "Need more info. What app? Web/mobile/desktop? What searching — local list, API, docs?",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 5305,
-    "duration_api_ms": 6551,
+    "duration_ms": 2490,
+    "duration_api_ms": 3750,
     "num_turns": 1,
-    "result": "Need stack + where search lives. Frontend framework? Searching what data (list in memory, API, DB)?",
+    "result": "Need more info. What app? Web/mobile/desktop? What searching — local list, API, docs?",
     "stop_reason": "end_turn",
-    "session_id": "eadf8130-e097-40f1-98f4-8335d728ed98",
-    "total_cost_usd": 0.1234995,
+    "session_id": "8251d148-d812-4abc-8dc7-7505254f6a5f",
+    "total_cost_usd": 0.018967,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 18192,
-      "cache_read_input_tokens": 16805,
-      "output_tokens": 38,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 35290,
+      "output_tokens": 35,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 18192,
+        "ephemeral_1h_input_tokens": 0,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 38,
-          "cache_read_input_tokens": 16805,
-          "cache_creation_input_tokens": 18192,
+          "output_tokens": 35,
+          "cache_read_input_tokens": 35290,
+          "cache_creation_input_tokens": 0,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 18192
+            "ephemeral_1h_input_tokens": 0
           },
           "type": "message"
         }
@@ -88,11 +88,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 38,
-        "cacheReadInputTokens": 16805,
-        "cacheCreationInputTokens": 18192,
+        "outputTokens": 35,
+        "cacheReadInputTokens": 35290,
+        "cacheCreationInputTokens": 0,
         "webSearchRequests": 0,
-        "costUSD": 0.1230825,
+        "costUSD": 0.01855,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "8d335d53-624b-48cb-97c4-9ff50234568e"
+    "uuid": "7aea132f-70a9-431a-921b-22c395cfacff"
   }
 }

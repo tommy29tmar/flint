@@ -14,61 +14,61 @@
   ],
   "digest_hex": "99b7ab7ba17a8ba246c01cb3b86810b0fa1d28957b03d5604a74b257ab3da763",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T07:58:01.725165+00:00",
-  "output_tokens_tiktoken": 230,
-  "output_tokens_anthropic": 415,
+  "timestamp": "2026-04-22T09:21:16.793229+00:00",
+  "output_tokens_tiktoken": 267,
+  "output_tokens_anthropic": 489,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 33821,
-  "cache_read_input_tokens": 0,
-  "total_input_tokens": 33827,
-  "cache_state": "cold",
-  "wallclock_ms": 17173.226385988528,
-  "duration_ms": 10277,
-  "duration_api_ms": 12113,
+  "cache_creation_input_tokens": 17051,
+  "cache_read_input_tokens": 16796,
+  "total_input_tokens": 33853,
+  "cache_state": "warm",
+  "wallclock_ms": 17974.721080012387,
+  "duration_ms": 10910,
+  "duration_api_ms": 11948,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "a696eef8-1347-4e87-aed4-14c59ab3762a",
-  "total_cost_usd": 0.22221325,
+  "session_id": "b249c094-3d19-44c8-ac7c-d77b3fc1bd16",
+  "total_cost_usd": 0.12764875,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "By default, React re-renders every child when the parent re-renders — regardless of whether props changed. That's the model, not a bug.\n\nTo skip re-renders when props are shallow-equal:\n\n```jsx\nconst Child = React.memo(function Child(props) { ... });\n```\n\nGotchas that defeat `memo`:\n- **New object/array/function props each render.** `<Child onClick={() => ...} />` or `<Child style={{...}} />` creates a fresh reference every time → memo sees \"changed\" → re-renders. Wrap with `useCallback` / `useMemo`, or hoist the literal.\n- **Children as JSX.** `<Child><Thing/></Child>` passes a new `children` element each parent render.\n- **Context.** A memoized component still re-renders when a consumed context value changes.\n\nQuick diagnosis: open React DevTools → Profiler → \"Why did this render?\". It tells you which prop's identity changed.\n\nIf the child is cheap, don't bother — `memo` isn't free. Only reach for it when the Profiler shows it matters.",
+  "result": "React re-renders a child whenever the parent renders, unless you opt out. Reference equality is the mechanism — on each parent render, new prop values (especially objects, arrays, functions) are created, and React's default is to re-render children regardless.\n\n**Common causes:**\n1. **No memoization** — child isn't wrapped in `React.memo`, so it re-renders even when props are shallow-equal.\n2. **New object/array/function props each render** — `onClick={() => ...}`, `style={{...}}`, `options={[...]}` create fresh references every time, defeating `React.memo`.\n3. **Context updates** — any consumer of a changed context re-renders.\n4. **State lifted too high** — state that only one subtree needs lives in the parent, forcing siblings to re-render on every change.\n\n**Fixes, in order of preference:**\n- Move state down to where it's actually used.\n- `React.memo(Child)` + stable props via `useCallback` / `useMemo`.\n- Split context so unrelated consumers don't re-render.\n- Pass primitives instead of objects when possible.\n\nNote: re-rendering ≠ re-mounting, and isn't automatically a perf problem. Profile with React DevTools before optimizing — most re-renders are cheap.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 10277,
-    "duration_api_ms": 12113,
+    "duration_ms": 10910,
+    "duration_api_ms": 11948,
     "num_turns": 1,
-    "result": "By default, React re-renders every child when the parent re-renders — regardless of whether props changed. That's the model, not a bug.\n\nTo skip re-renders when props are shallow-equal:\n\n```jsx\nconst Child = React.memo(function Child(props) { ... });\n```\n\nGotchas that defeat `memo`:\n- **New object/array/function props each render.** `<Child onClick={() => ...} />` or `<Child style={{...}} />` creates a fresh reference every time → memo sees \"changed\" → re-renders. Wrap with `useCallback` / `useMemo`, or hoist the literal.\n- **Children as JSX.** `<Child><Thing/></Child>` passes a new `children` element each parent render.\n- **Context.** A memoized component still re-renders when a consumed context value changes.\n\nQuick diagnosis: open React DevTools → Profiler → \"Why did this render?\". It tells you which prop's identity changed.\n\nIf the child is cheap, don't bother — `memo` isn't free. Only reach for it when the Profiler shows it matters.",
+    "result": "React re-renders a child whenever the parent renders, unless you opt out. Reference equality is the mechanism — on each parent render, new prop values (especially objects, arrays, functions) are created, and React's default is to re-render children regardless.\n\n**Common causes:**\n1. **No memoization** — child isn't wrapped in `React.memo`, so it re-renders even when props are shallow-equal.\n2. **New object/array/function props each render** — `onClick={() => ...}`, `style={{...}}`, `options={[...]}` create fresh references every time, defeating `React.memo`.\n3. **Context updates** — any consumer of a changed context re-renders.\n4. **State lifted too high** — state that only one subtree needs lives in the parent, forcing siblings to re-render on every change.\n\n**Fixes, in order of preference:**\n- Move state down to where it's actually used.\n- `React.memo(Child)` + stable props via `useCallback` / `useMemo`.\n- Split context so unrelated consumers don't re-render.\n- Pass primitives instead of objects when possible.\n\nNote: re-rendering ≠ re-mounting, and isn't automatically a perf problem. Profile with React DevTools before optimizing — most re-renders are cheap.",
     "stop_reason": "end_turn",
-    "session_id": "a696eef8-1347-4e87-aed4-14c59ab3762a",
-    "total_cost_usd": 0.22221325,
+    "session_id": "b249c094-3d19-44c8-ac7c-d77b3fc1bd16",
+    "total_cost_usd": 0.12764875,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 33821,
-      "cache_read_input_tokens": 0,
-      "output_tokens": 415,
+      "cache_creation_input_tokens": 17051,
+      "cache_read_input_tokens": 16796,
+      "output_tokens": 489,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 33821,
+        "ephemeral_1h_input_tokens": 17051,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 415,
-          "cache_read_input_tokens": 0,
-          "cache_creation_input_tokens": 33821,
+          "output_tokens": 489,
+          "cache_read_input_tokens": 16796,
+          "cache_creation_input_tokens": 17051,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 33821
+            "ephemeral_1h_input_tokens": 17051
           },
           "type": "message"
         }
@@ -88,11 +88,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 415,
-        "cacheReadInputTokens": 0,
-        "cacheCreationInputTokens": 33821,
+        "outputTokens": 489,
+        "cacheReadInputTokens": 16796,
+        "cacheCreationInputTokens": 17051,
         "webSearchRequests": 0,
-        "costUSD": 0.22178625,
+        "costUSD": 0.12722175,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "c2a73fdd-f504-4390-909d-839ff5bb3689"
+    "uuid": "eff4a62f-086a-46c1-9915-2c17c1c34483"
   }
 }

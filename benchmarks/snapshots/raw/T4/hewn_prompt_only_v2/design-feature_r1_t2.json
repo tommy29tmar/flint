@@ -1,0 +1,96 @@
+{
+  "track": "T4",
+  "arm": "hewn_prompt_only",
+  "sequence_id": "design-feature",
+  "run_index": 1,
+  "turn": 2,
+  "arm_order_index": 1,
+  "arm_order_full": [
+    "hewn_full",
+    "hewn_prompt_only",
+    "terse",
+    "baseline",
+    "caveman_full"
+  ],
+  "digest_hex": "30a2f9a62df0d790c0598917c3ab42509bbadd672a0a484741ea201d2da3b44f",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:32:22.168275+00:00",
+  "session_id_used_for_resume": "dbae8038-082c-4770-a429-b9b4f798bbc6",
+  "output_tokens_tiktoken": 593,
+  "output_tokens_anthropic": 1654,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 1805,
+  "cache_read_input_tokens": 33875,
+  "total_input_tokens": 35686,
+  "cache_state": "warm",
+  "wallclock_ms": 37670.137663022615,
+  "duration_ms": 31523,
+  "duration_api_ms": 31499,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "dbae8038-082c-4770-a429-b9b4f798bbc6",
+  "total_cost_usd": 0.06959875000000001,
+  "model_used": "claude-opus-4-7",
+  "result": "Short version: for gift cards I'd lean **event-sourced ledger with a cached balance column**, even though wallets are mutable. Here's why the tradeoff tips differently for gift cards.\n\n**Mutable balance row**\n- Pros: simple; one row, one update, fast reads. Matches your existing wallet code, tooling, and ops runbooks — one mental model, one set of queries, one monitoring surface. Fastest to ship.\n- Cons: no history. You cannot answer \"why is this balance $12.34\" without rebuilding it from orders/refunds elsewhere. Refunds are destructive writes; a bug or a bad migration silently corrupts balances with no way to reconstruct. Concurrent redemption requires explicit locking. Disputes (\"I didn't use that $50\") are hard to defend.\n\n**Event-sourced (append-only ledger of debits/credits/holds)**\n- Pros: the balance *is* the sum of events, so every movement is auditable by construction. Refunds and reversals are new compensating entries, not overwrites — good for accounting and chargebacks. Idempotency is natural (dedupe on event id, so retried PSP webhooks don't double-spend). Concurrency is an append, not a lock. Regulators and escheatment reporting (dormancy, state unclaimed-property filings) want this shape anyway.\n- Cons: reads need aggregation — solved by a denormalized `balance` column updated in the same transaction as the event, but now you have two things to keep in sync. More code. Diverges from your wallet pattern, so ops people now hold two models.\n\n**Why gift cards tip further toward ledger than wallets do:**\n- Higher regulatory exposure (escheatment, some states require redemption/balance-inquiry history).\n- Refund/reversal volume is higher — items get returned, orders get canceled post-capture.\n- Codes are bearer instruments: fraud and dispute investigations are routine, and a ledger is your evidence.\n- Tax treatment as tender means the gift-card movement sits next to the payment record in reconciliation; accounting teams strongly prefer append-only there.\n\n**Pragmatic middle ground** if full event-sourcing feels heavy: keep the mutable `gift_card.balance` row, but pair it with an immutable `gift_card_transactions` table that records every debit/credit/hold with `(id, card_id, delta, reason, order_id, created_at)`, written in the same DB transaction as the balance update. You get the audit trail and idempotency without the \"balance is a projection\" machinery. This is probably the right spot for you given the wallet precedent.\n\nOne question that decides it: **do you expect to ever need to reconstruct a card's balance from scratch** (migration, corruption, audit)? If yes, you need the log regardless — at which point the log is the source of truth and the balance column is just a cache.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 31523,
+    "duration_api_ms": 31499,
+    "num_turns": 1,
+    "result": "Short version: for gift cards I'd lean **event-sourced ledger with a cached balance column**, even though wallets are mutable. Here's why the tradeoff tips differently for gift cards.\n\n**Mutable balance row**\n- Pros: simple; one row, one update, fast reads. Matches your existing wallet code, tooling, and ops runbooks — one mental model, one set of queries, one monitoring surface. Fastest to ship.\n- Cons: no history. You cannot answer \"why is this balance $12.34\" without rebuilding it from orders/refunds elsewhere. Refunds are destructive writes; a bug or a bad migration silently corrupts balances with no way to reconstruct. Concurrent redemption requires explicit locking. Disputes (\"I didn't use that $50\") are hard to defend.\n\n**Event-sourced (append-only ledger of debits/credits/holds)**\n- Pros: the balance *is* the sum of events, so every movement is auditable by construction. Refunds and reversals are new compensating entries, not overwrites — good for accounting and chargebacks. Idempotency is natural (dedupe on event id, so retried PSP webhooks don't double-spend). Concurrency is an append, not a lock. Regulators and escheatment reporting (dormancy, state unclaimed-property filings) want this shape anyway.\n- Cons: reads need aggregation — solved by a denormalized `balance` column updated in the same transaction as the event, but now you have two things to keep in sync. More code. Diverges from your wallet pattern, so ops people now hold two models.\n\n**Why gift cards tip further toward ledger than wallets do:**\n- Higher regulatory exposure (escheatment, some states require redemption/balance-inquiry history).\n- Refund/reversal volume is higher — items get returned, orders get canceled post-capture.\n- Codes are bearer instruments: fraud and dispute investigations are routine, and a ledger is your evidence.\n- Tax treatment as tender means the gift-card movement sits next to the payment record in reconciliation; accounting teams strongly prefer append-only there.\n\n**Pragmatic middle ground** if full event-sourcing feels heavy: keep the mutable `gift_card.balance` row, but pair it with an immutable `gift_card_transactions` table that records every debit/credit/hold with `(id, card_id, delta, reason, order_id, created_at)`, written in the same DB transaction as the balance update. You get the audit trail and idempotency without the \"balance is a projection\" machinery. This is probably the right spot for you given the wallet precedent.\n\nOne question that decides it: **do you expect to ever need to reconstruct a card's balance from scratch** (migration, corruption, audit)? If yes, you need the log regardless — at which point the log is the source of truth and the balance column is just a cache.",
+    "stop_reason": "end_turn",
+    "session_id": "dbae8038-082c-4770-a429-b9b4f798bbc6",
+    "total_cost_usd": 0.06959875000000001,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 1805,
+      "cache_read_input_tokens": 33875,
+      "output_tokens": 1654,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 1805,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 1654,
+          "cache_read_input_tokens": 33875,
+          "cache_creation_input_tokens": 1805,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 1805
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 1654,
+        "cacheReadInputTokens": 33875,
+        "cacheCreationInputTokens": 1805,
+        "webSearchRequests": 0,
+        "costUSD": 0.06959875000000001,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "c3089871-37f6-458f-bd7c-995c88190a37"
+  }
+}

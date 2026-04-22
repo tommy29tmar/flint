@@ -1,9 +1,9 @@
 # Hewn vs Verbose Claude vs Caveman — benchmark report
 
-_Generated: 2026-04-22T08:27:48.670552+00:00_
+_Generated: 2026-04-22T09:55:11.836404+00:00_
 _Model: `claude-opus-4-7`_
 _Claude CLI: 2.1.117 (Claude Code)_
-_Hewn repo commit: 66c9d8dc968a36a3c69d092d6142bb9bd543dea9_
+_Hewn repo commit: 99ffcba31852a943303024b142db306a107db186_
 _Caveman repo commit pinned: 84cc3c14fa1e10182adaced856e003406ccd250d_
 _Caveman SKILL.md sha256: `1762eb9ab0b566d70f51b040dbfd77d1f5be89cfa70da874564bda38c111be7c`_
 _Random seed: `hewn-bench-v1`_
@@ -111,17 +111,17 @@ Cell values: median(output_tokens). `hewn_full` includes the classifier hook ove
 
 | Prompt | baseline | terse | caveman_full | caveman+ultra | hewn_prompt_only | hewn_full |
 |---|---:|---:|---:|---:|---:|---:|
-| `cors-errors` | 423 | 432 | 248 | 219 | 570 | 59 |
-| `debounce-search` | 225 | 212 | 61 | 53 | 237 | 59 |
-| `explain-db-pool` | 661 | 583 | 98 | 62 | 541 | 56 |
-| `fix-node-memory-leak` | 701 | 594 | 442 | 319 | 779 | 59 |
-| `git-rebase-vs-merge` | 218 | 248 | 103 | 102 | 209 | 66 |
-| `hash-table-collisions` | 309 | 324 | 145 | 178 | 374 | 62 |
-| `queue-vs-topic` | 190 | 191 | 128 | 122 | 133 | 74 |
-| `react-rerender-parent` | 315 | 388 | 140 | 131 | 415 | 51 |
-| `sql-explain` | 266 | 414 | 178 | 118 | 455 | 59 |
-| `tcp-vs-udp` | 181 | 171 | 125 | 95 | 210 | 70 |
-| **mean** | **349** | **356** | **167** | **140** | **392** | **62** |
+| `cors-errors` | 423 | 432 | 248 | 219 | 732 | 175 |
+| `debounce-search` | 225 | 212 | 61 | 53 | 253 | 88 |
+| `explain-db-pool` | 661 | 583 | 98 | 62 | 694 | 259 |
+| `fix-node-memory-leak` | 701 | 594 | 442 | 319 | 742 | 59 |
+| `git-rebase-vs-merge` | 218 | 248 | 103 | 102 | 293 | 112 |
+| `hash-table-collisions` | 309 | 324 | 145 | 178 | 513 | 231 |
+| `queue-vs-topic` | 190 | 191 | 128 | 122 | 304 | 135 |
+| `react-rerender-parent` | 315 | 388 | 140 | 131 | 489 | 162 |
+| `sql-explain` | 266 | 414 | 178 | 118 | 588 | 120 |
+| `tcp-vs-udp` | 181 | 171 | 125 | 95 | 164 | 151 |
+| **mean** | **349** | **356** | **167** | **140** | **477** | **149** |
 
 ### Hewn-vs-comparator savings — `(appended, observed)` pair
 
@@ -131,53 +131,53 @@ Cross-track join: `appended` side from T0 single run; `observed` side and `hewn_
 
 | Prompt | observed (T1b stock) | appended (T0 calibrated) |
 |---|---:|---:|
-| `cors-errors` | +189 | +132 |
-| `debounce-search` | +2 | +119 |
-| `explain-db-pool` | +42 | +152 |
+| `cors-errors` | +73 | +16 |
+| `debounce-search` | -27 | +90 |
+| `explain-db-pool` | -161 | -51 |
 | `fix-node-memory-leak` | +383 | +433 |
-| `git-rebase-vs-merge` | +37 | +103 |
-| `hash-table-collisions` | +83 | +166 |
-| `queue-vs-topic` | +54 | +108 |
-| `react-rerender-parent` | +89 | +125 |
-| `sql-explain` | +119 | +171 |
-| `tcp-vs-udp` | +55 | +172 |
-| **median** | **+69** | **+142** |
-| **mean** | **+105** | **+168** |
+| `git-rebase-vs-merge` | -9 | +57 |
+| `hash-table-collisions` | -86 | -3 |
+| `queue-vs-topic` | -7 | +47 |
+| `react-rerender-parent` | -22 | +14 |
+| `sql-explain` | +58 | +110 |
+| `tcp-vs-udp` | -26 | +91 |
+| **median** | **-15** | **+52** |
+| **mean** | **+17** | **+80** |
 
 **vs terse** — same shape:
 
 | Prompt | observed (T1b stock) | appended (T0 calibrated) |
 |---|---:|---:|
-| `cors-errors` | +373 | +441 |
-| `debounce-search` | +153 | +196 |
-| `explain-db-pool` | +527 | +490 |
+| `cors-errors` | +257 | +325 |
+| `debounce-search` | +124 | +167 |
+| `explain-db-pool` | +324 | +287 |
 | `fix-node-memory-leak` | +535 | +528 |
-| `git-rebase-vs-merge` | +182 | +84 |
-| `hash-table-collisions` | +262 | +253 |
-| `queue-vs-topic` | +117 | +188 |
-| `react-rerender-parent` | +337 | +305 |
-| `sql-explain` | +355 | +464 |
-| `tcp-vs-udp` | +101 | +102 |
-| **median** | **+299** | **+279** |
-| **mean** | **+294** | **+305** |
+| `git-rebase-vs-merge` | +136 | +38 |
+| `hash-table-collisions` | +93 | +84 |
+| `queue-vs-topic` | +56 | +127 |
+| `react-rerender-parent` | +226 | +194 |
+| `sql-explain` | +294 | +403 |
+| `tcp-vs-udp` | +20 | +21 |
+| **median** | **+181** | **+180** |
+| **mean** | **+206** | **+217** |
 
 ### Hewn-vs-baseline (causal — both arms inherit default+CLAUDE.md)
 
 | Prompt | baseline | hewn_full | savings |
 |---|---:|---:|---:|
-| `cors-errors` | 423 | 59 | 86% |
-| `debounce-search` | 225 | 59 | 74% |
-| `explain-db-pool` | 661 | 56 | 92% |
+| `cors-errors` | 423 | 175 | 59% |
+| `debounce-search` | 225 | 88 | 61% |
+| `explain-db-pool` | 661 | 259 | 61% |
 | `fix-node-memory-leak` | 701 | 59 | 92% |
-| `git-rebase-vs-merge` | 218 | 66 | 70% |
-| `hash-table-collisions` | 309 | 62 | 80% |
-| `queue-vs-topic` | 190 | 74 | 61% |
-| `react-rerender-parent` | 315 | 51 | 84% |
-| `sql-explain` | 266 | 59 | 78% |
-| `tcp-vs-udp` | 181 | 70 | 61% |
-| **median** | | | **79%** |
-| **mean** | | | **78%** |
-| **range** | | | **61% – 92%** |
+| `git-rebase-vs-merge` | 218 | 112 | 49% |
+| `hash-table-collisions` | 309 | 231 | 25% |
+| `queue-vs-topic` | 190 | 135 | 29% |
+| `react-rerender-parent` | 315 | 162 | 49% |
+| `sql-explain` | 266 | 120 | 55% |
+| `tcp-vs-udp` | 181 | 151 | 17% |
+| **median** | | | **52%** |
+| **mean** | | | **49%** |
+| **range** | | | **17% – 92%** |
 
 ### Stability (stdev of output_tokens across 3 runs per arm × prompt)
 
@@ -187,8 +187,8 @@ Cross-track join: `appended` side from T0 single run; `observed` side and `hewn_
 | terse | 59.8 |
 | caveman_full | 36.7 |
 | caveman_full_plus_ultra_directive | 18.6 |
-| hewn_prompt_only | 74.9 |
-| hewn_full | 3.8 |
+| hewn_prompt_only | 61.3 |
+| hewn_full | 41.3 |
 
 ## T2 — Vibe / non-tech user prompts
 
@@ -198,34 +198,34 @@ Cross-track join: `appended` side from T0 single run; `observed` side and `hewn_
 
 | Prompt | baseline | terse | caveman_full | caveman+ultra | hewn_prompt_only | hewn_full |
 |---|---:|---:|---:|---:|---:|---:|
-| `add-search-bar` | 197 | 117 | 266 | 199 | 186 | 42 |
-| `login-button-broken` | 227 | 93 | 122 | 106 | 385 | 44 |
-| `make-website-faster` | 43 | 94 | 59 | 131 | 53 | 43 |
-| `spaghetti-code` | 442 | 422 | 427 | 451 | 453 | 55 |
-| `typeerror-undefined-map` | 254 | 277 | 116 | 105 | 297 | 56 |
-| **mean** | **233** | **201** | **198** | **198** | **275** | **48** |
+| `add-search-bar` | 197 | 117 | 266 | 199 | 213 | 35 |
+| `login-button-broken` | 227 | 93 | 122 | 106 | 185 | 45 |
+| `make-website-faster` | 43 | 94 | 59 | 131 | 208 | 44 |
+| `spaghetti-code` | 442 | 422 | 427 | 451 | 518 | 72 |
+| `typeerror-undefined-map` | 254 | 277 | 116 | 105 | 460 | 58 |
+| **mean** | **233** | **201** | **198** | **198** | **317** | **51** |
 
 ### Hewn-vs-baseline (causal — both arms inherit default+CLAUDE.md)
 
 | Prompt | baseline | hewn_full | savings |
 |---|---:|---:|---:|
-| `add-search-bar` | 197 | 42 | 79% |
-| `login-button-broken` | 227 | 44 | 81% |
-| `make-website-faster` | 43 | 43 | 0% |
-| `spaghetti-code` | 442 | 55 | 88% |
-| `typeerror-undefined-map` | 254 | 56 | 78% |
-| **median** | | | **79%** |
-| **mean** | | | **65%** |
+| `add-search-bar` | 197 | 35 | 82% |
+| `login-button-broken` | 227 | 45 | 80% |
+| `make-website-faster` | 43 | 44 | −2% |
+| `spaghetti-code` | 442 | 72 | 84% |
+| `typeerror-undefined-map` | 254 | 58 | 77% |
+| **median** | | | **80%** |
+| **mean** | | | **64%** |
 
 ### Wall-clock latency (median, ms)
 
 | Prompt | baseline | terse | caveman_full | caveman+ultra | hewn_prompt_only | hewn_full |
 |---|---:|---:|---:|---:|---:|---:|
-| `add-search-bar` | 5397 | 3948 | 6454 | 5872 | 4855 | 5305 |
-| `login-button-broken` | 4985 | 3396 | 4849 | 4063 | 7407 | 3396 |
-| `make-website-faster` | 2479 | 3412 | 4133 | 4344 | 4690 | 4290 |
-| `spaghetti-code` | 10576 | 10273 | 10834 | 12322 | 11945 | 4891 |
-| `typeerror-undefined-map` | 7046 | 5795 | 4021 | 4078 | 6423 | 3727 |
+| `add-search-bar` | 5397 | 3948 | 6454 | 5872 | 5071 | 2653 |
+| `login-button-broken` | 4985 | 3396 | 4849 | 4063 | 5332 | 3776 |
+| `make-website-faster` | 2479 | 3412 | 4133 | 4344 | 5037 | 2852 |
+| `spaghetti-code` | 10576 | 10273 | 10834 | 12322 | 11178 | 4954 |
+| `typeerror-undefined-map` | 7046 | 5795 | 4021 | 4078 | 9322 | 3345 |
 
 ## T3 — Long context (~5k handbook prefix)
 
@@ -235,28 +235,28 @@ Cross-track join: `appended` side from T0 single run; `observed` side and `hewn_
 
 | Prompt | baseline | terse | caveman_full | caveman+ultra | hewn_prompt_only | hewn_full |
 |---|---:|---:|---:|---:|---:|---:|
-| `body-size-rollout-plan` | 1712 | 1548 | 1389 | 1630 | 2159 | 1380 |
-| `rate-limit-xff-review` | 146 | 100 | 72 | 54 | 293 | 242 |
-| `transfer-handler-review` | 772 | 801 | 532 | 560 | 793 | 788 |
-| **mean** | **877** | **816** | **664** | **748** | **1082** | **803** |
+| `body-size-rollout-plan` | 1712 | 1548 | 1389 | 1630 | 1783 | 1758 |
+| `rate-limit-xff-review` | 146 | 100 | 72 | 54 | 201 | 4457 |
+| `transfer-handler-review` | 772 | 801 | 532 | 560 | 945 | 1205 |
+| **mean** | **877** | **816** | **664** | **748** | **976** | **2473** |
 
 ### Hewn-vs-baseline (causal — both arms inherit default+CLAUDE.md)
 
 | Prompt | baseline | hewn_full | savings |
 |---|---:|---:|---:|
-| `body-size-rollout-plan` | 1712 | 1380 | 19% |
-| `rate-limit-xff-review` | 146 | 242 | −66% |
-| `transfer-handler-review` | 772 | 788 | −2% |
-| **median** | | | **−2%** |
-| **mean** | | | **−16%** |
+| `body-size-rollout-plan` | 1712 | 1758 | −3% |
+| `rate-limit-xff-review` | 146 | 4457 | −2953% |
+| `transfer-handler-review` | 772 | 1205 | −56% |
+| **median** | | | **−56%** |
+| **mean** | | | **−1004%** |
 
 ### Wall-clock latency (median, ms)
 
 | Prompt | baseline | terse | caveman_full | caveman+ultra | hewn_prompt_only | hewn_full |
 |---|---:|---:|---:|---:|---:|---:|
-| `body-size-rollout-plan` | 31892 | 26159 | 25480 | 30524 | 40299 | 27486 |
-| `rate-limit-xff-review` | 4864 | 2556 | 2968 | 2645 | 6382 | 7819 |
-| `transfer-handler-review` | 12623 | 13293 | 9240 | 9540 | 13162 | 16451 |
+| `body-size-rollout-plan` | 31892 | 26159 | 25480 | 30524 | 32756 | 33747 |
+| `rate-limit-xff-review` | 4864 | 2556 | 2968 | 2645 | 4990 | 78529 |
+| `transfer-handler-review` | 12623 | 13293 | 9240 | 9540 | 17180 | 22537 |
 
 ## T4 — Multi-turn (drift + isolated hook value)
 
@@ -266,8 +266,8 @@ Each (arm, sequence, run) replays 5 user turns via explicit `--resume <session_i
 
 | Sequence | baseline | terse | caveman_full | hewn_prompt_only | hewn_full |
 |---|---:|---:|---:|---:|---:|
-| `debug-prod-incident` | 5550 | 2255 | 1612 | 2401 | 353 |
-| `design-feature` | 8841 | 5585 | 6840 | 10950 | 992 |
+| `debug-prod-incident` | 5550 | 2255 | 1612 | 5431 | 719 |
+| `design-feature` | 8841 | 5585 | 6840 | 10303 | 4956 |
 
 ### Hook value — `(hewn_prompt_only − hewn_full)` cumulative deltas
 
@@ -275,8 +275,8 @@ Positive Δ output_tokens = hook makes hewn_full produce **fewer** tokens. Posit
 
 | Sequence | Δ output_tokens (median) | Δ cache_creation_input (median) |
 |---|---:|---:|
-| `debug-prod-incident` | +2048 | -7572 |
-| `design-feature` | +9958 | -13695 |
+| `debug-prod-incident` | +4712 | -414 |
+| `design-feature` | +5347 | -97 |
 
 ### Session-id isolation check
 
@@ -290,25 +290,25 @@ OK — no session_id collision across distinct (arm, seq, run) tuples.
 
 | Prompt | baseline | terse | caveman_full | caveman+ultra | hewn_prompt_only | hewn_full |
 |---|---:|---:|---:|---:|---:|---:|
-| `outage-apology-email` | 481 | 483 | 538 | 450 | 417 | 486 |
-| `smart-drafts-release-note` | 13 | 10 | 12 | 14 | 29 | 16 |
-| **mean** | **247** | **247** | **275** | **232** | **224** | **251** |
+| `outage-apology-email` | 481 | 483 | 538 | 450 | 457 | 481 |
+| `smart-drafts-release-note` | 13 | 10 | 12 | 14 | 17 | 15 |
+| **mean** | **247** | **247** | **275** | **232** | **237** | **248** |
 
 ### Hewn-vs-baseline (causal — both arms inherit default+CLAUDE.md)
 
 | Prompt | baseline | hewn_full | savings |
 |---|---:|---:|---:|
-| `outage-apology-email` | 481 | 486 | −1% |
-| `smart-drafts-release-note` | 13 | 16 | −19% |
-| **median** | | | **−10%** |
-| **mean** | | | **−10%** |
+| `outage-apology-email` | 481 | 481 | 0% |
+| `smart-drafts-release-note` | 13 | 15 | −11% |
+| **median** | | | **−6%** |
+| **mean** | | | **−6%** |
 
 ### Wall-clock latency (median, ms)
 
 | Prompt | baseline | terse | caveman_full | caveman+ultra | hewn_prompt_only | hewn_full |
 |---|---:|---:|---:|---:|---:|---:|
-| `outage-apology-email` | 11520 | 10397 | 11910 | 11079 | 10321 | 11722 |
-| `smart-drafts-release-note` | 1680 | 3024 | 1779 | 1629 | 3310 | 2206 |
+| `outage-apology-email` | 11520 | 10397 | 11910 | 11079 | 10673 | 12141 |
+| `smart-drafts-release-note` | 1680 | 3024 | 1779 | 1629 | 1978 | 2429 |
 
 ## Quality — concepts coverage, literals, format compliance, judge failure rates
 
@@ -327,10 +327,12 @@ OK — no session_id collision across distinct (arm, seq, run) tuples.
 | baseline | 96% | 93% | 0% | 0.2 | 0 | — |
 | caveman_full | 95% | 93% | 0% | 0.0 | 0 | — |
 | caveman_full_plus_ultra_directive | 93% | 80% | 0% | 0.1 | 0 | — |
-| hewn_full | 38% | 20% | 100% | 0.0 | 0 | — |
+| hewn_full | 91% | 100% | 10% | 0.0 | 0 | — |
 | hewn_full_v1 | 96% | 100% | 10% | 0.2 | 0 | — |
-| hewn_prompt_only | 98% | 100% | 0% | 0.2 | 0 | — |
+| hewn_full_v2 | 38% | 20% | 100% | 0.0 | 0 | — |
+| hewn_prompt_only | 99% | 100% | 0% | 0.1 | 0 | — |
 | hewn_prompt_only_v1 | 96% | 93% | 0% | 0.2 | 0 | — |
+| hewn_prompt_only_v2 | 98% | 100% | 0% | 0.2 | 0 | — |
 | terse | 96% | 100% | 0% | 0.2 | 0 | — |
 
 ### T2
@@ -340,10 +342,12 @@ OK — no session_id collision across distinct (arm, seq, run) tuples.
 | baseline | 47% | 50% | 0% | 0.1 | 0 | 78% |
 | caveman_full | 78% | 33% | 0% | 0.0 | 0 | 20% |
 | caveman_full_plus_ultra_directive | 83% | 17% | 0% | 0.1 | 0 | 28% |
-| hewn_full | 53% | 50% | 0% | 0.3 | 0 | 47% |
+| hewn_full | 53% | 50% | 0% | 0.0 | 0 | 37% |
 | hewn_full_v1 | 70% | 50% | 0% | 0.8 | 0 | 35% |
-| hewn_prompt_only | 55% | 50% | 0% | 0.1 | 0 | 72% |
+| hewn_full_v2 | 53% | 50% | 0% | 0.3 | 0 | 47% |
+| hewn_prompt_only | 48% | 50% | 0% | 0.3 | 0 | 68% |
 | hewn_prompt_only_v1 | 45% | 50% | 0% | 0.3 | 0 | 60% |
+| hewn_prompt_only_v2 | 55% | 50% | 0% | 0.1 | 0 | 72% |
 | terse | 65% | 50% | 0% | 0.4 | 0 | 43% |
 
 ### T3
@@ -353,10 +357,12 @@ OK — no session_id collision across distinct (arm, seq, run) tuples.
 | baseline | 5% | 0% | 0% | 0.5 | 0 | — |
 | caveman_full | 5% | 0% | 0% | 0.0 | 0 | — |
 | caveman_full_plus_ultra_directive | 5% | 0% | 0% | 0.0 | 0 | — |
-| hewn_full | 12% | 8% | 0% | 0.0 | 0 | — |
+| hewn_full | 39% | 33% | 0% | 0.1 | 0 | — |
 | hewn_full_v1 | 27% | 42% | 0% | 0.1 | 0 | — |
-| hewn_prompt_only | 5% | 0% | 0% | 0.1 | 0 | — |
+| hewn_full_v2 | 12% | 8% | 0% | 0.0 | 0 | — |
+| hewn_prompt_only | 6% | 0% | 0% | 0.0 | 0 | — |
 | hewn_prompt_only_v1 | 5% | 0% | 0% | 0.0 | 0 | — |
+| hewn_prompt_only_v2 | 5% | 0% | 0% | 0.1 | 0 | — |
 | terse | 5% | 0% | 0% | 0.0 | 0 | — |
 
 ### T4
@@ -365,10 +371,12 @@ OK — no session_id collision across distinct (arm, seq, run) tuples.
 |---|---:|---:|---:|---:|---:|---:|
 | baseline | 100% | — | 0% | 0.4 | 0 | — |
 | caveman_full | 98% | — | 0% | 0.1 | 0 | — |
-| hewn_full | 85% | — | 20% | 0.1 | 0 | — |
+| hewn_full | 82% | — | 20% | 0.0 | 0 | — |
 | hewn_full_v1 | 100% | — | 20% | 0.1 | 0 | — |
-| hewn_prompt_only | 98% | — | 0% | 0.3 | 0 | — |
+| hewn_full_v2 | 85% | — | 20% | 0.1 | 0 | — |
+| hewn_prompt_only | 98% | — | 0% | 0.2 | 0 | — |
 | hewn_prompt_only_v1 | 95% | — | 0% | 0.3 | 0 | — |
+| hewn_prompt_only_v2 | 98% | — | 0% | 0.3 | 0 | — |
 | terse | 95% | — | 0% | 0.3 | 0 | — |
 
 ### T5
@@ -380,6 +388,8 @@ OK — no session_id collision across distinct (arm, seq, run) tuples.
 | caveman_full_plus_ultra_directive | 0% | 0% | 0% | 0.2 | 0 | — |
 | hewn_full | 0% | 0% | 0% | 0.2 | 0 | — |
 | hewn_full_v1 | 0% | 0% | 0% | 0.5 | 0 | — |
-| hewn_prompt_only | 0% | 0% | 0% | 3.5 | 0 | — |
+| hewn_full_v2 | 0% | 0% | 0% | 0.2 | 0 | — |
+| hewn_prompt_only | 0% | 0% | 0% | 0.5 | 0 | — |
 | hewn_prompt_only_v1 | 0% | 0% | 0% | 0.3 | 0 | — |
+| hewn_prompt_only_v2 | 0% | 0% | 0% | 3.5 | 0 | — |
 | terse | 0% | 0% | 0% | 0.4 | 0 | — |

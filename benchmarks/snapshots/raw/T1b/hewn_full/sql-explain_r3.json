@@ -14,61 +14,61 @@
   ],
   "digest_hex": "3aa90e0ce3bf73b84f09778e7aa8f88c3b89ffe3948e8877446a0e78f751df25",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:08:22.288938+00:00",
-  "output_tokens_tiktoken": 34,
-  "output_tokens_anthropic": 60,
+  "timestamp": "2026-04-22T09:33:07.905103+00:00",
+  "output_tokens_tiktoken": 69,
+  "output_tokens_anthropic": 115,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 18760,
+  "cache_creation_input_tokens": 18488,
   "cache_read_input_tokens": 16805,
-  "total_input_tokens": 35571,
+  "total_input_tokens": 35299,
   "cache_state": "warm",
-  "wallclock_ms": 10535.503528022673,
-  "duration_ms": 4496,
-  "duration_api_ms": 5322,
-  "wrapper_overhead_ms": 5213.503528022673,
+  "wallclock_ms": 11357.769866008312,
+  "duration_ms": 4846,
+  "duration_api_ms": 5613,
+  "wrapper_overhead_ms": 5744.7698660083115,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "e6029dba-b897-405f-b572-19a9bdc5d346",
-  "total_cost_usd": 0.1276005,
+  "session_id": "d8b5ffb6-aeda-43bd-b44e-f33b2b4e15c6",
+  "total_cost_usd": 0.1272705,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "@hewn v0 hybrid\nG: sql_explain\nC: query_plan\nP: optimizer_steps\nV: spot_slow_ops\nA: tune_indexes",
+  "result": "EXPLAIN shows query plan. How DB will execute: join order, index use, scan type (seq vs index), estimated rows/cost.\nEXPLAIN ANALYZE runs query, adds real timings + actual row counts.\nRead it to find slow nodes: seq scans on big tables, bad row estimates, nested loops over millions.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 4496,
-    "duration_api_ms": 5322,
+    "duration_ms": 4846,
+    "duration_api_ms": 5613,
     "num_turns": 1,
-    "result": "@hewn v0 hybrid\nG: sql_explain\nC: query_plan\nP: optimizer_steps\nV: spot_slow_ops\nA: tune_indexes",
+    "result": "EXPLAIN shows query plan. How DB will execute: join order, index use, scan type (seq vs index), estimated rows/cost.\nEXPLAIN ANALYZE runs query, adds real timings + actual row counts.\nRead it to find slow nodes: seq scans on big tables, bad row estimates, nested loops over millions.",
     "stop_reason": "end_turn",
-    "session_id": "e6029dba-b897-405f-b572-19a9bdc5d346",
-    "total_cost_usd": 0.1276005,
+    "session_id": "d8b5ffb6-aeda-43bd-b44e-f33b2b4e15c6",
+    "total_cost_usd": 0.1272705,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 18760,
+      "cache_creation_input_tokens": 18488,
       "cache_read_input_tokens": 16805,
-      "output_tokens": 60,
+      "output_tokens": 115,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 18760,
+        "ephemeral_1h_input_tokens": 18488,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 60,
+          "output_tokens": 115,
           "cache_read_input_tokens": 16805,
-          "cache_creation_input_tokens": 18760,
+          "cache_creation_input_tokens": 18488,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 18760
+            "ephemeral_1h_input_tokens": 18488
           },
           "type": "message"
         }
@@ -78,21 +78,21 @@
     "modelUsage": {
       "claude-haiku-4-5-20251001": {
         "inputTokens": 348,
-        "outputTokens": 14,
+        "outputTokens": 13,
         "cacheReadInputTokens": 0,
         "cacheCreationInputTokens": 0,
         "webSearchRequests": 0,
-        "costUSD": 0.00041799999999999997,
+        "costUSD": 0.000413,
         "contextWindow": 200000,
         "maxOutputTokens": 32000
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 60,
+        "outputTokens": 115,
         "cacheReadInputTokens": 16805,
-        "cacheCreationInputTokens": 18760,
+        "cacheCreationInputTokens": 18488,
         "webSearchRequests": 0,
-        "costUSD": 0.1271825,
+        "costUSD": 0.1268575,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "be27ceb5-450c-413c-94dd-37a1f6006cd2"
+    "uuid": "777a9c17-8516-4a7a-8b1d-ea268b371d94"
   }
 }

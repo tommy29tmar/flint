@@ -1,0 +1,105 @@
+{
+  "track": "T1b",
+  "arm": "hewn_prompt_only",
+  "prompt_id": "queue-vs-topic",
+  "run_index": 3,
+  "arm_order_index": 2,
+  "arm_order_full": [
+    "terse",
+    "hewn_full",
+    "hewn_prompt_only",
+    "caveman_full_plus_ultra_directive",
+    "caveman_full",
+    "baseline"
+  ],
+  "digest_hex": "12d5f12129216ce1c15ddae588d0de60b3bad5ba9e88ba91d072dae61c162ecb",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:10:22.226462+00:00",
+  "output_tokens_tiktoken": 74,
+  "output_tokens_anthropic": 120,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 17027,
+  "cache_read_input_tokens": 16796,
+  "total_input_tokens": 33829,
+  "cache_state": "warm",
+  "wallclock_ms": 13614.476927003125,
+  "duration_ms": 7682,
+  "duration_api_ms": 9053,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "8878d681-e51e-40af-80d5-c729cc94e19b",
+  "total_cost_usd": 0.11826275,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "Queue: point-to-point, one consumer processes each message (work distribution, load balancing across workers).\n\nTopic: pub/sub, every subscriber gets a copy (event broadcasting, fanout to independent consumers).\n\nRule of thumb: if adding a second consumer should *share* the load, use a queue; if it should *also* receive every message, use a topic.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 7682,
+    "duration_api_ms": 9053,
+    "num_turns": 1,
+    "result": "Queue: point-to-point, one consumer processes each message (work distribution, load balancing across workers).\n\nTopic: pub/sub, every subscriber gets a copy (event broadcasting, fanout to independent consumers).\n\nRule of thumb: if adding a second consumer should *share* the load, use a queue; if it should *also* receive every message, use a topic.",
+    "stop_reason": "end_turn",
+    "session_id": "8878d681-e51e-40af-80d5-c729cc94e19b",
+    "total_cost_usd": 0.11826275,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 17027,
+      "cache_read_input_tokens": 16796,
+      "output_tokens": 120,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 17027,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 120,
+          "cache_read_input_tokens": 16796,
+          "cache_creation_input_tokens": 17027,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 17027
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 351,
+        "outputTokens": 13,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.00041600000000000003,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 120,
+        "cacheReadInputTokens": 16796,
+        "cacheCreationInputTokens": 17027,
+        "webSearchRequests": 0,
+        "costUSD": 0.11784675,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "b63f5c95-45c6-4c58-8c2c-40734ea885e7"
+  }
+}

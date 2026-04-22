@@ -14,61 +14,61 @@
   ],
   "digest_hex": "dd0de5b36562eee233e96607f6b16004e23554c44ac346d467b78d873739dd7b",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:08:32.825046+00:00",
-  "output_tokens_tiktoken": 35,
-  "output_tokens_anthropic": 63,
+  "timestamp": "2026-04-22T09:33:19.263646+00:00",
+  "output_tokens_tiktoken": 224,
+  "output_tokens_anthropic": 376,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 18754,
+  "cache_creation_input_tokens": 18482,
   "cache_read_input_tokens": 16805,
-  "total_input_tokens": 35565,
+  "total_input_tokens": 35293,
   "cache_state": "warm",
-  "wallclock_ms": 9495.458930992754,
-  "duration_ms": 3504,
-  "duration_api_ms": 4467,
-  "wrapper_overhead_ms": 5028.458930992754,
+  "wallclock_ms": 15078.845821990399,
+  "duration_ms": 8661,
+  "duration_api_ms": 9609,
+  "wrapper_overhead_ms": 5469.845821990399,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "0baf3706-ab28-4b75-aa23-f4fe73a90a8d",
-  "total_cost_usd": 0.127632,
+  "session_id": "7aed9cc7-28b2-4e8d-92ad-fc4e29b4c105",
+  "total_cost_usd": 0.133757,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "@hewn v0 hybrid\nG: hash_collisions\nC: same_bucket\nP: chain_or_probe\nV: o1_avg_lookup\nA: pick_strategy",
+  "result": "Hash table stores key-value pairs in array indexed by hash(key) % size. Collision when two keys hash to same slot.\n\nTwo main strategies:\n\nSeparate chaining. Each slot holds linked list (or tree). On collision, append to list. Lookup walks list comparing keys. Java HashMap uses this — switches to red-black tree when chain exceeds 8 entries.\n\nOpen addressing. Keep one entry per slot. On collision, probe for next free slot.\n- Linear probing: try slot+1, slot+2, ... Cache-friendly but clusters.\n- Quadratic probing: try slot+1, slot+4, slot+9, ... Breaks clusters.\n- Double hashing: step size from second hash function. Best distribution.\nPython dict, Go map use open addressing variants.\n\nDeletion in open addressing needs tombstones — can't just empty slot or lookups break.\n\nLoad factor (entries/slots) drives resize. Chaining tolerates >1.0; open addressing resizes around 0.7 before probe chains explode.\n\nGood hash function matters more than collision strategy. Bad hash = everything in one slot regardless.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 3504,
-    "duration_api_ms": 4467,
+    "duration_ms": 8661,
+    "duration_api_ms": 9609,
     "num_turns": 1,
-    "result": "@hewn v0 hybrid\nG: hash_collisions\nC: same_bucket\nP: chain_or_probe\nV: o1_avg_lookup\nA: pick_strategy",
+    "result": "Hash table stores key-value pairs in array indexed by hash(key) % size. Collision when two keys hash to same slot.\n\nTwo main strategies:\n\nSeparate chaining. Each slot holds linked list (or tree). On collision, append to list. Lookup walks list comparing keys. Java HashMap uses this — switches to red-black tree when chain exceeds 8 entries.\n\nOpen addressing. Keep one entry per slot. On collision, probe for next free slot.\n- Linear probing: try slot+1, slot+2, ... Cache-friendly but clusters.\n- Quadratic probing: try slot+1, slot+4, slot+9, ... Breaks clusters.\n- Double hashing: step size from second hash function. Best distribution.\nPython dict, Go map use open addressing variants.\n\nDeletion in open addressing needs tombstones — can't just empty slot or lookups break.\n\nLoad factor (entries/slots) drives resize. Chaining tolerates >1.0; open addressing resizes around 0.7 before probe chains explode.\n\nGood hash function matters more than collision strategy. Bad hash = everything in one slot regardless.",
     "stop_reason": "end_turn",
-    "session_id": "0baf3706-ab28-4b75-aa23-f4fe73a90a8d",
-    "total_cost_usd": 0.127632,
+    "session_id": "7aed9cc7-28b2-4e8d-92ad-fc4e29b4c105",
+    "total_cost_usd": 0.133757,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 18754,
+      "cache_creation_input_tokens": 18482,
       "cache_read_input_tokens": 16805,
-      "output_tokens": 63,
+      "output_tokens": 376,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 18754,
+        "ephemeral_1h_input_tokens": 18482,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 63,
+          "output_tokens": 376,
           "cache_read_input_tokens": 16805,
-          "cache_creation_input_tokens": 18754,
+          "cache_creation_input_tokens": 18482,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 18754
+            "ephemeral_1h_input_tokens": 18482
           },
           "type": "message"
         }
@@ -88,11 +88,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 63,
+        "outputTokens": 376,
         "cacheReadInputTokens": 16805,
-        "cacheCreationInputTokens": 18754,
+        "cacheCreationInputTokens": 18482,
         "webSearchRequests": 0,
-        "costUSD": 0.12722,
+        "costUSD": 0.133345,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "9830e0af-d92d-4515-bba3-f95ddc72c899"
+    "uuid": "82cf007f-f947-4b4e-abf2-03394919844f"
   }
 }

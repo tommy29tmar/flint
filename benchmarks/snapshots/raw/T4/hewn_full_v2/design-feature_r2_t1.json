@@ -1,0 +1,106 @@
+{
+  "track": "T4",
+  "arm": "hewn_full",
+  "sequence_id": "design-feature",
+  "run_index": 2,
+  "turn": 1,
+  "arm_order_index": 4,
+  "arm_order_full": [
+    "baseline",
+    "caveman_full",
+    "hewn_prompt_only",
+    "terse",
+    "hewn_full"
+  ],
+  "digest_hex": "3191b019d37f08f3d5b68d9000f1aeb1e1a3524225f9daa893803df1e240ffd1",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:41:11.475937+00:00",
+  "session_id_used_for_resume": null,
+  "output_tokens_tiktoken": 78,
+  "output_tokens_anthropic": 137,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 35053,
+  "total_input_tokens": 35059,
+  "cache_state": "warm",
+  "wallclock_ms": 12027.961579995463,
+  "duration_ms": 5406,
+  "duration_api_ms": 6382,
+  "wrapper_overhead_ms": 5645.961579995463,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "a54c782e-344b-4398-9b93-e8973f75e9a0",
+  "total_cost_usd": 0.0214425,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "Scope: single-use vs reusable, partial redemption, expiry? Stacking with promos/other gift cards allowed?\n\nMoney model: separate gift-card ledger or just a payment method? How to handle refunds back to card (original balance restored or new code)?\n\nConcurrency + fraud: lock balance at auth vs capture, rate-limit code guessing, code entropy/format, PCI scope if card stores value.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 5406,
+    "duration_api_ms": 6382,
+    "num_turns": 1,
+    "result": "Scope: single-use vs reusable, partial redemption, expiry? Stacking with promos/other gift cards allowed?\n\nMoney model: separate gift-card ledger or just a payment method? How to handle refunds back to card (original balance restored or new code)?\n\nConcurrency + fraud: lock balance at auth vs capture, rate-limit code guessing, code entropy/format, PCI scope if card stores value.",
+    "stop_reason": "end_turn",
+    "session_id": "a54c782e-344b-4398-9b93-e8973f75e9a0",
+    "total_cost_usd": 0.0214425,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 35053,
+      "output_tokens": 137,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 137,
+          "cache_read_input_tokens": 35053,
+          "cache_creation_input_tokens": 0,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 391,
+        "outputTokens": 14,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.00046100000000000004,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 137,
+        "cacheReadInputTokens": 35053,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.0209815,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "9a7d0ddc-bacd-49c4-a107-334322d71ae7"
+  }
+}

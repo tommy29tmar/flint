@@ -14,43 +14,43 @@
   ],
   "digest_hex": "522341918a5177210ef438fa55486ec5b622aaa576febbd731536d82595ec31b",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:35:37.172658+00:00",
-  "session_id_used_for_resume": "28476761-e798-48de-8d0d-808033975f18",
-  "output_tokens_tiktoken": 33,
-  "output_tokens_anthropic": 55,
+  "timestamp": "2026-04-22T10:05:07.026452+00:00",
+  "session_id_used_for_resume": "51f5f3e7-4934-4e00-95a6-1d779f1f2fa8",
+  "output_tokens_tiktoken": 35,
+  "output_tokens_anthropic": 59,
   "input_tokens_anthropic": 6,
   "cache_creation_input_tokens": 831,
-  "cache_read_input_tokens": 36068,
-  "total_input_tokens": 36905,
+  "cache_read_input_tokens": 36417,
+  "total_input_tokens": 37254,
   "cache_state": "warm",
-  "wallclock_ms": 9420.34595500445,
-  "duration_ms": 2339,
-  "duration_api_ms": 2248,
-  "wrapper_overhead_ms": 7172.34595500445,
+  "wallclock_ms": 11822.71009098622,
+  "duration_ms": 4581,
+  "duration_api_ms": 4460,
+  "wrapper_overhead_ms": 7362.71009098622,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "28476761-e798-48de-8d0d-808033975f18",
-  "total_cost_usd": 0.024632750000000002,
+  "session_id": "51f5f3e7-4934-4e00-95a6-1d779f1f2fa8",
+  "total_cost_usd": 0.02490725,
   "model_used": "claude-opus-4-7",
-  "result": "@hewn v0 hybrid\nG: contract_test\nC: shape_drift\nP: assert_keys\nV: catch_drop\nA: expect_items_field",
+  "result": "@hewn v0 hybrid\nG: contract_test\nC: shape_drift\nP: assert_items_present\nV: catch_regression\nA: snapshot_buildcart",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 2339,
-    "duration_api_ms": 2248,
+    "duration_ms": 4581,
+    "duration_api_ms": 4460,
     "num_turns": 1,
-    "result": "@hewn v0 hybrid\nG: contract_test\nC: shape_drift\nP: assert_keys\nV: catch_drop\nA: expect_items_field",
+    "result": "@hewn v0 hybrid\nG: contract_test\nC: shape_drift\nP: assert_items_present\nV: catch_regression\nA: snapshot_buildcart",
     "stop_reason": "end_turn",
-    "session_id": "28476761-e798-48de-8d0d-808033975f18",
-    "total_cost_usd": 0.024632750000000002,
+    "session_id": "51f5f3e7-4934-4e00-95a6-1d779f1f2fa8",
+    "total_cost_usd": 0.02490725,
     "usage": {
       "input_tokens": 6,
       "cache_creation_input_tokens": 831,
-      "cache_read_input_tokens": 36068,
-      "output_tokens": 55,
+      "cache_read_input_tokens": 36417,
+      "output_tokens": 59,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
@@ -64,8 +64,8 @@
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 55,
-          "cache_read_input_tokens": 36068,
+          "output_tokens": 59,
+          "cache_read_input_tokens": 36417,
           "cache_creation_input_tokens": 831,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
@@ -79,11 +79,11 @@
     "modelUsage": {
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 55,
-        "cacheReadInputTokens": 36068,
+        "outputTokens": 59,
+        "cacheReadInputTokens": 36417,
         "cacheCreationInputTokens": 831,
         "webSearchRequests": 0,
-        "costUSD": 0.024632750000000002,
+        "costUSD": 0.02490725,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -91,6 +91,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "b599c03f-c8fb-482c-a20f-c6a0255a593a"
+    "uuid": "6fd3ea25-181c-49e8-b90a-2178e84140d9"
   }
 }

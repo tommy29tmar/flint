@@ -14,62 +14,62 @@
   ],
   "digest_hex": "c436155c1e87e76d88e6f2c66d47c90c16ae78237b0a8de1b93824cf92fb5c9b",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:28:48.739767+00:00",
-  "session_id_used_for_resume": "c579d119-eec3-4ec9-86e2-73fdfa7c99ed",
-  "output_tokens_tiktoken": 35,
-  "output_tokens_anthropic": 59,
+  "timestamp": "2026-04-22T09:56:12.643173+00:00",
+  "session_id_used_for_resume": "da4960e5-0b72-4644-92e3-36ad58ade0c4",
+  "output_tokens_tiktoken": 90,
+  "output_tokens_anthropic": 149,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 297,
-  "cache_read_input_tokens": 37170,
-  "total_input_tokens": 37473,
+  "cache_creation_input_tokens": 679,
+  "cache_read_input_tokens": 37774,
+  "total_input_tokens": 38459,
   "cache_state": "warm",
-  "wallclock_ms": 17406.312642007833,
-  "duration_ms": 10878,
-  "duration_api_ms": 10772,
-  "wrapper_overhead_ms": 6634.312642007833,
+  "wallclock_ms": 11489.777412993135,
+  "duration_ms": 4945,
+  "duration_api_ms": 4838,
+  "wrapper_overhead_ms": 6651.777412993135,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "c579d119-eec3-4ec9-86e2-73fdfa7c99ed",
-  "total_cost_usd": 0.02194625,
+  "session_id": "da4960e5-0b72-4644-92e3-36ad58ade0c4",
+  "total_cost_usd": 0.026885750000000003,
   "model_used": "claude-opus-4-7",
-  "result": "Use p-limit with concurrency ~5–8: 3-SKU carts finish in one batch, 47-SKU carts stay well under the 20-pool ceiling.",
+  "result": "Batch into single `SELECT ... WHERE sku IN (...)` — one connection, one round trip, scales to 47 SKUs fine.\n3-SKU common case also faster than 3 parallel queries (one network hop instead of three).\nIf batch query not feasible, use p-limit with cap of 5: 3-SKU orders still fully parallel, 47-SKU orders cap at 5 in-flight per request.\nPrefer the IN query.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 10878,
-    "duration_api_ms": 10772,
+    "duration_ms": 4945,
+    "duration_api_ms": 4838,
     "num_turns": 1,
-    "result": "Use p-limit with concurrency ~5–8: 3-SKU carts finish in one batch, 47-SKU carts stay well under the 20-pool ceiling.",
+    "result": "Batch into single `SELECT ... WHERE sku IN (...)` — one connection, one round trip, scales to 47 SKUs fine.\n3-SKU common case also faster than 3 parallel queries (one network hop instead of three).\nIf batch query not feasible, use p-limit with cap of 5: 3-SKU orders still fully parallel, 47-SKU orders cap at 5 in-flight per request.\nPrefer the IN query.",
     "stop_reason": "end_turn",
-    "session_id": "c579d119-eec3-4ec9-86e2-73fdfa7c99ed",
-    "total_cost_usd": 0.02194625,
+    "session_id": "da4960e5-0b72-4644-92e3-36ad58ade0c4",
+    "total_cost_usd": 0.026885750000000003,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 297,
-      "cache_read_input_tokens": 37170,
-      "output_tokens": 59,
+      "cache_creation_input_tokens": 679,
+      "cache_read_input_tokens": 37774,
+      "output_tokens": 149,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 297,
+        "ephemeral_1h_input_tokens": 679,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 59,
-          "cache_read_input_tokens": 37170,
-          "cache_creation_input_tokens": 297,
+          "output_tokens": 149,
+          "cache_read_input_tokens": 37774,
+          "cache_creation_input_tokens": 679,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 297
+            "ephemeral_1h_input_tokens": 679
           },
           "type": "message"
         }
@@ -79,11 +79,11 @@
     "modelUsage": {
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 59,
-        "cacheReadInputTokens": 37170,
-        "cacheCreationInputTokens": 297,
+        "outputTokens": 149,
+        "cacheReadInputTokens": 37774,
+        "cacheCreationInputTokens": 679,
         "webSearchRequests": 0,
-        "costUSD": 0.02194625,
+        "costUSD": 0.026885750000000003,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -91,6 +91,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "6f9102da-0c56-4065-8e37-711e41567fcc"
+    "uuid": "b78fcbcc-2c66-4a6e-bf28-78e16018e36c"
   }
 }

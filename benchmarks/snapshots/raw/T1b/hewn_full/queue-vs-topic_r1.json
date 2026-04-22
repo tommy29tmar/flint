@@ -14,61 +14,61 @@
   ],
   "digest_hex": "5d6d15de966d2de1a01243f9e0d98a5b8908442798145efdf692af7bd3cb36a9",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:02:04.479552+00:00",
-  "output_tokens_tiktoken": 39,
-  "output_tokens_anthropic": 66,
+  "timestamp": "2026-04-22T09:25:53.337994+00:00",
+  "output_tokens_tiktoken": 79,
+  "output_tokens_anthropic": 135,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 18761,
+  "cache_creation_input_tokens": 18489,
   "cache_read_input_tokens": 16805,
-  "total_input_tokens": 35572,
+  "total_input_tokens": 35300,
   "cache_state": "warm",
-  "wallclock_ms": 9624.53866499709,
-  "duration_ms": 3213,
-  "duration_api_ms": 3990,
-  "wrapper_overhead_ms": 5634.53866499709,
+  "wallclock_ms": 10962.26931901765,
+  "duration_ms": 4688,
+  "duration_api_ms": 5766,
+  "wrapper_overhead_ms": 5196.269319017651,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "ce068f20-3872-4b4e-8d62-3874553e6f8f",
-  "total_cost_usd": 0.12775475,
+  "session_id": "d99be0d1-8b8f-452c-9f9e-14499e7ad061",
+  "total_cost_usd": 0.12777975,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "@hewn v0 hybrid\nG: queue_vs_topic\nC: consumer_fanout\nP: one_vs_many\nV: delivery_semantics\nA: pick_by_fanout",
+  "result": "Queue: point-to-point. One message, one consumer. Work distribution, load balancing across workers.\n\nTopic: pub/sub. One message, many subscribers. Event fan-out, notifications, multiple independent consumers each needing full stream.\n\nPick queue when work must be done once (job processing, task dispatch).\nPick topic when multiple systems react to same event (order placed → billing + inventory + email).",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 3213,
-    "duration_api_ms": 3990,
+    "duration_ms": 4688,
+    "duration_api_ms": 5766,
     "num_turns": 1,
-    "result": "@hewn v0 hybrid\nG: queue_vs_topic\nC: consumer_fanout\nP: one_vs_many\nV: delivery_semantics\nA: pick_by_fanout",
+    "result": "Queue: point-to-point. One message, one consumer. Work distribution, load balancing across workers.\n\nTopic: pub/sub. One message, many subscribers. Event fan-out, notifications, multiple independent consumers each needing full stream.\n\nPick queue when work must be done once (job processing, task dispatch).\nPick topic when multiple systems react to same event (order placed → billing + inventory + email).",
     "stop_reason": "end_turn",
-    "session_id": "ce068f20-3872-4b4e-8d62-3874553e6f8f",
-    "total_cost_usd": 0.12775475,
+    "session_id": "d99be0d1-8b8f-452c-9f9e-14499e7ad061",
+    "total_cost_usd": 0.12777975,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 18761,
+      "cache_creation_input_tokens": 18489,
       "cache_read_input_tokens": 16805,
-      "output_tokens": 66,
+      "output_tokens": 135,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 18761,
+        "ephemeral_1h_input_tokens": 18489,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 66,
+          "output_tokens": 135,
           "cache_read_input_tokens": 16805,
-          "cache_creation_input_tokens": 18761,
+          "cache_creation_input_tokens": 18489,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 18761
+            "ephemeral_1h_input_tokens": 18489
           },
           "type": "message"
         }
@@ -88,11 +88,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 66,
+        "outputTokens": 135,
         "cacheReadInputTokens": 16805,
-        "cacheCreationInputTokens": 18761,
+        "cacheCreationInputTokens": 18489,
         "webSearchRequests": 0,
-        "costUSD": 0.12733875,
+        "costUSD": 0.12736375,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "5bba4010-b23f-4191-a720-8b0211551caf"
+    "uuid": "6a811375-bd4a-46b5-806d-a10f57eee31f"
   }
 }

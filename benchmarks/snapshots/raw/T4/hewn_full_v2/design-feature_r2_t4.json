@@ -1,0 +1,96 @@
+{
+  "track": "T4",
+  "arm": "hewn_full",
+  "sequence_id": "design-feature",
+  "run_index": 2,
+  "turn": 4,
+  "arm_order_index": 4,
+  "arm_order_full": [
+    "baseline",
+    "caveman_full",
+    "hewn_prompt_only",
+    "terse",
+    "hewn_full"
+  ],
+  "digest_hex": "3191b019d37f08f3d5b68d9000f1aeb1e1a3524225f9daa893803df1e240ffd1",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:41:46.344993+00:00",
+  "session_id_used_for_resume": "a54c782e-344b-4398-9b93-e8973f75e9a0",
+  "output_tokens_tiktoken": 57,
+  "output_tokens_anthropic": 94,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 377,
+  "cache_read_input_tokens": 35795,
+  "total_input_tokens": 36178,
+  "cache_state": "warm",
+  "wallclock_ms": 10684.092739014886,
+  "duration_ms": 3066,
+  "duration_api_ms": 2888,
+  "wrapper_overhead_ms": 7796.092739014886,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "a54c782e-344b-4398-9b93-e8973f75e9a0",
+  "total_cost_usd": 0.02263375,
+  "model_used": "claude-opus-4-7",
+  "result": "Both, but they do different jobs. The consumption path must check expiry at redemption time so an expired card can never be spent, even if the batch hasn't run yet. The daily job is for zeroing out balances, emitting accounting events, and notifying users — housekeeping, not enforcement.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 3066,
+    "duration_api_ms": 2888,
+    "num_turns": 1,
+    "result": "Both, but they do different jobs. The consumption path must check expiry at redemption time so an expired card can never be spent, even if the batch hasn't run yet. The daily job is for zeroing out balances, emitting accounting events, and notifying users — housekeeping, not enforcement.",
+    "stop_reason": "end_turn",
+    "session_id": "a54c782e-344b-4398-9b93-e8973f75e9a0",
+    "total_cost_usd": 0.02263375,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 377,
+      "cache_read_input_tokens": 35795,
+      "output_tokens": 94,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 377,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 94,
+          "cache_read_input_tokens": 35795,
+          "cache_creation_input_tokens": 377,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 377
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 94,
+        "cacheReadInputTokens": 35795,
+        "cacheCreationInputTokens": 377,
+        "webSearchRequests": 0,
+        "costUSD": 0.02263375,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "53f4c471-0e44-41a4-be98-16467b866cbe"
+  }
+}

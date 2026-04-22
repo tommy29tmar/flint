@@ -1,0 +1,105 @@
+{
+  "track": "T2",
+  "arm": "hewn_full",
+  "prompt_id": "add-search-bar",
+  "run_index": 1,
+  "arm_order_index": 4,
+  "arm_order_full": [
+    "hewn_prompt_only",
+    "terse",
+    "caveman_full",
+    "baseline",
+    "hewn_full",
+    "caveman_full_plus_ultra_directive"
+  ],
+  "digest_hex": "87154785cda4737305ac6142704bf42d817426f83c953447d3e28835e0246410",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:11:33.578591+00:00",
+  "output_tokens_tiktoken": 29,
+  "output_tokens_anthropic": 45,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 18192,
+  "cache_read_input_tokens": 16805,
+  "total_input_tokens": 35003,
+  "cache_state": "warm",
+  "wallclock_ms": 11851.712373987539,
+  "duration_ms": 5366,
+  "duration_api_ms": 6405,
+  "wrapper_overhead_ms": 5446.712373987539,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "af658dd1-ae73-4f4f-a947-616af08dc11c",
+  "total_cost_usd": 0.12367449999999999,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "Need stack + where search lives (client-only filter, server API, full-text DB?). Point me at the repo/file or describe the app.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 5366,
+    "duration_api_ms": 6405,
+    "num_turns": 1,
+    "result": "Need stack + where search lives (client-only filter, server API, full-text DB?). Point me at the repo/file or describe the app.",
+    "stop_reason": "end_turn",
+    "session_id": "af658dd1-ae73-4f4f-a947-616af08dc11c",
+    "total_cost_usd": 0.12367449999999999,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 18192,
+      "cache_read_input_tokens": 16805,
+      "output_tokens": 45,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 18192,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 45,
+          "cache_read_input_tokens": 16805,
+          "cache_creation_input_tokens": 18192,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 18192
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 352,
+        "outputTokens": 13,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.000417,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 45,
+        "cacheReadInputTokens": 16805,
+        "cacheCreationInputTokens": 18192,
+        "webSearchRequests": 0,
+        "costUSD": 0.12325749999999999,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "603229d9-78ef-4ea6-bf6e-4a02244b63d7"
+  }
+}

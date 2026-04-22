@@ -14,61 +14,61 @@
   ],
   "digest_hex": "5c7062d59c99ec93d8648382caa16140c672b41605bcf28c536ff4956e9b7125",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:02:14.104806+00:00",
-  "output_tokens_tiktoken": 226,
-  "output_tokens_anthropic": 400,
+  "timestamp": "2026-04-22T09:26:04.300932+00:00",
+  "output_tokens_tiktoken": 277,
+  "output_tokens_anthropic": 464,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17025,
+  "cache_creation_input_tokens": 17051,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33827,
+  "total_input_tokens": 33853,
   "cache_state": "warm",
-  "wallclock_ms": 15732.101132976823,
-  "duration_ms": 9458,
-  "duration_api_ms": 11110,
+  "wallclock_ms": 16022.054092987673,
+  "duration_ms": 9691,
+  "duration_api_ms": 10515,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "56c4354a-869b-4875-92d6-ce86cfe237ab",
-  "total_cost_usd": 0.12526125,
+  "session_id": "c8fa6b35-48d0-4b5f-b4a2-ec2b4ca4349e",
+  "total_cost_usd": 0.12702375000000002,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "By default, a React component re-renders whenever its parent re-renders, regardless of whether its props changed. React doesn't memoize automatically.\n\nCommon causes:\n1. **No memoization** — wrap the child in `React.memo(Component)` to skip re-renders when props are shallow-equal.\n2. **New object/array/function props each render** — even with `React.memo`, passing `{...}`, `[...]`, or `() => ...` inline creates a new reference every parent render, defeating shallow comparison. Stabilize with `useMemo` / `useCallback`.\n3. **Context consumers** — any component reading a context re-renders when the context value changes; if the provider passes a fresh object literal, all consumers re-render.\n4. **Children prop** — `<Parent><Child/></Parent>` creates a new `children` element each render; memoize the JSX or hoist it.\n\nQuick check: add `console.log` in the child and inspect props with `Object.is` against the previous render — if refs change, the issue is upstream prop identity, not the child itself.",
+  "result": "By default, a child re-renders whenever its parent renders — React doesn't compare props to decide. The parent render creates a new render pass, and the child is part of that tree.\n\nCommon causes to check:\n\n1. **No memoization.** Wrap the child in `React.memo(Child)` so it only re-renders when props change by shallow equality.\n2. **New object/array/function props each render.** Even with `React.memo`, passing `onClick={() => ...}` or `style={{...}}` creates a new reference every render, defeating memo. Use `useCallback` / `useMemo` in the parent.\n3. **Children as props.** `<Parent><Child /></Parent>` creates a new `children` element each parent render; memo won't help unless the JSX reference is stable.\n4. **Context.** If the child consumes a context whose value object is re-created each render, it re-renders regardless of memo.\n5. **Non-primitive state/props derived inline** (e.g. `.filter()`, `.map()` in render) — wrap in `useMemo`.\n\nQuick diagnosis: add React DevTools Profiler, record a parent update, and check the \"Why did this render?\" panel — it tells you which prop changed reference.\n\nIf you paste the component, I'll point at the specific cause.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 9458,
-    "duration_api_ms": 11110,
+    "duration_ms": 9691,
+    "duration_api_ms": 10515,
     "num_turns": 1,
-    "result": "By default, a React component re-renders whenever its parent re-renders, regardless of whether its props changed. React doesn't memoize automatically.\n\nCommon causes:\n1. **No memoization** — wrap the child in `React.memo(Component)` to skip re-renders when props are shallow-equal.\n2. **New object/array/function props each render** — even with `React.memo`, passing `{...}`, `[...]`, or `() => ...` inline creates a new reference every parent render, defeating shallow comparison. Stabilize with `useMemo` / `useCallback`.\n3. **Context consumers** — any component reading a context re-renders when the context value changes; if the provider passes a fresh object literal, all consumers re-render.\n4. **Children prop** — `<Parent><Child/></Parent>` creates a new `children` element each render; memoize the JSX or hoist it.\n\nQuick check: add `console.log` in the child and inspect props with `Object.is` against the previous render — if refs change, the issue is upstream prop identity, not the child itself.",
+    "result": "By default, a child re-renders whenever its parent renders — React doesn't compare props to decide. The parent render creates a new render pass, and the child is part of that tree.\n\nCommon causes to check:\n\n1. **No memoization.** Wrap the child in `React.memo(Child)` so it only re-renders when props change by shallow equality.\n2. **New object/array/function props each render.** Even with `React.memo`, passing `onClick={() => ...}` or `style={{...}}` creates a new reference every render, defeating memo. Use `useCallback` / `useMemo` in the parent.\n3. **Children as props.** `<Parent><Child /></Parent>` creates a new `children` element each parent render; memo won't help unless the JSX reference is stable.\n4. **Context.** If the child consumes a context whose value object is re-created each render, it re-renders regardless of memo.\n5. **Non-primitive state/props derived inline** (e.g. `.filter()`, `.map()` in render) — wrap in `useMemo`.\n\nQuick diagnosis: add React DevTools Profiler, record a parent update, and check the \"Why did this render?\" panel — it tells you which prop changed reference.\n\nIf you paste the component, I'll point at the specific cause.",
     "stop_reason": "end_turn",
-    "session_id": "56c4354a-869b-4875-92d6-ce86cfe237ab",
-    "total_cost_usd": 0.12526125,
+    "session_id": "c8fa6b35-48d0-4b5f-b4a2-ec2b4ca4349e",
+    "total_cost_usd": 0.12702375000000002,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17025,
+      "cache_creation_input_tokens": 17051,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 400,
+      "output_tokens": 464,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17025,
+        "ephemeral_1h_input_tokens": 17051,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 400,
+          "output_tokens": 464,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17025,
+          "cache_creation_input_tokens": 17051,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17025
+            "ephemeral_1h_input_tokens": 17051
           },
           "type": "message"
         }
@@ -88,11 +88,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 400,
+        "outputTokens": 464,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17025,
+        "cacheCreationInputTokens": 17051,
         "webSearchRequests": 0,
-        "costUSD": 0.12483425,
+        "costUSD": 0.12659675,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "605af59a-4808-42fb-9a0f-424b9abccacf"
+    "uuid": "c6f423be-880f-4705-a127-63c215b9239f"
   }
 }

@@ -14,62 +14,62 @@
   ],
   "digest_hex": "30a2f9a62df0d790c0598917c3ab42509bbadd672a0a484741ea201d2da3b44f",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:30:51.529155+00:00",
-  "session_id_used_for_resume": "a5b861a6-3ae3-47ab-bc99-1526aaf8a5f4",
-  "output_tokens_tiktoken": 131,
-  "output_tokens_anthropic": 198,
+  "timestamp": "2026-04-22T10:00:19.238025+00:00",
+  "session_id_used_for_resume": "50814b8c-e427-4d01-9d32-ef1364cdb4d9",
+  "output_tokens_tiktoken": 379,
+  "output_tokens_anthropic": 683,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 468,
-  "cache_read_input_tokens": 35848,
-  "total_input_tokens": 36322,
+  "cache_creation_input_tokens": 1465,
+  "cache_read_input_tokens": 37642,
+  "total_input_tokens": 39113,
   "cache_state": "warm",
-  "wallclock_ms": 11626.436521008145,
-  "duration_ms": 5194,
-  "duration_api_ms": 5103,
-  "wrapper_overhead_ms": 6523.436521008145,
+  "wallclock_ms": 21369.77424399811,
+  "duration_ms": 15319,
+  "duration_api_ms": 15232,
+  "wrapper_overhead_ms": 6137.774243998108,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "a5b861a6-3ae3-47ab-bc99-1526aaf8a5f4",
-  "total_cost_usd": 0.025828999999999998,
+  "session_id": "50814b8c-e427-4d01-9d32-ef1364cdb4d9",
+  "total_cost_usd": 0.04508225,
   "model_used": "claude-opus-4-7",
-  "result": "Both, but for different reasons. Consumption-path check is the source of truth — it's what prevents an expired card from being spent, and it's the only check that matters for correctness. The batch job is housekeeping: flip a status flag, zero the balance, emit analytics, send \"your card expired\" emails.\n\nIf you skip the consumption check and rely on the batch, you have a race window where a card expires at midnight and someone redeems it at 00:00:01 before the job runs. If you skip the batch, expired cards sit with non-zero balances forever, which confuses reporting and makes \"outstanding liability\" reports wrong.",
+  "result": "Both, different jobs.\n\nConsumption path check: gate every redeem on expired_at > now(). Enforces correctness at point of use. Without it, batch job lag lets an expired card redeem.\n\nPattern: add AND expired_at > now() to the SELECT FOR UPDATE. If no row, distinguish \"not found\" from \"expired\" for UX — do a second read without the predicate to decide the error message.\n\nBatch job check: nightly sweep marks expired cards (status = 'expired'), writes audit event, emits notification 30/7/1 days before expiry.\nPurpose: not correctness, but side effects consumption path can't do — emails, analytics rollups, escheatment reporting, clearing balance for accounting, freeing reserved float on the balance sheet.\n\nWhy both: consumption path is authoritative (\"can I spend this right now\"), batch is operational (\"tell the world this card died, update reports, notify user\"). Neither replaces the other.\n\nThird thing worth adding: expired_at column indexed, status enum (active/expired/disabled/fully_redeemed). Consumption checks status='active' AND expired_at > now(). Batch job flips status. Makes admin queries and reporting cheap — don't recompute expiry everywhere.\n\nTimezone: store expired_at as timestamptz, compute from issued_at + interval '12 months'. Month arithmetic is DST-safe in Postgres. Define \"end of day\" policy: expired at midnight UTC vs user's local midnight vs merchant timezone — pick one, write it down, legal may care.\n\nGrace period question: do you want a hard cutoff or a grace window where balance shows but can't redeem? Affects UX copy and whether you need a separate expired_at vs redeemable_until.\n\nMissing input: jurisdiction? US CARD Act bans expiry under 5 years on most retail gift cards; 12 months may be illegal depending on card type and state. Confirm legal signed off.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 5194,
-    "duration_api_ms": 5103,
+    "duration_ms": 15319,
+    "duration_api_ms": 15232,
     "num_turns": 1,
-    "result": "Both, but for different reasons. Consumption-path check is the source of truth — it's what prevents an expired card from being spent, and it's the only check that matters for correctness. The batch job is housekeeping: flip a status flag, zero the balance, emit analytics, send \"your card expired\" emails.\n\nIf you skip the consumption check and rely on the batch, you have a race window where a card expires at midnight and someone redeems it at 00:00:01 before the job runs. If you skip the batch, expired cards sit with non-zero balances forever, which confuses reporting and makes \"outstanding liability\" reports wrong.",
+    "result": "Both, different jobs.\n\nConsumption path check: gate every redeem on expired_at > now(). Enforces correctness at point of use. Without it, batch job lag lets an expired card redeem.\n\nPattern: add AND expired_at > now() to the SELECT FOR UPDATE. If no row, distinguish \"not found\" from \"expired\" for UX — do a second read without the predicate to decide the error message.\n\nBatch job check: nightly sweep marks expired cards (status = 'expired'), writes audit event, emits notification 30/7/1 days before expiry.\nPurpose: not correctness, but side effects consumption path can't do — emails, analytics rollups, escheatment reporting, clearing balance for accounting, freeing reserved float on the balance sheet.\n\nWhy both: consumption path is authoritative (\"can I spend this right now\"), batch is operational (\"tell the world this card died, update reports, notify user\"). Neither replaces the other.\n\nThird thing worth adding: expired_at column indexed, status enum (active/expired/disabled/fully_redeemed). Consumption checks status='active' AND expired_at > now(). Batch job flips status. Makes admin queries and reporting cheap — don't recompute expiry everywhere.\n\nTimezone: store expired_at as timestamptz, compute from issued_at + interval '12 months'. Month arithmetic is DST-safe in Postgres. Define \"end of day\" policy: expired at midnight UTC vs user's local midnight vs merchant timezone — pick one, write it down, legal may care.\n\nGrace period question: do you want a hard cutoff or a grace window where balance shows but can't redeem? Affects UX copy and whether you need a separate expired_at vs redeemable_until.\n\nMissing input: jurisdiction? US CARD Act bans expiry under 5 years on most retail gift cards; 12 months may be illegal depending on card type and state. Confirm legal signed off.",
     "stop_reason": "end_turn",
-    "session_id": "a5b861a6-3ae3-47ab-bc99-1526aaf8a5f4",
-    "total_cost_usd": 0.025828999999999998,
+    "session_id": "50814b8c-e427-4d01-9d32-ef1364cdb4d9",
+    "total_cost_usd": 0.04508225,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 468,
-      "cache_read_input_tokens": 35848,
-      "output_tokens": 198,
+      "cache_creation_input_tokens": 1465,
+      "cache_read_input_tokens": 37642,
+      "output_tokens": 683,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 468,
+        "ephemeral_1h_input_tokens": 1465,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 198,
-          "cache_read_input_tokens": 35848,
-          "cache_creation_input_tokens": 468,
+          "output_tokens": 683,
+          "cache_read_input_tokens": 37642,
+          "cache_creation_input_tokens": 1465,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 468
+            "ephemeral_1h_input_tokens": 1465
           },
           "type": "message"
         }
@@ -79,11 +79,11 @@
     "modelUsage": {
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 198,
-        "cacheReadInputTokens": 35848,
-        "cacheCreationInputTokens": 468,
+        "outputTokens": 683,
+        "cacheReadInputTokens": 37642,
+        "cacheCreationInputTokens": 1465,
         "webSearchRequests": 0,
-        "costUSD": 0.025828999999999998,
+        "costUSD": 0.04508225,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -91,6 +91,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "0ee02fbe-a040-479a-a27b-4f60a57d34e1"
+    "uuid": "6e44572e-6671-4797-b683-7009fb7eb3f3"
   }
 }

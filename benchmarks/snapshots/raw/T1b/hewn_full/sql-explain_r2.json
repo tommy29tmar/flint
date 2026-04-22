@@ -14,61 +14,61 @@
   ],
   "digest_hex": "0daec1e665fa21b1ea84e0a54616094044b7ad578b774280ee1e2598cf039bd8",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:04:18.788577+00:00",
-  "output_tokens_tiktoken": 32,
-  "output_tokens_anthropic": 52,
+  "timestamp": "2026-04-22T09:28:20.298691+00:00",
+  "output_tokens_tiktoken": 121,
+  "output_tokens_anthropic": 202,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 18760,
+  "cache_creation_input_tokens": 18488,
   "cache_read_input_tokens": 16805,
-  "total_input_tokens": 35571,
+  "total_input_tokens": 35299,
   "cache_state": "warm",
-  "wallclock_ms": 8875.637315999484,
-  "duration_ms": 2660,
-  "duration_api_ms": 3634,
-  "wrapper_overhead_ms": 5241.637315999484,
+  "wallclock_ms": 12186.65448500542,
+  "duration_ms": 5704,
+  "duration_api_ms": 6546,
+  "wrapper_overhead_ms": 5640.65448500542,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "43b6d125-28f8-47e1-808c-2ef78511b742",
-  "total_cost_usd": 0.1273955,
+  "session_id": "55b805be-29cc-42b3-85b4-4b4132415572",
+  "total_cost_usd": 0.1294455,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "@hewn v0 hybrid\nG: explain\nC: query_plan\nP: show_steps\nV: spot_slow_ops\nA: read_plan",
+  "result": "SQL EXPLAIN shows query plan. How DB executes query.\n\nKey bits:\n- Access method: seq scan vs index scan vs index-only scan\n- Join type: nested loop, hash, merge\n- Join order\n- Estimated rows + cost per node\n- Sort/aggregate steps\n\nUse `EXPLAIN ANALYZE` to also run query and see actual time + actual rows vs estimate. Mismatch = stale stats or bad selectivity guess.\n\nLook for: seq scans on big tables, row estimates off by >10x, sorts spilling to disk, nested loop over large sets.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 2660,
-    "duration_api_ms": 3634,
+    "duration_ms": 5704,
+    "duration_api_ms": 6546,
     "num_turns": 1,
-    "result": "@hewn v0 hybrid\nG: explain\nC: query_plan\nP: show_steps\nV: spot_slow_ops\nA: read_plan",
+    "result": "SQL EXPLAIN shows query plan. How DB executes query.\n\nKey bits:\n- Access method: seq scan vs index scan vs index-only scan\n- Join type: nested loop, hash, merge\n- Join order\n- Estimated rows + cost per node\n- Sort/aggregate steps\n\nUse `EXPLAIN ANALYZE` to also run query and see actual time + actual rows vs estimate. Mismatch = stale stats or bad selectivity guess.\n\nLook for: seq scans on big tables, row estimates off by >10x, sorts spilling to disk, nested loop over large sets.",
     "stop_reason": "end_turn",
-    "session_id": "43b6d125-28f8-47e1-808c-2ef78511b742",
-    "total_cost_usd": 0.1273955,
+    "session_id": "55b805be-29cc-42b3-85b4-4b4132415572",
+    "total_cost_usd": 0.1294455,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 18760,
+      "cache_creation_input_tokens": 18488,
       "cache_read_input_tokens": 16805,
-      "output_tokens": 52,
+      "output_tokens": 202,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 18760,
+        "ephemeral_1h_input_tokens": 18488,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 52,
+          "output_tokens": 202,
           "cache_read_input_tokens": 16805,
-          "cache_creation_input_tokens": 18760,
+          "cache_creation_input_tokens": 18488,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 18760
+            "ephemeral_1h_input_tokens": 18488
           },
           "type": "message"
         }
@@ -88,11 +88,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 52,
+        "outputTokens": 202,
         "cacheReadInputTokens": 16805,
-        "cacheCreationInputTokens": 18760,
+        "cacheCreationInputTokens": 18488,
         "webSearchRequests": 0,
-        "costUSD": 0.1269825,
+        "costUSD": 0.1290325,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "bf07fa83-f8a9-4829-8f2c-6307f45939ef"
+    "uuid": "4da27a7b-871b-46ea-ad36-c2bf3406ad5b"
   }
 }

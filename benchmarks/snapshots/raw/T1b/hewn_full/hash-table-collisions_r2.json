@@ -14,61 +14,61 @@
   ],
   "digest_hex": "7a7e2664771ede4b86664d7fc5d4494f8f70d62c74a225df1f386f63a681b524",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:04:39.534704+00:00",
-  "output_tokens_tiktoken": 34,
-  "output_tokens_anthropic": 62,
+  "timestamp": "2026-04-22T09:28:49.694906+00:00",
+  "output_tokens_tiktoken": 116,
+  "output_tokens_anthropic": 195,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 18754,
+  "cache_creation_input_tokens": 18482,
   "cache_read_input_tokens": 16805,
-  "total_input_tokens": 35565,
+  "total_input_tokens": 35293,
   "cache_state": "warm",
-  "wallclock_ms": 9462.612967006862,
-  "duration_ms": 3545,
-  "duration_api_ms": 4387,
-  "wrapper_overhead_ms": 5075.612967006862,
+  "wallclock_ms": 11933.497420017375,
+  "duration_ms": 5588,
+  "duration_api_ms": 6981,
+  "wrapper_overhead_ms": 4952.497420017375,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "1b3e9bcd-9a36-492d-807f-636c758382e4",
-  "total_cost_usd": 0.127607,
+  "session_id": "aaf9baad-7d17-465b-b4f5-7d75f1d92648",
+  "total_cost_usd": 0.129237,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "@hewn v0 hybrid\nG: hash_collision\nC: same_bucket\nP: chain_or_probe\nV: o1_avg_lookup\nA: pick_strategy",
+  "result": "Two main strategies.\n\nChaining: each bucket holds linked list (or tree). Collisions append to list. Lookup walks list. Java `HashMap` converts to red-black tree past threshold.\n\nOpen addressing: probe for next empty slot in same array. Variants: linear probing (i+1), quadratic (i+k²), double hashing (second hash as step). Needs load factor <1, resize when full.\n\nTradeoffs: chaining tolerates high load, wastes pointers, bad cache locality. Open addressing packs tight, cache-friendly, dies under high load + clustering.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 3545,
-    "duration_api_ms": 4387,
+    "duration_ms": 5588,
+    "duration_api_ms": 6981,
     "num_turns": 1,
-    "result": "@hewn v0 hybrid\nG: hash_collision\nC: same_bucket\nP: chain_or_probe\nV: o1_avg_lookup\nA: pick_strategy",
+    "result": "Two main strategies.\n\nChaining: each bucket holds linked list (or tree). Collisions append to list. Lookup walks list. Java `HashMap` converts to red-black tree past threshold.\n\nOpen addressing: probe for next empty slot in same array. Variants: linear probing (i+1), quadratic (i+k²), double hashing (second hash as step). Needs load factor <1, resize when full.\n\nTradeoffs: chaining tolerates high load, wastes pointers, bad cache locality. Open addressing packs tight, cache-friendly, dies under high load + clustering.",
     "stop_reason": "end_turn",
-    "session_id": "1b3e9bcd-9a36-492d-807f-636c758382e4",
-    "total_cost_usd": 0.127607,
+    "session_id": "aaf9baad-7d17-465b-b4f5-7d75f1d92648",
+    "total_cost_usd": 0.129237,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 18754,
+      "cache_creation_input_tokens": 18482,
       "cache_read_input_tokens": 16805,
-      "output_tokens": 62,
+      "output_tokens": 195,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 18754,
+        "ephemeral_1h_input_tokens": 18482,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 62,
+          "output_tokens": 195,
           "cache_read_input_tokens": 16805,
-          "cache_creation_input_tokens": 18754,
+          "cache_creation_input_tokens": 18482,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 18754
+            "ephemeral_1h_input_tokens": 18482
           },
           "type": "message"
         }
@@ -78,21 +78,21 @@
     "modelUsage": {
       "claude-haiku-4-5-20251001": {
         "inputTokens": 347,
-        "outputTokens": 13,
+        "outputTokens": 14,
         "cacheReadInputTokens": 0,
         "cacheCreationInputTokens": 0,
         "webSearchRequests": 0,
-        "costUSD": 0.000412,
+        "costUSD": 0.00041699999999999994,
         "contextWindow": 200000,
         "maxOutputTokens": 32000
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 62,
+        "outputTokens": 195,
         "cacheReadInputTokens": 16805,
-        "cacheCreationInputTokens": 18754,
+        "cacheCreationInputTokens": 18482,
         "webSearchRequests": 0,
-        "costUSD": 0.127195,
+        "costUSD": 0.12882,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "bab3cbd6-3ae1-4893-9c87-fd29b5c2d14e"
+    "uuid": "c3ee61bb-2b6a-41c1-b1f3-0618c1ad3d86"
   }
 }

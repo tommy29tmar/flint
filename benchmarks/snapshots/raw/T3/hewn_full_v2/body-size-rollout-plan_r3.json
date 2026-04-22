@@ -1,0 +1,105 @@
+{
+  "track": "T3",
+  "arm": "hewn_full",
+  "prompt_id": "body-size-rollout-plan",
+  "run_index": 3,
+  "arm_order_index": 0,
+  "arm_order_full": [
+    "hewn_full",
+    "hewn_prompt_only",
+    "baseline",
+    "terse",
+    "caveman_full_plus_ultra_directive",
+    "caveman_full"
+  ],
+  "digest_hex": "83cf61101f93c83952a720a1c10bb2b89a0fe33cd226823e26742150e5132c55",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:24:22.443960+00:00",
+  "output_tokens_tiktoken": 897,
+  "output_tokens_anthropic": 1380,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 25701,
+  "cache_read_input_tokens": 16805,
+  "total_input_tokens": 42512,
+  "cache_state": "warm",
+  "wallclock_ms": 34198.380062996875,
+  "duration_ms": 27486,
+  "duration_api_ms": 28819,
+  "wrapper_overhead_ms": 5379.3800629968755,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "71637589-903f-4602-8399-3bb42dccae20",
+  "total_cost_usd": 0.20931175,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "1. Trusts client `X-User-Id` header for identity. Section 2 rule 1 + Section 5: edge strips client-supplied identity headers and sets `X-Internal-User-Id` only after JWT verification. Fix: read `req.user.sub` (or `X-Internal-User-Id` downstream) populated by `auth_jwt` middleware; never `req.headers['x-user-id']`.\n\n2. No authorization check that caller belongs to `:org_id`. Handler lets any authenticated user move funds in any org by changing the URL param. Fix: verify `req.user.org` matches `req.params.org_id` (or explicit membership lookup) and required role is in `req.user.roles` before calling `txSvc.transfer`.\n\n3. Registered via `app.post(...)` outside `src/edge/pipeline.ts`. Section 3: order is fixed (`header_sanitize` → `rate_limit` → `body_size_guard` → `auth_jwt` → `route_dispatcher`). A bare `app.post` risks bypassing or reordering middleware. Fix: register the route through the pipeline / route_dispatcher so all middleware runs in the mandated order.\n\n4. No input validation on `from`, `to`, `amount`, `org_id`. Untyped body forwarded to `tx-svc` — negative/float/string amounts, foreign account IDs, missing fields all pass. Fix: schema-validate (zod/ajv) — `amount` positive integer (minor units), `from`/`to` UUIDs belonging to `org_id`, `from !== to`, reject extras.\n\n5. No idempotency key. `POST /transfer` is money-moving; client retries or proxy replays double-spend. Fix: require `Idempotency-Key` header, dedupe in `tx-svc` (or edge cache) before forwarding.\n\n6. No `try/catch` or `next(err)`. Section 11: never swallow errors; promise rejections here become unhandled and the central `errorHandler` / RFC 7807 body (Section 2 rule 6) never runs — client gets a generic 500 or hang. Fix: `try { ... } catch (e) { next(e) }` or wrap with async handler util.\n\n7. Response is not RFC 7807 shaped and lacks `request_id`. Section 2 rule 6: all responses carry `request_id` tying to OTel trace. Fix: success body is fine as JSON, but error paths must be problem+json with `type/title/status/detail/instance` and include `request_id`.\n\n8. Uses default rate-limit bucket for a money endpoint. Section 4 default is 30/min for POST — too loose for transfers, and there's no per-user (not per-IP) limit. Fix: add a stricter entry in `config/rate_limits.json` for `/v1/orgs/*/transfer`, key on `user_id` in addition to IP.\n\n9. No audit log entry. Section 3 step 9 + Section 9: money movement must hit the 365-day audit log (S3, object-lock). Fix: ensure `audit_log` middleware captures `user_id`, `org_id`, `from`, `to`, `amount`, `request_id`, outcome; do not rely on tx-svc's own logs alone.\n\n10. Missing CODEOWNERS trust-boundary review trigger. Handler touches auth/authorization logic — Section 6 requires human approval on auth-adjacent changes. Fix: route the authz check through `src/edge/auth_*` helpers so CODEOWNERS path rules catch the PR; don't inline ad-hoc auth in a route file.\n\n11. `amount` type coercion risk. JSON allows `1e308`, floats, strings if body parser is lax. Combined with no validation (#4), can overflow `tx-svc`. Fix: enforce integer minor-units, cap at configured max-transfer, reject non-finite.\n\n12. No body-size / content-type enforcement visible. `body_size_guard` runs in pipeline (Section 3 step 4), but handler also doesn't assert `Content-Type: application/json`. Fix: `express.json({ strict: true, limit: '16kb' })` on this route; reject other content types with 415.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 27486,
+    "duration_api_ms": 28819,
+    "num_turns": 1,
+    "result": "1. Trusts client `X-User-Id` header for identity. Section 2 rule 1 + Section 5: edge strips client-supplied identity headers and sets `X-Internal-User-Id` only after JWT verification. Fix: read `req.user.sub` (or `X-Internal-User-Id` downstream) populated by `auth_jwt` middleware; never `req.headers['x-user-id']`.\n\n2. No authorization check that caller belongs to `:org_id`. Handler lets any authenticated user move funds in any org by changing the URL param. Fix: verify `req.user.org` matches `req.params.org_id` (or explicit membership lookup) and required role is in `req.user.roles` before calling `txSvc.transfer`.\n\n3. Registered via `app.post(...)` outside `src/edge/pipeline.ts`. Section 3: order is fixed (`header_sanitize` → `rate_limit` → `body_size_guard` → `auth_jwt` → `route_dispatcher`). A bare `app.post` risks bypassing or reordering middleware. Fix: register the route through the pipeline / route_dispatcher so all middleware runs in the mandated order.\n\n4. No input validation on `from`, `to`, `amount`, `org_id`. Untyped body forwarded to `tx-svc` — negative/float/string amounts, foreign account IDs, missing fields all pass. Fix: schema-validate (zod/ajv) — `amount` positive integer (minor units), `from`/`to` UUIDs belonging to `org_id`, `from !== to`, reject extras.\n\n5. No idempotency key. `POST /transfer` is money-moving; client retries or proxy replays double-spend. Fix: require `Idempotency-Key` header, dedupe in `tx-svc` (or edge cache) before forwarding.\n\n6. No `try/catch` or `next(err)`. Section 11: never swallow errors; promise rejections here become unhandled and the central `errorHandler` / RFC 7807 body (Section 2 rule 6) never runs — client gets a generic 500 or hang. Fix: `try { ... } catch (e) { next(e) }` or wrap with async handler util.\n\n7. Response is not RFC 7807 shaped and lacks `request_id`. Section 2 rule 6: all responses carry `request_id` tying to OTel trace. Fix: success body is fine as JSON, but error paths must be problem+json with `type/title/status/detail/instance` and include `request_id`.\n\n8. Uses default rate-limit bucket for a money endpoint. Section 4 default is 30/min for POST — too loose for transfers, and there's no per-user (not per-IP) limit. Fix: add a stricter entry in `config/rate_limits.json` for `/v1/orgs/*/transfer`, key on `user_id` in addition to IP.\n\n9. No audit log entry. Section 3 step 9 + Section 9: money movement must hit the 365-day audit log (S3, object-lock). Fix: ensure `audit_log` middleware captures `user_id`, `org_id`, `from`, `to`, `amount`, `request_id`, outcome; do not rely on tx-svc's own logs alone.\n\n10. Missing CODEOWNERS trust-boundary review trigger. Handler touches auth/authorization logic — Section 6 requires human approval on auth-adjacent changes. Fix: route the authz check through `src/edge/auth_*` helpers so CODEOWNERS path rules catch the PR; don't inline ad-hoc auth in a route file.\n\n11. `amount` type coercion risk. JSON allows `1e308`, floats, strings if body parser is lax. Combined with no validation (#4), can overflow `tx-svc`. Fix: enforce integer minor-units, cap at configured max-transfer, reject non-finite.\n\n12. No body-size / content-type enforcement visible. `body_size_guard` runs in pipeline (Section 3 step 4), but handler also doesn't assert `Content-Type: application/json`. Fix: `express.json({ strict: true, limit: '16kb' })` on this route; reject other content types with 415.",
+    "stop_reason": "end_turn",
+    "session_id": "71637589-903f-4602-8399-3bb42dccae20",
+    "total_cost_usd": 0.20931175,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 25701,
+      "cache_read_input_tokens": 16805,
+      "output_tokens": 1380,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 25701,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 1380,
+          "cache_read_input_tokens": 16805,
+          "cache_creation_input_tokens": 25701,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 25701
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 5668,
+        "outputTokens": 16,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.0057480000000000005,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 1380,
+        "cacheReadInputTokens": 16805,
+        "cacheCreationInputTokens": 25701,
+        "webSearchRequests": 0,
+        "costUSD": 0.20356375,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "1b583b34-f30c-4f70-9866-60b9fbed189b"
+  }
+}

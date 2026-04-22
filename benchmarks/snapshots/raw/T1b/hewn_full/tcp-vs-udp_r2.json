@@ -14,61 +14,61 @@
   ],
   "digest_hex": "f12180983420f4a94b3592c84a1684c904419bcb9246fe5b531e2451e68c7956",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:03:18.409219+00:00",
-  "output_tokens_tiktoken": 36,
-  "output_tokens_anthropic": 70,
+  "timestamp": "2026-04-22T09:27:18.986806+00:00",
+  "output_tokens_tiktoken": 81,
+  "output_tokens_anthropic": 151,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 18756,
+  "cache_creation_input_tokens": 18484,
   "cache_read_input_tokens": 16805,
-  "total_input_tokens": 35567,
+  "total_input_tokens": 35295,
   "cache_state": "warm",
-  "wallclock_ms": 9479.566522000823,
-  "duration_ms": 3176,
-  "duration_api_ms": 5095,
-  "wrapper_overhead_ms": 4384.566522000823,
+  "wallclock_ms": 10395.524963998469,
+  "duration_ms": 3982,
+  "duration_api_ms": 6613,
+  "wrapper_overhead_ms": 3782.5249639984686,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "95baa01e-f1df-4761-a493-2714eb297fd0",
-  "total_cost_usd": 0.1278195,
+  "session_id": "75c1cdf1-326b-4827-bb35-0d62b305fe88",
+  "total_cost_usd": 0.1281495,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "@hewn v0 hybrid\nG: tcp_vs_udp\nC: transport_proto\nP: handshake_vs_fireforget\nV: reliable_vs_fast\nA: pick_per_use",
+  "result": "TCP: connection-oriented, reliable, ordered, retransmits lost packets, flow + congestion control. Handshake before data. Higher overhead.\n\nUDP: connectionless, no delivery guarantee, no ordering, no retransmit. Fire-and-forget datagrams. Low overhead, low latency.\n\nUse TCP for HTTP, SSH, file transfer. Use UDP for DNS, video/voice, games, QUIC base.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 3176,
-    "duration_api_ms": 5095,
+    "duration_ms": 3982,
+    "duration_api_ms": 6613,
     "num_turns": 1,
-    "result": "@hewn v0 hybrid\nG: tcp_vs_udp\nC: transport_proto\nP: handshake_vs_fireforget\nV: reliable_vs_fast\nA: pick_per_use",
+    "result": "TCP: connection-oriented, reliable, ordered, retransmits lost packets, flow + congestion control. Handshake before data. Higher overhead.\n\nUDP: connectionless, no delivery guarantee, no ordering, no retransmit. Fire-and-forget datagrams. Low overhead, low latency.\n\nUse TCP for HTTP, SSH, file transfer. Use UDP for DNS, video/voice, games, QUIC base.",
     "stop_reason": "end_turn",
-    "session_id": "95baa01e-f1df-4761-a493-2714eb297fd0",
-    "total_cost_usd": 0.1278195,
+    "session_id": "75c1cdf1-326b-4827-bb35-0d62b305fe88",
+    "total_cost_usd": 0.1281495,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 18756,
+      "cache_creation_input_tokens": 18484,
       "cache_read_input_tokens": 16805,
-      "output_tokens": 70,
+      "output_tokens": 151,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 18756,
+        "ephemeral_1h_input_tokens": 18484,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 70,
+          "output_tokens": 151,
           "cache_read_input_tokens": 16805,
-          "cache_creation_input_tokens": 18756,
+          "cache_creation_input_tokens": 18484,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 18756
+            "ephemeral_1h_input_tokens": 18484
           },
           "type": "message"
         }
@@ -78,21 +78,21 @@
     "modelUsage": {
       "claude-haiku-4-5-20251001": {
         "inputTokens": 347,
-        "outputTokens": 13,
+        "outputTokens": 14,
         "cacheReadInputTokens": 0,
         "cacheCreationInputTokens": 0,
         "webSearchRequests": 0,
-        "costUSD": 0.000412,
+        "costUSD": 0.00041699999999999994,
         "contextWindow": 200000,
         "maxOutputTokens": 32000
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 70,
+        "outputTokens": 151,
         "cacheReadInputTokens": 16805,
-        "cacheCreationInputTokens": 18756,
+        "cacheCreationInputTokens": 18484,
         "webSearchRequests": 0,
-        "costUSD": 0.1274075,
+        "costUSD": 0.1277325,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "57c9c1eb-99f1-42d6-ad99-bfb5c5cf59f7"
+    "uuid": "2df4e96e-455c-430d-92af-c819d46751a6"
   }
 }

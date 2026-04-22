@@ -14,61 +14,61 @@
   ],
   "digest_hex": "59c4393a35281e40f896315f0f5b5a542854dc38ea31bd4db0c6451c6b10b031",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:02:48.697619+00:00",
-  "output_tokens_tiktoken": 335,
-  "output_tokens_anthropic": 541,
+  "timestamp": "2026-04-22T09:26:47.910312+00:00",
+  "output_tokens_tiktoken": 399,
+  "output_tokens_anthropic": 694,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17018,
+  "cache_creation_input_tokens": 17044,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33820,
+  "total_input_tokens": 33846,
   "cache_state": "warm",
-  "wallclock_ms": 18305.34402898047,
-  "duration_ms": 11558,
-  "duration_api_ms": 12398,
+  "wallclock_ms": 20985.774824977852,
+  "duration_ms": 14799,
+  "duration_api_ms": 16056,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "252c3237-9a3f-4a69-98ec-80a696210a4a",
-  "total_cost_usd": 0.12873049999999997,
+  "session_id": "8ede5a2a-d03f-42ac-bfe5-58d925a14755",
+  "total_cost_usd": 0.132718,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "Connection pooling reuses a fixed set of DB connections instead of opening a new one per request.\n\n**Why it exists**: TCP + TLS + auth handshake costs 10-100ms per new connection. Databases also cap total connections (Postgres default: 100). Without pooling, 500 concurrent requests = 500 handshakes or refused connections.\n\n**How it works**:\n- App borrows a connection from the pool, runs queries, returns it.\n- Pool holds N idle connections ready. If all busy, requests wait or get rejected.\n- Key knobs: `min`, `max`, `idle_timeout`, `acquire_timeout`.\n\n**Two layers**:\n- **In-process** (HikariCP, pg-pool, SQLAlchemy): one pool per app instance.\n- **External** (PgBouncer, ProxySQL): shared pool between many app instances and the DB. Needed when you have 50 app pods × 20 connections = 1000, but Postgres only accepts 100.\n\n**Gotchas**:\n- Pool size ≠ throughput. Usually `max = 2 × cores + disk_spindles` beats bigger pools (contention inside Postgres).\n- Transaction-scoped state (temp tables, `SET LOCAL`, prepared statements) breaks under PgBouncer's transaction-pooling mode.\n- Long-running transactions starve the pool. One slow query holding a connection blocks everything else.\n- Always set `acquire_timeout` — otherwise requests queue forever when the DB is slow.\n\n**Rule of thumb**: start with `max = 10-20` per app instance, measure wait time, tune from there.",
+  "result": "A database connection pool is a cache of open DB connections kept ready for reuse, so the app doesn't pay TCP + auth + TLS + session-setup costs on every query.\n\n**Why it exists**\n- Opening a Postgres/MySQL connection takes ~tens of ms and allocates memory on the DB server.\n- DBs have a hard cap on concurrent connections (e.g. Postgres default ~100). Unpooled apps exhaust it under load.\n\n**How it works**\n- Pool maintains N idle connections (`min`/`max` bounds).\n- `acquire()` → hand out an idle conn, or open a new one up to `max`, or block/queue if at cap.\n- `release()` → reset session state (`DISCARD ALL` in PG), return to pool.\n- Idle conns past `idleTimeout` get closed; broken conns are evicted via validation query or error.\n\n**Key knobs**\n- `max` — upper bound on concurrent DB conns. Too high → DB thrashes; too low → app threads queue.\n- `acquireTimeout` — how long a caller waits before failing fast.\n- `idleTimeout` / `maxLifetime` — recycle conns so NAT/firewall/DB-side timeouts don't hand you a dead socket.\n\n**Sizing rule of thumb**\n`pool_size ≈ ((core_count * 2) + effective_spindle_count)` per app instance — and sum across instances must stay under the DB's `max_connections`. For serverless/high-fanout, front the DB with an external pooler (PgBouncer, RDS Proxy) in transaction mode.\n\n**Common pitfalls**\n- Holding a conn across an external HTTP call → pool starvation.\n- Long transactions block others from acquiring.\n- Per-request `new Pool()` defeats the purpose — pool must be a process singleton.\n- In transaction-mode PgBouncer, session features (prepared statements, `SET`, advisory locks) break.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 11558,
-    "duration_api_ms": 12398,
+    "duration_ms": 14799,
+    "duration_api_ms": 16056,
     "num_turns": 1,
-    "result": "Connection pooling reuses a fixed set of DB connections instead of opening a new one per request.\n\n**Why it exists**: TCP + TLS + auth handshake costs 10-100ms per new connection. Databases also cap total connections (Postgres default: 100). Without pooling, 500 concurrent requests = 500 handshakes or refused connections.\n\n**How it works**:\n- App borrows a connection from the pool, runs queries, returns it.\n- Pool holds N idle connections ready. If all busy, requests wait or get rejected.\n- Key knobs: `min`, `max`, `idle_timeout`, `acquire_timeout`.\n\n**Two layers**:\n- **In-process** (HikariCP, pg-pool, SQLAlchemy): one pool per app instance.\n- **External** (PgBouncer, ProxySQL): shared pool between many app instances and the DB. Needed when you have 50 app pods × 20 connections = 1000, but Postgres only accepts 100.\n\n**Gotchas**:\n- Pool size ≠ throughput. Usually `max = 2 × cores + disk_spindles` beats bigger pools (contention inside Postgres).\n- Transaction-scoped state (temp tables, `SET LOCAL`, prepared statements) breaks under PgBouncer's transaction-pooling mode.\n- Long-running transactions starve the pool. One slow query holding a connection blocks everything else.\n- Always set `acquire_timeout` — otherwise requests queue forever when the DB is slow.\n\n**Rule of thumb**: start with `max = 10-20` per app instance, measure wait time, tune from there.",
+    "result": "A database connection pool is a cache of open DB connections kept ready for reuse, so the app doesn't pay TCP + auth + TLS + session-setup costs on every query.\n\n**Why it exists**\n- Opening a Postgres/MySQL connection takes ~tens of ms and allocates memory on the DB server.\n- DBs have a hard cap on concurrent connections (e.g. Postgres default ~100). Unpooled apps exhaust it under load.\n\n**How it works**\n- Pool maintains N idle connections (`min`/`max` bounds).\n- `acquire()` → hand out an idle conn, or open a new one up to `max`, or block/queue if at cap.\n- `release()` → reset session state (`DISCARD ALL` in PG), return to pool.\n- Idle conns past `idleTimeout` get closed; broken conns are evicted via validation query or error.\n\n**Key knobs**\n- `max` — upper bound on concurrent DB conns. Too high → DB thrashes; too low → app threads queue.\n- `acquireTimeout` — how long a caller waits before failing fast.\n- `idleTimeout` / `maxLifetime` — recycle conns so NAT/firewall/DB-side timeouts don't hand you a dead socket.\n\n**Sizing rule of thumb**\n`pool_size ≈ ((core_count * 2) + effective_spindle_count)` per app instance — and sum across instances must stay under the DB's `max_connections`. For serverless/high-fanout, front the DB with an external pooler (PgBouncer, RDS Proxy) in transaction mode.\n\n**Common pitfalls**\n- Holding a conn across an external HTTP call → pool starvation.\n- Long transactions block others from acquiring.\n- Per-request `new Pool()` defeats the purpose — pool must be a process singleton.\n- In transaction-mode PgBouncer, session features (prepared statements, `SET`, advisory locks) break.",
     "stop_reason": "end_turn",
-    "session_id": "252c3237-9a3f-4a69-98ec-80a696210a4a",
-    "total_cost_usd": 0.12873049999999997,
+    "session_id": "8ede5a2a-d03f-42ac-bfe5-58d925a14755",
+    "total_cost_usd": 0.132718,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17018,
+      "cache_creation_input_tokens": 17044,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 541,
+      "output_tokens": 694,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17018,
+        "ephemeral_1h_input_tokens": 17044,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 541,
+          "output_tokens": 694,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17018,
+          "cache_creation_input_tokens": 17044,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17018
+            "ephemeral_1h_input_tokens": 17044
           },
           "type": "message"
         }
@@ -88,11 +88,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 541,
+        "outputTokens": 694,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17018,
+        "cacheCreationInputTokens": 17044,
         "webSearchRequests": 0,
-        "costUSD": 0.12831549999999997,
+        "costUSD": 0.132303,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "edff3e71-1bec-416a-9689-2adf5814a14b"
+    "uuid": "591a33ef-30a4-4f58-9102-5eebbb52093c"
   }
 }

@@ -14,62 +14,62 @@
   ],
   "digest_hex": "c436155c1e87e76d88e6f2c66d47c90c16ae78237b0a8de1b93824cf92fb5c9b",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:29:41.153381+00:00",
-  "session_id_used_for_resume": "8acb082e-5568-4113-ae2d-3cb9f4fcb062",
-  "output_tokens_tiktoken": 182,
-  "output_tokens_anthropic": 487,
+  "timestamp": "2026-04-22T09:58:28.053378+00:00",
+  "session_id_used_for_resume": "ccd81265-ac51-41cb-b5e9-eac10e44515d",
+  "output_tokens_tiktoken": 408,
+  "output_tokens_anthropic": 1256,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 442,
-  "cache_read_input_tokens": 34414,
-  "total_input_tokens": 34862,
+  "cache_creation_input_tokens": 1105,
+  "cache_read_input_tokens": 38843,
+  "total_input_tokens": 39954,
   "cache_state": "warm",
-  "wallclock_ms": 17928.09122201288,
-  "duration_ms": 11633,
-  "duration_api_ms": 11613,
+  "wallclock_ms": 28195.757642999524,
+  "duration_ms": 21960,
+  "duration_api_ms": 21934,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "8acb082e-5568-4113-ae2d-3cb9f4fcb062",
-  "total_cost_usd": 0.0321745,
+  "session_id": "ccd81265-ac51-41cb-b5e9-eac10e44515d",
+  "total_cost_usd": 0.057757750000000004,
   "model_used": "claude-opus-4-7",
-  "result": "Not safe as-is. `Promise.all` fires all SKU lookups concurrently — a cart with 25 items saturates the pool from a single request, and two concurrent orders with 10 items each will contend. Under load you'll see pool timeouts, not just slowness.\n\nThe old sequential loop was pool-safe by accident. The right shape is bounded concurrency:\n\n```js\nimport pLimit from 'p-limit';\nconst limit = pLimit(5);\nconst results = await Promise.all(skus.map(sku => limit(() => lookup(sku))));\n```\n\nPick the bound based on pool size ÷ expected concurrent request count, with headroom. With pool=20 and, say, ~4 concurrent order requests typical, 3–5 per request is reasonable.\n\nCheck whether your ORM/driver queues on pool exhaustion or throws — that determines whether the symptom would be latency or 500s.",
+  "result": "Depends on three things — answer each before calling it safe:\n\n1. **Is the array bounded?** If cart size is user-controlled and can hit 100+, a single request can claim 20 connections and queue the rest, starving concurrent traffic. With even modest request concurrency (say 5 req/s × 30 SKUs), you'll exhaust the pool. Sequential loops have the opposite problem (slow) but don't starve.\n\n2. **Is this inside a transaction?** If the original loop ran on a single checked-out connection (`BEGIN ... COMMIT`), `Promise.all` is **broken**, not just risky — you can't multiplex queries on one connection. Most drivers either serialize them silently (making the \"parallelism\" a lie) or throw. Check whether the surrounding handler uses `db.transaction(...)` or similar.\n\n3. **What's the pool acquire timeout?** If it's short (pg default is no timeout; many setups set 5–30s), saturating the pool turns into request failures rather than slow requests. Sequential loops never saturate.\n\n**The right fix is almost always neither**: replace N round-trips with one query.\n\n```js\nconst rows = await db.query('SELECT sku, stock FROM inventory WHERE sku = ANY($1)', [skus]);\n```\n\nOne connection, one round trip, no pool pressure, no concurrency cap to tune. Faster than both the old loop and the new `Promise.all`. If the inventory check has per-SKU side effects that can't be batched, bound concurrency with `p-limit`:\n\n```js\nconst limit = pLimit(5);\nawait Promise.all(skus.map(sku => limit(() => checkSku(sku))));\n```\n\nPick a cap well below pool max (e.g. 5) so a single request can't monopolize connections. Add an integration test that runs a large-cart order concurrently with other traffic against a real DB and asserts no `timeout acquiring connection` errors — this class of bug never surfaces in unit tests.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 11633,
-    "duration_api_ms": 11613,
+    "duration_ms": 21960,
+    "duration_api_ms": 21934,
     "num_turns": 1,
-    "result": "Not safe as-is. `Promise.all` fires all SKU lookups concurrently — a cart with 25 items saturates the pool from a single request, and two concurrent orders with 10 items each will contend. Under load you'll see pool timeouts, not just slowness.\n\nThe old sequential loop was pool-safe by accident. The right shape is bounded concurrency:\n\n```js\nimport pLimit from 'p-limit';\nconst limit = pLimit(5);\nconst results = await Promise.all(skus.map(sku => limit(() => lookup(sku))));\n```\n\nPick the bound based on pool size ÷ expected concurrent request count, with headroom. With pool=20 and, say, ~4 concurrent order requests typical, 3–5 per request is reasonable.\n\nCheck whether your ORM/driver queues on pool exhaustion or throws — that determines whether the symptom would be latency or 500s.",
+    "result": "Depends on three things — answer each before calling it safe:\n\n1. **Is the array bounded?** If cart size is user-controlled and can hit 100+, a single request can claim 20 connections and queue the rest, starving concurrent traffic. With even modest request concurrency (say 5 req/s × 30 SKUs), you'll exhaust the pool. Sequential loops have the opposite problem (slow) but don't starve.\n\n2. **Is this inside a transaction?** If the original loop ran on a single checked-out connection (`BEGIN ... COMMIT`), `Promise.all` is **broken**, not just risky — you can't multiplex queries on one connection. Most drivers either serialize them silently (making the \"parallelism\" a lie) or throw. Check whether the surrounding handler uses `db.transaction(...)` or similar.\n\n3. **What's the pool acquire timeout?** If it's short (pg default is no timeout; many setups set 5–30s), saturating the pool turns into request failures rather than slow requests. Sequential loops never saturate.\n\n**The right fix is almost always neither**: replace N round-trips with one query.\n\n```js\nconst rows = await db.query('SELECT sku, stock FROM inventory WHERE sku = ANY($1)', [skus]);\n```\n\nOne connection, one round trip, no pool pressure, no concurrency cap to tune. Faster than both the old loop and the new `Promise.all`. If the inventory check has per-SKU side effects that can't be batched, bound concurrency with `p-limit`:\n\n```js\nconst limit = pLimit(5);\nawait Promise.all(skus.map(sku => limit(() => checkSku(sku))));\n```\n\nPick a cap well below pool max (e.g. 5) so a single request can't monopolize connections. Add an integration test that runs a large-cart order concurrently with other traffic against a real DB and asserts no `timeout acquiring connection` errors — this class of bug never surfaces in unit tests.",
     "stop_reason": "end_turn",
-    "session_id": "8acb082e-5568-4113-ae2d-3cb9f4fcb062",
-    "total_cost_usd": 0.0321745,
+    "session_id": "ccd81265-ac51-41cb-b5e9-eac10e44515d",
+    "total_cost_usd": 0.057757750000000004,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 442,
-      "cache_read_input_tokens": 34414,
-      "output_tokens": 487,
+      "cache_creation_input_tokens": 1105,
+      "cache_read_input_tokens": 38843,
+      "output_tokens": 1256,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 442,
+        "ephemeral_1h_input_tokens": 1105,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 487,
-          "cache_read_input_tokens": 34414,
-          "cache_creation_input_tokens": 442,
+          "output_tokens": 1256,
+          "cache_read_input_tokens": 38843,
+          "cache_creation_input_tokens": 1105,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 442
+            "ephemeral_1h_input_tokens": 1105
           },
           "type": "message"
         }
@@ -79,11 +79,11 @@
     "modelUsage": {
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 487,
-        "cacheReadInputTokens": 34414,
-        "cacheCreationInputTokens": 442,
+        "outputTokens": 1256,
+        "cacheReadInputTokens": 38843,
+        "cacheCreationInputTokens": 1105,
         "webSearchRequests": 0,
-        "costUSD": 0.0321745,
+        "costUSD": 0.057757750000000004,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -91,6 +91,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "7cdbc6f6-a1c7-43d8-a8e0-aab2f97ed470"
+    "uuid": "0b564e6d-4aad-4868-bb6f-96bf3325b8a9"
   }
 }

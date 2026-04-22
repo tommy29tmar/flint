@@ -14,61 +14,61 @@
   ],
   "digest_hex": "87154785cda4737305ac6142704bf42d817426f83c953447d3e28835e0246410",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:11:22.057478+00:00",
-  "output_tokens_tiktoken": 35,
-  "output_tokens_anthropic": 145,
+  "timestamp": "2026-04-22T09:36:24.963566+00:00",
+  "output_tokens_tiktoken": 52,
+  "output_tokens_anthropic": 232,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17023,
+  "cache_creation_input_tokens": 17049,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33825,
+  "total_input_tokens": 33851,
   "cache_state": "warm",
-  "wallclock_ms": 11520.40860298439,
-  "duration_ms": 4855,
-  "duration_api_ms": 5680,
+  "wallclock_ms": 11410.267330007628,
+  "duration_ms": 5071,
+  "duration_api_ms": 6101,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "d5fec4dd-9aca-4d99-9ab7-1c76c803e977",
-  "total_cost_usd": 0.11886374999999999,
+  "session_id": "53dd9029-35f6-42a5-ae62-92b8bb571aa5",
+  "total_cost_usd": 0.12120125000000001,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "Which app? This repo (SIGIL/Hewn) is a CLI wrapper for Claude Code — no UI to add a search bar to. Do you mean a different project?",
+  "result": "Which app? This repo (SIGIL/Hewn) is a Claude Code CLI wrapper — no UI to add a search bar to. Point me at the project (path or repo) and what you want to search over (files, records, an API?).",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 4855,
-    "duration_api_ms": 5680,
+    "duration_ms": 5071,
+    "duration_api_ms": 6101,
     "num_turns": 1,
-    "result": "Which app? This repo (SIGIL/Hewn) is a CLI wrapper for Claude Code — no UI to add a search bar to. Do you mean a different project?",
+    "result": "Which app? This repo (SIGIL/Hewn) is a Claude Code CLI wrapper — no UI to add a search bar to. Point me at the project (path or repo) and what you want to search over (files, records, an API?).",
     "stop_reason": "end_turn",
-    "session_id": "d5fec4dd-9aca-4d99-9ab7-1c76c803e977",
-    "total_cost_usd": 0.11886374999999999,
+    "session_id": "53dd9029-35f6-42a5-ae62-92b8bb571aa5",
+    "total_cost_usd": 0.12120125000000001,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17023,
+      "cache_creation_input_tokens": 17049,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 145,
+      "output_tokens": 232,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17023,
+        "ephemeral_1h_input_tokens": 17049,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 145,
+          "output_tokens": 232,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17023,
+          "cache_creation_input_tokens": 17049,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17023
+            "ephemeral_1h_input_tokens": 17049
           },
           "type": "message"
         }
@@ -88,11 +88,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 145,
+        "outputTokens": 232,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17023,
+        "cacheCreationInputTokens": 17049,
         "webSearchRequests": 0,
-        "costUSD": 0.11844674999999999,
+        "costUSD": 0.12078425000000001,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "89bafeb8-aa89-4cbd-ae63-1f3e7c06feba"
+    "uuid": "50b20d51-5432-45e7-80db-cd0c542547e3"
   }
 }

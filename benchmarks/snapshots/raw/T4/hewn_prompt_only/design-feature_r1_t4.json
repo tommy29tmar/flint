@@ -14,62 +14,62 @@
   ],
   "digest_hex": "30a2f9a62df0d790c0598917c3ab42509bbadd672a0a484741ea201d2da3b44f",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:33:52.599921+00:00",
-  "session_id_used_for_resume": "dbae8038-082c-4770-a429-b9b4f798bbc6",
-  "output_tokens_tiktoken": 625,
-  "output_tokens_anthropic": 2115,
+  "timestamp": "2026-04-22T10:03:17.886923+00:00",
+  "session_id_used_for_resume": "dc1168d0-f9c6-48dd-9150-791599c75151",
+  "output_tokens_tiktoken": 589,
+  "output_tokens_anthropic": 1978,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 2017,
-  "cache_read_input_tokens": 37405,
-  "total_input_tokens": 39428,
+  "cache_creation_input_tokens": 2409,
+  "cache_read_input_tokens": 36709,
+  "total_input_tokens": 39124,
   "cache_state": "warm",
-  "wallclock_ms": 43603.55647400138,
-  "duration_ms": 37578,
-  "duration_api_ms": 37552,
+  "wallclock_ms": 41255.76414298848,
+  "duration_ms": 35396,
+  "duration_api_ms": 35367,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "dbae8038-082c-4770-a429-b9b4f798bbc6",
-  "total_cost_usd": 0.08421375,
+  "session_id": "dc1168d0-f9c6-48dd-9150-791599c75151",
+  "total_cost_usd": 0.08289075000000001,
   "model_used": "claude-opus-4-7",
-  "result": "**Both, but they do different jobs.**\n\n**Consumption path: correctness guard.** Add the expiry predicate to the `SELECT FOR UPDATE` (and/or the debit UPDATE) — it's basically free:\n\n```sql\nSELECT balance, expires_at\nFROM gift_cards\nWHERE id = :card_id\n  AND (expires_at IS NULL OR expires_at > now())\nFOR UPDATE;\n```\n\nThis is the authoritative check. It closes the race window where a card expires at 00:00 but the batch hasn't zeroed it yet. Without it, a card that expires overnight is still spendable until the next sweep. Cheap, local, can't drift.\n\n**Batch job: accounting + hygiene.** A daily (or whatever cadence finance wants) sweep that finds cards past `expires_at` with non-zero balance and:\n\n1. Writes a `gift_card_transactions` row with `reason='expired'`, `delta = -balance`, `status='forfeited'`.\n2. Sets `balance = 0` on the card.\n3. Emits an accounting event so finance can move unredeemed liability into breakage income.\n\nThis isn't about preventing redemption — the consumption guard already does that. It's about making the balance column, the ledger, and the general ledger agree, and about closing out the liability on your books. Without the batch, you accumulate ghost balances that are unspendable but still showing as owed.\n\n**Why not consumption-only:** balance column lies. User sees \"$50 available\" in their account page, support tools show it as owed, reporting counts it as outstanding liability. All technically spendable = false, but nothing reflects that until someone tries to redeem.\n\n**Why not batch-only:** race window between expiry and the next sweep. A batch that runs at 3am leaves 3 hours where expired cards are still redeemable. For a cash-equivalent instrument you want the authoritative check at point-of-use.\n\n**Two things to flag separately from enforcement:**\n\n1. **Expiry notifications** (30/7/1-day warnings) — separate concern, separate job. Reads `expires_at`, doesn't modify balance. Don't conflate it with the forfeiture sweep; you want to notify on *upcoming* expiry, not *past* expiry.\n\n2. **Regulatory.** Flagging again: a flat 12-month expiry is illegal in some jurisdictions (CA and several US states ban expiry on cash-equivalent gift cards outright; UK/EU have various floors, often 24 months minimum; some jurisdictions require expiry to reset on use). Confirm with legal before codifying 12 months. If you operate in multiple regions, `expires_at` likely needs to be per-card and computed at issuance based on buyer/recipient jurisdiction, not hardcoded.\n\nOne design decision implied here: **does redemption extend expiry?** Several jurisdictions require it. If yes, every successful consumption also updates `expires_at = greatest(expires_at, now() + interval '12 months')` inside the same transaction. Worth deciding now — it's a one-line change today, a data migration later.",
+  "result": "Quick flag before the expiry question: \"SELECT FOR UPDATE inside the checkout transaction\" is the pattern I was recommending *against*, not for. If the checkout transaction stays open across the payment-gateway call, you're holding a row lock for the duration of an external API request — that's the failure mode that turns a slow Stripe into a DB connection exhaustion outage. Worth double-checking we're aligned: the safe shape is atomic conditional `UPDATE` (`WHERE balance >= :amount`) *outside* the payment-auth transaction, with the reservation row as the hold. Want to revisit that, or did you mean something different by \"inside the checkout transaction\"?\n\n---\n\nOn expiry: **both, but they do different jobs, and only one is load-bearing.**\n\n**Consumption-path check (mandatory, correctness gate).**\nThe redemption query just checks `expires_at > now()` as part of the same atomic UPDATE:\n```sql\nUPDATE gift_card\nSET balance = balance - :amount\nWHERE id = :id AND balance >= :amount AND expires_at > now()\n```\nThis is the only check that actually prevents spending an expired card. It handles the nasty edge case a batch job can't: a card reserved at 11:59pm on its last day, committed at 12:01am. It's cheap, always correct, and doesn't depend on anything else running.\n\n**Batch job (operational, not correctness).**\nA daily sweep is useful for everything the consumption path *can't* do:\n- Send \"your gift card expires in 30 days\" emails before the fact.\n- Move expired balances into a `breakage` ledger for accounting (finance will eventually ask).\n- Flip a denormalized `status` column for support/reporting queries.\n- Archive rows older than some retention window.\n\nNote: the batch job is not the source of truth. `expires_at > now()` is. The batch just maintains materialized state for queries the consumption path wouldn't naturally produce.\n\n**The failure mode to avoid:** making the batch job load-bearing — i.e., consumption code reads a `status='active'` flag instead of comparing timestamps. Now if the job misses a run, expired cards are spendable for a day. And you've re-introduced the drift problem we just avoided by picking mutable-balance-plus-log over event sourcing: denormalized state that can diverge from reality. Compute expiry from the timestamp every time; let the batch be best-effort.\n\n**Escheatment caveat:** if you operate in US states with unclaimed-property laws (most of them, for gift cards over some threshold), \"expired\" isn't the end of the story — unredeemed balance may be owed to the state after a dormancy period. That's a finance/legal conversation, not a code one, but flag it before you ship: some states prohibit expiry on retail gift cards outright, which kills this whole feature in those jurisdictions.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 37578,
-    "duration_api_ms": 37552,
+    "duration_ms": 35396,
+    "duration_api_ms": 35367,
     "num_turns": 1,
-    "result": "**Both, but they do different jobs.**\n\n**Consumption path: correctness guard.** Add the expiry predicate to the `SELECT FOR UPDATE` (and/or the debit UPDATE) — it's basically free:\n\n```sql\nSELECT balance, expires_at\nFROM gift_cards\nWHERE id = :card_id\n  AND (expires_at IS NULL OR expires_at > now())\nFOR UPDATE;\n```\n\nThis is the authoritative check. It closes the race window where a card expires at 00:00 but the batch hasn't zeroed it yet. Without it, a card that expires overnight is still spendable until the next sweep. Cheap, local, can't drift.\n\n**Batch job: accounting + hygiene.** A daily (or whatever cadence finance wants) sweep that finds cards past `expires_at` with non-zero balance and:\n\n1. Writes a `gift_card_transactions` row with `reason='expired'`, `delta = -balance`, `status='forfeited'`.\n2. Sets `balance = 0` on the card.\n3. Emits an accounting event so finance can move unredeemed liability into breakage income.\n\nThis isn't about preventing redemption — the consumption guard already does that. It's about making the balance column, the ledger, and the general ledger agree, and about closing out the liability on your books. Without the batch, you accumulate ghost balances that are unspendable but still showing as owed.\n\n**Why not consumption-only:** balance column lies. User sees \"$50 available\" in their account page, support tools show it as owed, reporting counts it as outstanding liability. All technically spendable = false, but nothing reflects that until someone tries to redeem.\n\n**Why not batch-only:** race window between expiry and the next sweep. A batch that runs at 3am leaves 3 hours where expired cards are still redeemable. For a cash-equivalent instrument you want the authoritative check at point-of-use.\n\n**Two things to flag separately from enforcement:**\n\n1. **Expiry notifications** (30/7/1-day warnings) — separate concern, separate job. Reads `expires_at`, doesn't modify balance. Don't conflate it with the forfeiture sweep; you want to notify on *upcoming* expiry, not *past* expiry.\n\n2. **Regulatory.** Flagging again: a flat 12-month expiry is illegal in some jurisdictions (CA and several US states ban expiry on cash-equivalent gift cards outright; UK/EU have various floors, often 24 months minimum; some jurisdictions require expiry to reset on use). Confirm with legal before codifying 12 months. If you operate in multiple regions, `expires_at` likely needs to be per-card and computed at issuance based on buyer/recipient jurisdiction, not hardcoded.\n\nOne design decision implied here: **does redemption extend expiry?** Several jurisdictions require it. If yes, every successful consumption also updates `expires_at = greatest(expires_at, now() + interval '12 months')` inside the same transaction. Worth deciding now — it's a one-line change today, a data migration later.",
+    "result": "Quick flag before the expiry question: \"SELECT FOR UPDATE inside the checkout transaction\" is the pattern I was recommending *against*, not for. If the checkout transaction stays open across the payment-gateway call, you're holding a row lock for the duration of an external API request — that's the failure mode that turns a slow Stripe into a DB connection exhaustion outage. Worth double-checking we're aligned: the safe shape is atomic conditional `UPDATE` (`WHERE balance >= :amount`) *outside* the payment-auth transaction, with the reservation row as the hold. Want to revisit that, or did you mean something different by \"inside the checkout transaction\"?\n\n---\n\nOn expiry: **both, but they do different jobs, and only one is load-bearing.**\n\n**Consumption-path check (mandatory, correctness gate).**\nThe redemption query just checks `expires_at > now()` as part of the same atomic UPDATE:\n```sql\nUPDATE gift_card\nSET balance = balance - :amount\nWHERE id = :id AND balance >= :amount AND expires_at > now()\n```\nThis is the only check that actually prevents spending an expired card. It handles the nasty edge case a batch job can't: a card reserved at 11:59pm on its last day, committed at 12:01am. It's cheap, always correct, and doesn't depend on anything else running.\n\n**Batch job (operational, not correctness).**\nA daily sweep is useful for everything the consumption path *can't* do:\n- Send \"your gift card expires in 30 days\" emails before the fact.\n- Move expired balances into a `breakage` ledger for accounting (finance will eventually ask).\n- Flip a denormalized `status` column for support/reporting queries.\n- Archive rows older than some retention window.\n\nNote: the batch job is not the source of truth. `expires_at > now()` is. The batch just maintains materialized state for queries the consumption path wouldn't naturally produce.\n\n**The failure mode to avoid:** making the batch job load-bearing — i.e., consumption code reads a `status='active'` flag instead of comparing timestamps. Now if the job misses a run, expired cards are spendable for a day. And you've re-introduced the drift problem we just avoided by picking mutable-balance-plus-log over event sourcing: denormalized state that can diverge from reality. Compute expiry from the timestamp every time; let the batch be best-effort.\n\n**Escheatment caveat:** if you operate in US states with unclaimed-property laws (most of them, for gift cards over some threshold), \"expired\" isn't the end of the story — unredeemed balance may be owed to the state after a dormancy period. That's a finance/legal conversation, not a code one, but flag it before you ship: some states prohibit expiry on retail gift cards outright, which kills this whole feature in those jurisdictions.",
     "stop_reason": "end_turn",
-    "session_id": "dbae8038-082c-4770-a429-b9b4f798bbc6",
-    "total_cost_usd": 0.08421375,
+    "session_id": "dc1168d0-f9c6-48dd-9150-791599c75151",
+    "total_cost_usd": 0.08289075000000001,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 2017,
-      "cache_read_input_tokens": 37405,
-      "output_tokens": 2115,
+      "cache_creation_input_tokens": 2409,
+      "cache_read_input_tokens": 36709,
+      "output_tokens": 1978,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 2017,
+        "ephemeral_1h_input_tokens": 2409,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 2115,
-          "cache_read_input_tokens": 37405,
-          "cache_creation_input_tokens": 2017,
+          "output_tokens": 1978,
+          "cache_read_input_tokens": 36709,
+          "cache_creation_input_tokens": 2409,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 2017
+            "ephemeral_1h_input_tokens": 2409
           },
           "type": "message"
         }
@@ -79,11 +79,11 @@
     "modelUsage": {
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 2115,
-        "cacheReadInputTokens": 37405,
-        "cacheCreationInputTokens": 2017,
+        "outputTokens": 1978,
+        "cacheReadInputTokens": 36709,
+        "cacheCreationInputTokens": 2409,
         "webSearchRequests": 0,
-        "costUSD": 0.08421375,
+        "costUSD": 0.08289075000000001,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -91,6 +91,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "e41d70f4-ffd4-41fd-8226-ecd9c6251265"
+    "uuid": "8f0ee2e8-b0b1-4ce0-ad9e-7324a83ccf90"
   }
 }

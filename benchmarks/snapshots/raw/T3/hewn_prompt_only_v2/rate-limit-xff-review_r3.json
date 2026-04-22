@@ -1,0 +1,105 @@
+{
+  "track": "T3",
+  "arm": "hewn_prompt_only",
+  "prompt_id": "rate-limit-xff-review",
+  "run_index": 3,
+  "arm_order_index": 0,
+  "arm_order_full": [
+    "hewn_prompt_only",
+    "baseline",
+    "caveman_full_plus_ultra_directive",
+    "hewn_full",
+    "terse",
+    "caveman_full"
+  ],
+  "digest_hex": "cffe317c5c73922535ac9a56d76b012bce4c891ed45ea6f65a6644bb758137e0",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:23:18.045651+00:00",
+  "output_tokens_tiktoken": 100,
+  "output_tokens_anthropic": 320,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 41008,
+  "total_input_tokens": 41014,
+  "cache_state": "warm",
+  "wallclock_ms": 13013.289819005877,
+  "duration_ms": 6646,
+  "duration_api_ms": 8136,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "03e229f1-00a6-4059-b609-e27194e316a9",
+  "total_cost_usd": 0.034109,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "The `[Task]` block at the end is empty — you pasted the Atlas API handbook but didn't include an actual request. What would you like me to do with it? Some common options:\n\n- Review a PR or diff against these standards\n- Draft code that follows Section 2/4/5 rules (rate limiter, JWT verify, header sanitizer)\n- Generate a checklist/test matrix from the runbook\n- Summarize or extract a specific section\n\nPaste the task and I'll proceed.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 6646,
+    "duration_api_ms": 8136,
+    "num_turns": 1,
+    "result": "The `[Task]` block at the end is empty — you pasted the Atlas API handbook but didn't include an actual request. What would you like me to do with it? Some common options:\n\n- Review a PR or diff against these standards\n- Draft code that follows Section 2/4/5 rules (rate limiter, JWT verify, header sanitizer)\n- Generate a checklist/test matrix from the runbook\n- Summarize or extract a specific section\n\nPaste the task and I'll proceed.",
+    "stop_reason": "end_turn",
+    "session_id": "03e229f1-00a6-4059-b609-e27194e316a9",
+    "total_cost_usd": 0.034109,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 41008,
+      "output_tokens": 320,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 320,
+          "cache_read_input_tokens": 41008,
+          "cache_creation_input_tokens": 0,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 5505,
+        "outputTokens": 14,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.005575,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 320,
+        "cacheReadInputTokens": 41008,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.028534000000000004,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "6412b294-6392-4dc1-a840-5e5575d3adcf"
+  }
+}

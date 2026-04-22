@@ -14,62 +14,62 @@
   ],
   "digest_hex": "522341918a5177210ef438fa55486ec5b622aaa576febbd731536d82595ec31b",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:36:45.991946+00:00",
-  "session_id_used_for_resume": "f349cd15-26d0-4a3f-979a-a8e27980ef9b",
-  "output_tokens_tiktoken": 280,
-  "output_tokens_anthropic": 530,
+  "timestamp": "2026-04-22T10:06:16.744567+00:00",
+  "session_id_used_for_resume": "946b8940-22b4-481f-950e-511305adddcd",
+  "output_tokens_tiktoken": 359,
+  "output_tokens_anthropic": 559,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 465,
-  "cache_read_input_tokens": 34473,
-  "total_input_tokens": 34944,
+  "cache_creation_input_tokens": 381,
+  "cache_read_input_tokens": 34421,
+  "total_input_tokens": 34808,
   "cache_state": "warm",
-  "wallclock_ms": 17337.128065992147,
-  "duration_ms": 11071,
-  "duration_api_ms": 11043,
+  "wallclock_ms": 16348.206716007553,
+  "duration_ms": 10261,
+  "duration_api_ms": 10237,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "f349cd15-26d0-4a3f-979a-a8e27980ef9b",
-  "total_cost_usd": 0.03342275,
+  "session_id": "946b8940-22b4-481f-950e-511305adddcd",
+  "total_cost_usd": 0.03359675,
   "model_used": "claude-opus-4-7",
-  "result": "Test the contract that broke: `buildCart`'s output shape. A caller-side test also works but the bug was a producer breaking its contract, so pin it there.\n\n```js\ndescribe('buildCart', () => {\n  it('returns id, items, and total', () => {\n    const cart = {\n      id: 'c1',\n      items: [{ price: 10, qty: 2 }, { price: 5, qty: 1 }],\n    };\n\n    expect(buildCart(cart)).toEqual({\n      id: 'c1',\n      items: cart.items,\n      total: 25,\n    });\n  });\n});\n```\n\nWhy `toEqual` with the full object (not just `toHaveProperty('items')`): it fails if a field is *removed* AND if one is silently added or reshaped. That's the class of bug you just hit.\n\nOne test is enough for the regression. Don't add five variants — empty cart, one item, many items — unless `total` math has edge cases you actually care about. The bug wasn't arithmetic.\n\nIf `buildCart` has many consumers and you want stronger guarantees, add a TypeScript return type or a JSDoc `@returns` with a shape — the type system catches this at build time, not runtime. A test only catches it if someone runs the test.",
+  "result": "Test the contract `createOrder` depends on, not `buildCart` in isolation. The bug was a missing field the caller needed — a shape test on `buildCart` would have caught it, but the durable test is the integration.\n\nTwo tests, both cheap:\n\n```js\n// 1. Contract test — locks buildCart's output shape\ndescribe('buildCart', () => {\n  it('returns id, items, and total', () => {\n    const cart = { id: 'c1', items: [{ price: 10, qty: 2 }] };\n    expect(buildCart(cart)).toEqual({\n      id: 'c1',\n      items: [{ price: 10, qty: 2 }],\n      total: 20,\n    });\n  });\n});\n\n// 2. Regression test — exercises the path that broke\ndescribe('createOrder', () => {\n  it('creates an order from a cart with items', async () => {\n    const cart = { id: 'c1', items: [{ sku: 'A', price: 10, qty: 2 }] };\n    const order = await createOrder({ cart, userId: 'u1' });\n    expect(order.items).toHaveLength(1);\n    expect(order.total).toBe(20);\n  });\n});\n```\n\nThe second one is the one that matters. `toEqual` on the full object (not `toMatchObject`) is deliberate — it fails on *missing* fields, which is exactly what happened. `toMatchObject` would have passed.\n\nIf `createOrder` hits a DB or external service, stub at the boundary (repository/client), not at `buildCart`. Mocking `buildCart` recreates the original blind spot.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 11071,
-    "duration_api_ms": 11043,
+    "duration_ms": 10261,
+    "duration_api_ms": 10237,
     "num_turns": 1,
-    "result": "Test the contract that broke: `buildCart`'s output shape. A caller-side test also works but the bug was a producer breaking its contract, so pin it there.\n\n```js\ndescribe('buildCart', () => {\n  it('returns id, items, and total', () => {\n    const cart = {\n      id: 'c1',\n      items: [{ price: 10, qty: 2 }, { price: 5, qty: 1 }],\n    };\n\n    expect(buildCart(cart)).toEqual({\n      id: 'c1',\n      items: cart.items,\n      total: 25,\n    });\n  });\n});\n```\n\nWhy `toEqual` with the full object (not just `toHaveProperty('items')`): it fails if a field is *removed* AND if one is silently added or reshaped. That's the class of bug you just hit.\n\nOne test is enough for the regression. Don't add five variants — empty cart, one item, many items — unless `total` math has edge cases you actually care about. The bug wasn't arithmetic.\n\nIf `buildCart` has many consumers and you want stronger guarantees, add a TypeScript return type or a JSDoc `@returns` with a shape — the type system catches this at build time, not runtime. A test only catches it if someone runs the test.",
+    "result": "Test the contract `createOrder` depends on, not `buildCart` in isolation. The bug was a missing field the caller needed — a shape test on `buildCart` would have caught it, but the durable test is the integration.\n\nTwo tests, both cheap:\n\n```js\n// 1. Contract test — locks buildCart's output shape\ndescribe('buildCart', () => {\n  it('returns id, items, and total', () => {\n    const cart = { id: 'c1', items: [{ price: 10, qty: 2 }] };\n    expect(buildCart(cart)).toEqual({\n      id: 'c1',\n      items: [{ price: 10, qty: 2 }],\n      total: 20,\n    });\n  });\n});\n\n// 2. Regression test — exercises the path that broke\ndescribe('createOrder', () => {\n  it('creates an order from a cart with items', async () => {\n    const cart = { id: 'c1', items: [{ sku: 'A', price: 10, qty: 2 }] };\n    const order = await createOrder({ cart, userId: 'u1' });\n    expect(order.items).toHaveLength(1);\n    expect(order.total).toBe(20);\n  });\n});\n```\n\nThe second one is the one that matters. `toEqual` on the full object (not `toMatchObject`) is deliberate — it fails on *missing* fields, which is exactly what happened. `toMatchObject` would have passed.\n\nIf `createOrder` hits a DB or external service, stub at the boundary (repository/client), not at `buildCart`. Mocking `buildCart` recreates the original blind spot.",
     "stop_reason": "end_turn",
-    "session_id": "f349cd15-26d0-4a3f-979a-a8e27980ef9b",
-    "total_cost_usd": 0.03342275,
+    "session_id": "946b8940-22b4-481f-950e-511305adddcd",
+    "total_cost_usd": 0.03359675,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 465,
-      "cache_read_input_tokens": 34473,
-      "output_tokens": 530,
+      "cache_creation_input_tokens": 381,
+      "cache_read_input_tokens": 34421,
+      "output_tokens": 559,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 465,
+        "ephemeral_1h_input_tokens": 381,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 530,
-          "cache_read_input_tokens": 34473,
-          "cache_creation_input_tokens": 465,
+          "output_tokens": 559,
+          "cache_read_input_tokens": 34421,
+          "cache_creation_input_tokens": 381,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 465
+            "ephemeral_1h_input_tokens": 381
           },
           "type": "message"
         }
@@ -79,11 +79,11 @@
     "modelUsage": {
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 530,
-        "cacheReadInputTokens": 34473,
-        "cacheCreationInputTokens": 465,
+        "outputTokens": 559,
+        "cacheReadInputTokens": 34421,
+        "cacheCreationInputTokens": 381,
         "webSearchRequests": 0,
-        "costUSD": 0.03342275,
+        "costUSD": 0.03359675,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -91,6 +91,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "a89be95d-13cb-4c4a-be8e-45279fe1ac0c"
+    "uuid": "5d68de33-4784-4666-9708-ef5bba68a9f5"
   }
 }

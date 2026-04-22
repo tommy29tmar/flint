@@ -14,61 +14,61 @@
   ],
   "digest_hex": "0db86ef9039b5089d2e722b87250da0e6caef801039c526c02d2b461a0eb6acc",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:01:42.898030+00:00",
-  "output_tokens_tiktoken": 39,
-  "output_tokens_anthropic": 70,
+  "timestamp": "2026-04-22T09:25:27.133948+00:00",
+  "output_tokens_tiktoken": 52,
+  "output_tokens_anthropic": 90,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 18755,
+  "cache_creation_input_tokens": 18483,
   "cache_read_input_tokens": 16805,
-  "total_input_tokens": 35566,
+  "total_input_tokens": 35294,
   "cache_state": "warm",
-  "wallclock_ms": 10743.338709988166,
-  "duration_ms": 4586,
-  "duration_api_ms": 5667,
-  "wrapper_overhead_ms": 5076.338709988166,
+  "wallclock_ms": 10725.447889009956,
+  "duration_ms": 4195,
+  "duration_api_ms": 4845,
+  "wrapper_overhead_ms": 5880.447889009956,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "881b63de-2d78-40ec-bcf0-ff03fb2cacd9",
-  "total_cost_usd": 0.12781925000000002,
+  "session_id": "8ca64f62-f2c2-43d3-8e03-274ed67bfa6e",
+  "total_cost_usd": 0.12662925000000003,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "@hewn v0 hybrid\nG: rebase_vs_merge\nC: history_shape\nP: replay_vs_join\nV: linear_vs_branchy\nA: rebase_local_merge_shared",
+  "result": "rebase replays your commits on top of target tip. Linear history. Rewrites SHAs.\n\nmerge creates merge commit joining two branches. Preserves history as-is. No SHA rewrite.\n\nRule: rebase local/unpushed work. merge shared branches.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 4586,
-    "duration_api_ms": 5667,
+    "duration_ms": 4195,
+    "duration_api_ms": 4845,
     "num_turns": 1,
-    "result": "@hewn v0 hybrid\nG: rebase_vs_merge\nC: history_shape\nP: replay_vs_join\nV: linear_vs_branchy\nA: rebase_local_merge_shared",
+    "result": "rebase replays your commits on top of target tip. Linear history. Rewrites SHAs.\n\nmerge creates merge commit joining two branches. Preserves history as-is. No SHA rewrite.\n\nRule: rebase local/unpushed work. merge shared branches.",
     "stop_reason": "end_turn",
-    "session_id": "881b63de-2d78-40ec-bcf0-ff03fb2cacd9",
-    "total_cost_usd": 0.12781925000000002,
+    "session_id": "8ca64f62-f2c2-43d3-8e03-274ed67bfa6e",
+    "total_cost_usd": 0.12662925000000003,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 18755,
+      "cache_creation_input_tokens": 18483,
       "cache_read_input_tokens": 16805,
-      "output_tokens": 70,
+      "output_tokens": 90,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 18755,
+        "ephemeral_1h_input_tokens": 18483,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 70,
+          "output_tokens": 90,
           "cache_read_input_tokens": 16805,
-          "cache_creation_input_tokens": 18755,
+          "cache_creation_input_tokens": 18483,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 18755
+            "ephemeral_1h_input_tokens": 18483
           },
           "type": "message"
         }
@@ -78,21 +78,21 @@
     "modelUsage": {
       "claude-haiku-4-5-20251001": {
         "inputTokens": 348,
-        "outputTokens": 14,
+        "outputTokens": 16,
         "cacheReadInputTokens": 0,
         "cacheCreationInputTokens": 0,
         "webSearchRequests": 0,
-        "costUSD": 0.00041799999999999997,
+        "costUSD": 0.000428,
         "contextWindow": 200000,
         "maxOutputTokens": 32000
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 70,
+        "outputTokens": 90,
         "cacheReadInputTokens": 16805,
-        "cacheCreationInputTokens": 18755,
+        "cacheCreationInputTokens": 18483,
         "webSearchRequests": 0,
-        "costUSD": 0.12740125000000002,
+        "costUSD": 0.12620125000000001,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "4ed8362e-73c0-4671-a085-846776126cc4"
+    "uuid": "5fbb0207-6407-4fdd-9dd0-27576f67fd24"
   }
 }

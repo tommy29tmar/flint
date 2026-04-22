@@ -14,61 +14,61 @@
   ],
   "digest_hex": "0daec1e665fa21b1ea84e0a54616094044b7ad578b774280ee1e2598cf039bd8",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:03:58.939795+00:00",
-  "output_tokens_tiktoken": 347,
-  "output_tokens_anthropic": 571,
+  "timestamp": "2026-04-22T09:28:02.525284+00:00",
+  "output_tokens_tiktoken": 287,
+  "output_tokens_anthropic": 523,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17026,
+  "cache_creation_input_tokens": 17052,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33828,
+  "total_input_tokens": 33854,
   "cache_state": "warm",
-  "wallclock_ms": 19847.186821018113,
-  "duration_ms": 13877,
-  "duration_api_ms": 14824,
+  "wallclock_ms": 17772.433976002503,
+  "duration_ms": 10897,
+  "duration_api_ms": 11744,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "adb8a3d9-b9f4-4178-9523-f18bfdc631b5",
-  "total_cost_usd": 0.1295285,
+  "session_id": "000f24d3-b82e-4af9-846f-62c4d55a41b0",
+  "total_cost_usd": 0.128491,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "`EXPLAIN` shows the query plan — how the database intends to execute your SQL without actually running it (or with `EXPLAIN ANALYZE`, running it and reporting real timings).\n\nWhat you get:\n- **Access method** per table: sequential scan, index scan, index-only scan, bitmap scan.\n- **Join strategy**: nested loop, hash join, merge join.\n- **Order of operations**: which table is scanned first, where filters/sorts/aggregates happen.\n- **Cost estimates**: startup cost, total cost, estimated rows, row width (planner's guesses, in arbitrary units).\n- **With `ANALYZE`**: actual rows, actual time, loops, and buffer/IO stats (with `BUFFERS`).\n\nWhat to look for:\n- **Seq Scan on a large table** where you expected an index → missing/unusable index, or stale stats.\n- **Estimated rows vs actual rows diverge sharply** → run `ANALYZE <table>`; the planner is flying blind.\n- **Nested Loop with high outer row count** → usually wants a hash join; check join keys and indexes.\n- **Sort or Hash spilling to disk** → `work_mem` too low.\n- **Filter removing most rows after the scan** → predicate isn't index-eligible (function on column, type mismatch, leading wildcard `LIKE '%x'`).\n\nSyntax varies: Postgres `EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT) <query>`; MySQL `EXPLAIN ANALYZE` (8.0+) or `EXPLAIN FORMAT=TREE`; SQLite `EXPLAIN QUERY PLAN`.",
+  "result": "`EXPLAIN` shows the query planner's execution plan for a SQL statement — how the database intends to run it, without actually running it (most engines; `EXPLAIN ANALYZE` in Postgres does run it and reports real timings).\n\nKey things it reveals:\n- **Access method** per table: sequential scan, index scan, index-only scan, bitmap scan.\n- **Join strategy**: nested loop, hash join, merge join — and the join order.\n- **Estimated rows + cost** at each step (planner's guesses, based on table stats).\n- **Filter vs. index conditions**: whether a `WHERE` predicate is pushed into the index or applied after the scan.\n- **Sorts, aggregates, hashes**: where they happen and whether they spill to disk.\n\nWhat you typically look for:\n- Seq scans on large tables → missing index.\n- Estimated rows wildly off from actual (with `ANALYZE`) → stale statistics; run `ANALYZE`.\n- Nested loop over a huge outer set → bad join order or missing index on the inner side.\n- `Sort` / `Hash` with high memory → may spill; consider `work_mem` or indexed ordering.\n\nExact output varies by engine (Postgres, MySQL, SQLite, SQL Server all differ in format and vocabulary), but the concept is the same: it's the optimizer showing its work.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 13877,
-    "duration_api_ms": 14824,
+    "duration_ms": 10897,
+    "duration_api_ms": 11744,
     "num_turns": 1,
-    "result": "`EXPLAIN` shows the query plan — how the database intends to execute your SQL without actually running it (or with `EXPLAIN ANALYZE`, running it and reporting real timings).\n\nWhat you get:\n- **Access method** per table: sequential scan, index scan, index-only scan, bitmap scan.\n- **Join strategy**: nested loop, hash join, merge join.\n- **Order of operations**: which table is scanned first, where filters/sorts/aggregates happen.\n- **Cost estimates**: startup cost, total cost, estimated rows, row width (planner's guesses, in arbitrary units).\n- **With `ANALYZE`**: actual rows, actual time, loops, and buffer/IO stats (with `BUFFERS`).\n\nWhat to look for:\n- **Seq Scan on a large table** where you expected an index → missing/unusable index, or stale stats.\n- **Estimated rows vs actual rows diverge sharply** → run `ANALYZE <table>`; the planner is flying blind.\n- **Nested Loop with high outer row count** → usually wants a hash join; check join keys and indexes.\n- **Sort or Hash spilling to disk** → `work_mem` too low.\n- **Filter removing most rows after the scan** → predicate isn't index-eligible (function on column, type mismatch, leading wildcard `LIKE '%x'`).\n\nSyntax varies: Postgres `EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT) <query>`; MySQL `EXPLAIN ANALYZE` (8.0+) or `EXPLAIN FORMAT=TREE`; SQLite `EXPLAIN QUERY PLAN`.",
+    "result": "`EXPLAIN` shows the query planner's execution plan for a SQL statement — how the database intends to run it, without actually running it (most engines; `EXPLAIN ANALYZE` in Postgres does run it and reports real timings).\n\nKey things it reveals:\n- **Access method** per table: sequential scan, index scan, index-only scan, bitmap scan.\n- **Join strategy**: nested loop, hash join, merge join — and the join order.\n- **Estimated rows + cost** at each step (planner's guesses, based on table stats).\n- **Filter vs. index conditions**: whether a `WHERE` predicate is pushed into the index or applied after the scan.\n- **Sorts, aggregates, hashes**: where they happen and whether they spill to disk.\n\nWhat you typically look for:\n- Seq scans on large tables → missing index.\n- Estimated rows wildly off from actual (with `ANALYZE`) → stale statistics; run `ANALYZE`.\n- Nested loop over a huge outer set → bad join order or missing index on the inner side.\n- `Sort` / `Hash` with high memory → may spill; consider `work_mem` or indexed ordering.\n\nExact output varies by engine (Postgres, MySQL, SQLite, SQL Server all differ in format and vocabulary), but the concept is the same: it's the optimizer showing its work.",
     "stop_reason": "end_turn",
-    "session_id": "adb8a3d9-b9f4-4178-9523-f18bfdc631b5",
-    "total_cost_usd": 0.1295285,
+    "session_id": "000f24d3-b82e-4af9-846f-62c4d55a41b0",
+    "total_cost_usd": 0.128491,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17026,
+      "cache_creation_input_tokens": 17052,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 571,
+      "output_tokens": 523,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17026,
+        "ephemeral_1h_input_tokens": 17052,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 571,
+          "output_tokens": 523,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17026,
+          "cache_creation_input_tokens": 17052,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17026
+            "ephemeral_1h_input_tokens": 17052
           },
           "type": "message"
         }
@@ -88,11 +88,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 571,
+        "outputTokens": 523,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17026,
+        "cacheCreationInputTokens": 17052,
         "webSearchRequests": 0,
-        "costUSD": 0.1291155,
+        "costUSD": 0.128078,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "7646a2d8-733c-4c0f-80fa-df5b94185597"
+    "uuid": "e2747750-ff09-4e71-a134-728feb6ac717"
   }
 }

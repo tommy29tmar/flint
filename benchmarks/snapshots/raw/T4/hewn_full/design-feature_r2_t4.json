@@ -14,62 +14,62 @@
   ],
   "digest_hex": "3191b019d37f08f3d5b68d9000f1aeb1e1a3524225f9daa893803df1e240ffd1",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:41:46.344993+00:00",
-  "session_id_used_for_resume": "a54c782e-344b-4398-9b93-e8973f75e9a0",
-  "output_tokens_tiktoken": 57,
-  "output_tokens_anthropic": 94,
+  "timestamp": "2026-04-22T10:12:02.054375+00:00",
+  "session_id_used_for_resume": "bddbfb84-a1c4-45a2-af56-8b442fa1a621",
+  "output_tokens_tiktoken": 572,
+  "output_tokens_anthropic": 1010,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 377,
-  "cache_read_input_tokens": 35795,
-  "total_input_tokens": 36178,
+  "cache_creation_input_tokens": 1809,
+  "cache_read_input_tokens": 37712,
+  "total_input_tokens": 39527,
   "cache_state": "warm",
-  "wallclock_ms": 10684.092739014886,
-  "duration_ms": 3066,
-  "duration_api_ms": 2888,
-  "wrapper_overhead_ms": 7796.092739014886,
+  "wallclock_ms": 26140.849101997446,
+  "duration_ms": 20319,
+  "duration_api_ms": 20218,
+  "wrapper_overhead_ms": 5922.849101997446,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "a54c782e-344b-4398-9b93-e8973f75e9a0",
-  "total_cost_usd": 0.02263375,
+  "session_id": "bddbfb84-a1c4-45a2-af56-8b442fa1a621",
+  "total_cost_usd": 0.05544225,
   "model_used": "claude-opus-4-7",
-  "result": "Both, but they do different jobs. The consumption path must check expiry at redemption time so an expired card can never be spent, even if the batch hasn't run yet. The daily job is for zeroing out balances, emitting accounting events, and notifying users — housekeeping, not enforcement.",
+  "result": "Both, and they do different jobs.\n\nConsumption path (synchronous check):\n- Authoritative gate. `WHERE balance >= :amt AND expires_at > now()` inside the same FOR UPDATE SELECT (or the UPDATE).\n- Non-negotiable — this is what prevents spending an expired card.\n- Zero lag. Card that expired 1 second ago cannot redeem.\n- Costs nothing: expires_at is already on the row, comparison is free.\n\nBatch job (async sweep):\n- Not for correctness — for state hygiene and accounting.\n- Flips status from `active` to `expired`, writes expiry event, moves balance to breakage revenue account (finance recognizes unredeemed balance as revenue at expiry — this is the whole reason breakage matters).\n- Emits notifications (\"your card expired\"), updates reporting tables, cleans up indexes.\n- Runs daily, idempotent, processes `WHERE status = 'active' AND expires_at <= now()`.\n\nWhy you need both:\n- If only consumption-path: expired cards linger as active rows forever. Finance can't recognize breakage. Users see \"active\" balance in account UI that they can't actually spend. Reporting queries for liability get wrong.\n- If only batch: up-to-24h window where an expired card still redeems because the sweep hasn't run. Customers will find this. Accounting gets messy.\n\nSecondary considerations:\n\n- Use `expires_at TIMESTAMPTZ`, not a derived check. Store the absolute moment, not `issued_at + 12 months` computed at read time. Makes the index usable and handles policy changes cleanly (a future promo card with 24-month expiry just gets a different value).\n\n- Index on `expires_at` partial `WHERE status = 'active'` for the sweep. Full-table scan for a growing table gets slow.\n\n- Warning emails before expiry (30/7 days out) — separate job, separate query, same index. Nice-to-have, often a support-ticket reducer.\n\n- Grace periods and legal: some US states ban expiry on purchased gift cards under certain amounts (CA is strict). If scope includes purchased cards, the expiry field may need to be null for some jurisdictions, or the policy keyed off issuance type. Worth flagging to legal before you commit to \"12 months always\".\n\n- Timezone: `now()` at DB is UTC in Postgres by default with TIMESTAMPTZ. Fine. Don't let app code compute expiry in local time and pass a naive timestamp.\n\n- On the consumption path, prefer putting the expiry check in the UPDATE WHERE clause (not the FOR UPDATE SELECT) so it's atomic with the debit. Belt-and-suspenders: check in the SELECT to give a clean error message, re-check in the UPDATE to be correct.\n\nWant to move to code format / hashing next, or dig into the breakage accounting side?",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 3066,
-    "duration_api_ms": 2888,
+    "duration_ms": 20319,
+    "duration_api_ms": 20218,
     "num_turns": 1,
-    "result": "Both, but they do different jobs. The consumption path must check expiry at redemption time so an expired card can never be spent, even if the batch hasn't run yet. The daily job is for zeroing out balances, emitting accounting events, and notifying users — housekeeping, not enforcement.",
+    "result": "Both, and they do different jobs.\n\nConsumption path (synchronous check):\n- Authoritative gate. `WHERE balance >= :amt AND expires_at > now()` inside the same FOR UPDATE SELECT (or the UPDATE).\n- Non-negotiable — this is what prevents spending an expired card.\n- Zero lag. Card that expired 1 second ago cannot redeem.\n- Costs nothing: expires_at is already on the row, comparison is free.\n\nBatch job (async sweep):\n- Not for correctness — for state hygiene and accounting.\n- Flips status from `active` to `expired`, writes expiry event, moves balance to breakage revenue account (finance recognizes unredeemed balance as revenue at expiry — this is the whole reason breakage matters).\n- Emits notifications (\"your card expired\"), updates reporting tables, cleans up indexes.\n- Runs daily, idempotent, processes `WHERE status = 'active' AND expires_at <= now()`.\n\nWhy you need both:\n- If only consumption-path: expired cards linger as active rows forever. Finance can't recognize breakage. Users see \"active\" balance in account UI that they can't actually spend. Reporting queries for liability get wrong.\n- If only batch: up-to-24h window where an expired card still redeems because the sweep hasn't run. Customers will find this. Accounting gets messy.\n\nSecondary considerations:\n\n- Use `expires_at TIMESTAMPTZ`, not a derived check. Store the absolute moment, not `issued_at + 12 months` computed at read time. Makes the index usable and handles policy changes cleanly (a future promo card with 24-month expiry just gets a different value).\n\n- Index on `expires_at` partial `WHERE status = 'active'` for the sweep. Full-table scan for a growing table gets slow.\n\n- Warning emails before expiry (30/7 days out) — separate job, separate query, same index. Nice-to-have, often a support-ticket reducer.\n\n- Grace periods and legal: some US states ban expiry on purchased gift cards under certain amounts (CA is strict). If scope includes purchased cards, the expiry field may need to be null for some jurisdictions, or the policy keyed off issuance type. Worth flagging to legal before you commit to \"12 months always\".\n\n- Timezone: `now()` at DB is UTC in Postgres by default with TIMESTAMPTZ. Fine. Don't let app code compute expiry in local time and pass a naive timestamp.\n\n- On the consumption path, prefer putting the expiry check in the UPDATE WHERE clause (not the FOR UPDATE SELECT) so it's atomic with the debit. Belt-and-suspenders: check in the SELECT to give a clean error message, re-check in the UPDATE to be correct.\n\nWant to move to code format / hashing next, or dig into the breakage accounting side?",
     "stop_reason": "end_turn",
-    "session_id": "a54c782e-344b-4398-9b93-e8973f75e9a0",
-    "total_cost_usd": 0.02263375,
+    "session_id": "bddbfb84-a1c4-45a2-af56-8b442fa1a621",
+    "total_cost_usd": 0.05544225,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 377,
-      "cache_read_input_tokens": 35795,
-      "output_tokens": 94,
+      "cache_creation_input_tokens": 1809,
+      "cache_read_input_tokens": 37712,
+      "output_tokens": 1010,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 377,
+        "ephemeral_1h_input_tokens": 1809,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 94,
-          "cache_read_input_tokens": 35795,
-          "cache_creation_input_tokens": 377,
+          "output_tokens": 1010,
+          "cache_read_input_tokens": 37712,
+          "cache_creation_input_tokens": 1809,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 377
+            "ephemeral_1h_input_tokens": 1809
           },
           "type": "message"
         }
@@ -79,11 +79,11 @@
     "modelUsage": {
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 94,
-        "cacheReadInputTokens": 35795,
-        "cacheCreationInputTokens": 377,
+        "outputTokens": 1010,
+        "cacheReadInputTokens": 37712,
+        "cacheCreationInputTokens": 1809,
         "webSearchRequests": 0,
-        "costUSD": 0.02263375,
+        "costUSD": 0.05544225,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -91,6 +91,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "53f4c471-0e44-41a4-be98-16467b866cbe"
+    "uuid": "c1cb0ebf-02c4-4311-8f5c-4111e1c5c53b"
   }
 }

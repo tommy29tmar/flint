@@ -14,62 +14,62 @@
   ],
   "digest_hex": "3191b019d37f08f3d5b68d9000f1aeb1e1a3524225f9daa893803df1e240ffd1",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:39:09.469903+00:00",
-  "session_id_used_for_resume": "ca9e1511-157b-402b-982e-a059f045fd4d",
-  "output_tokens_tiktoken": 603,
-  "output_tokens_anthropic": 1605,
+  "timestamp": "2026-04-22T10:08:32.162184+00:00",
+  "session_id_used_for_resume": "8dc1bbb1-b63e-45ed-98f1-6fda973ed692",
+  "output_tokens_tiktoken": 383,
+  "output_tokens_anthropic": 1728,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 1717,
-  "cache_read_input_tokens": 35160,
-  "total_input_tokens": 36883,
+  "cache_creation_input_tokens": 789,
+  "cache_read_input_tokens": 35311,
+  "total_input_tokens": 36106,
   "cache_state": "warm",
-  "wallclock_ms": 34246.70291799703,
-  "duration_ms": 27908,
-  "duration_api_ms": 27878,
+  "wallclock_ms": 36016.64177299244,
+  "duration_ms": 30054,
+  "duration_api_ms": 30006,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "ca9e1511-157b-402b-982e-a059f045fd4d",
-  "total_cost_usd": 0.06846625,
+  "session_id": "8dc1bbb1-b63e-45ed-98f1-6fda973ed692",
+  "total_cost_usd": 0.06581675,
   "model_used": "claude-opus-4-7",
-  "result": "Two solid patterns; I'd default to #1 for your case.\n\n**1. Atomic conditional update (recommended)**\n\n```sql\nUPDATE gift_cards\nSET balance = balance - :amount,\n    updated_at = now()\nWHERE id = :id\n  AND balance >= :amount\n  AND status = 'active';\n-- if rows_affected = 0: insufficient / already consumed / inactive\n```\n\nOne round-trip, atomic under read-committed, no explicit locking, no deadlock risk. The `WHERE balance >= :amount` is the guard. Check the affected-row count; zero means \"couldn't debit\" and you treat it like a failed payment.\n\n**2. `SELECT … FOR UPDATE` inside a tx**\n\n```sql\nBEGIN;\nSELECT balance FROM gift_cards WHERE id = :id FOR UPDATE;\n-- compute amount_to_consume = min(balance, amount_due) in app\nUPDATE gift_cards SET balance = balance - :consumed WHERE id = :id;\nINSERT INTO gift_card_ledger (...);\nCOMMIT;\n```\n\nMore flexible when the debit logic is non-trivial (expiry checks, partial consumption math, writing audit rows in the same tx). Pay for it with a held lock and a chance of lock contention if the same card is hit hard. Fine for gift cards since the hot-key case is rare.\n\n**What this does not solve on its own**\n\n- **Payment failure after debit.** If you debit the card and then the credit-card charge fails, you've lost the customer's balance. Two fixes: (a) debit *after* payment authorization succeeds, or (b) reserve-then-capture — a `reserved_amount` column decrements on checkout-start and converts to a real debit on payment success, released on failure/timeout. Reserve+capture is standard for checkout flows where the two tabs / back-button / abandoned-cart cases matter.\n- **Idempotency on retry.** The checkout service will retry. Put a unique `idempotency_key` (or `order_id` + operation) on the ledger row so the second attempt is a PK conflict, not a second debit. This is independent of the locking choice — you need it either way.\n- **Two tabs, same card, same user.** Reserve+capture handles this cleanly; pure debit-on-success does not — the user can briefly \"spend\" the same balance in two carts until one of them settles. Depending on your tolerance, this may be fine (whichever payment commits first wins, the other fails on the conditional update).\n\nMy recommendation for your stack: **atomic conditional update + ledger row with an idempotency key + reserve-then-capture around the payment authorization.** The conditional update handles the DB race; the idempotency key handles retries; reserve/capture handles the window between \"user clicks pay\" and \"Stripe says yes.\"\n\nDoes your checkout already have a reserve/capture concept, or is payment authorization a single step today?",
+  "result": "Use an **atomic conditional UPDATE** — don't read-then-write at all:\n\n```sql\nUPDATE gift_cards\nSET balance = balance - :amount\nWHERE id = :id AND balance >= :amount\n```\n\nCheck the affected row count. 1 = consumed, 0 = insufficient balance (or card doesn't exist — distinguish with a second lookup only then). This sidesteps the race entirely: the DB evaluates the guard and decrement in one statement under row-level locking. No `SELECT FOR UPDATE` round trip, no version column, no retry loop.\n\nWrite the audit transaction row in the **same DB transaction** as the UPDATE, so the ledger can't diverge from the balance.\n\n**Why not the alternatives:**\n- `SELECT ... FOR UPDATE` then UPDATE — works but two round trips and holds the lock longer. Use only if you need the old balance for business logic before deciding.\n- Optimistic version column — fine, but strictly more complex than the atomic UPDATE for this case. Reserve it for multi-field updates where you genuinely need to compare-and-swap a composite state.\n- Redis/advisory locks — extra infra, weaker guarantees than your DB. Skip.\n\n**The harder race is the cross-system one**, not the DB race. Checkout does two things: decrement gift card (your DB) + charge card (Stripe/etc). If card auth fails *after* the decrement commits, the gift card is wrongly drained. Options:\n\n1. **Authorize card first, decrement gift card on capture.** Card hold is reversible, gift card decrement is final. Preferred.\n2. **Decrement gift card first, void on card failure.** Needs a reliable compensation path — in practice a background worker that reconciles stuck \"pending card\" states, because the process can crash between steps.\n\nPick (1) unless your payment processor makes partial auth awkward. Want me to sketch the sequence?",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 27908,
-    "duration_api_ms": 27878,
+    "duration_ms": 30054,
+    "duration_api_ms": 30006,
     "num_turns": 1,
-    "result": "Two solid patterns; I'd default to #1 for your case.\n\n**1. Atomic conditional update (recommended)**\n\n```sql\nUPDATE gift_cards\nSET balance = balance - :amount,\n    updated_at = now()\nWHERE id = :id\n  AND balance >= :amount\n  AND status = 'active';\n-- if rows_affected = 0: insufficient / already consumed / inactive\n```\n\nOne round-trip, atomic under read-committed, no explicit locking, no deadlock risk. The `WHERE balance >= :amount` is the guard. Check the affected-row count; zero means \"couldn't debit\" and you treat it like a failed payment.\n\n**2. `SELECT … FOR UPDATE` inside a tx**\n\n```sql\nBEGIN;\nSELECT balance FROM gift_cards WHERE id = :id FOR UPDATE;\n-- compute amount_to_consume = min(balance, amount_due) in app\nUPDATE gift_cards SET balance = balance - :consumed WHERE id = :id;\nINSERT INTO gift_card_ledger (...);\nCOMMIT;\n```\n\nMore flexible when the debit logic is non-trivial (expiry checks, partial consumption math, writing audit rows in the same tx). Pay for it with a held lock and a chance of lock contention if the same card is hit hard. Fine for gift cards since the hot-key case is rare.\n\n**What this does not solve on its own**\n\n- **Payment failure after debit.** If you debit the card and then the credit-card charge fails, you've lost the customer's balance. Two fixes: (a) debit *after* payment authorization succeeds, or (b) reserve-then-capture — a `reserved_amount` column decrements on checkout-start and converts to a real debit on payment success, released on failure/timeout. Reserve+capture is standard for checkout flows where the two tabs / back-button / abandoned-cart cases matter.\n- **Idempotency on retry.** The checkout service will retry. Put a unique `idempotency_key` (or `order_id` + operation) on the ledger row so the second attempt is a PK conflict, not a second debit. This is independent of the locking choice — you need it either way.\n- **Two tabs, same card, same user.** Reserve+capture handles this cleanly; pure debit-on-success does not — the user can briefly \"spend\" the same balance in two carts until one of them settles. Depending on your tolerance, this may be fine (whichever payment commits first wins, the other fails on the conditional update).\n\nMy recommendation for your stack: **atomic conditional update + ledger row with an idempotency key + reserve-then-capture around the payment authorization.** The conditional update handles the DB race; the idempotency key handles retries; reserve/capture handles the window between \"user clicks pay\" and \"Stripe says yes.\"\n\nDoes your checkout already have a reserve/capture concept, or is payment authorization a single step today?",
+    "result": "Use an **atomic conditional UPDATE** — don't read-then-write at all:\n\n```sql\nUPDATE gift_cards\nSET balance = balance - :amount\nWHERE id = :id AND balance >= :amount\n```\n\nCheck the affected row count. 1 = consumed, 0 = insufficient balance (or card doesn't exist — distinguish with a second lookup only then). This sidesteps the race entirely: the DB evaluates the guard and decrement in one statement under row-level locking. No `SELECT FOR UPDATE` round trip, no version column, no retry loop.\n\nWrite the audit transaction row in the **same DB transaction** as the UPDATE, so the ledger can't diverge from the balance.\n\n**Why not the alternatives:**\n- `SELECT ... FOR UPDATE` then UPDATE — works but two round trips and holds the lock longer. Use only if you need the old balance for business logic before deciding.\n- Optimistic version column — fine, but strictly more complex than the atomic UPDATE for this case. Reserve it for multi-field updates where you genuinely need to compare-and-swap a composite state.\n- Redis/advisory locks — extra infra, weaker guarantees than your DB. Skip.\n\n**The harder race is the cross-system one**, not the DB race. Checkout does two things: decrement gift card (your DB) + charge card (Stripe/etc). If card auth fails *after* the decrement commits, the gift card is wrongly drained. Options:\n\n1. **Authorize card first, decrement gift card on capture.** Card hold is reversible, gift card decrement is final. Preferred.\n2. **Decrement gift card first, void on card failure.** Needs a reliable compensation path — in practice a background worker that reconciles stuck \"pending card\" states, because the process can crash between steps.\n\nPick (1) unless your payment processor makes partial auth awkward. Want me to sketch the sequence?",
     "stop_reason": "end_turn",
-    "session_id": "ca9e1511-157b-402b-982e-a059f045fd4d",
-    "total_cost_usd": 0.06846625,
+    "session_id": "8dc1bbb1-b63e-45ed-98f1-6fda973ed692",
+    "total_cost_usd": 0.06581675,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 1717,
-      "cache_read_input_tokens": 35160,
-      "output_tokens": 1605,
+      "cache_creation_input_tokens": 789,
+      "cache_read_input_tokens": 35311,
+      "output_tokens": 1728,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 1717,
+        "ephemeral_1h_input_tokens": 789,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 1605,
-          "cache_read_input_tokens": 35160,
-          "cache_creation_input_tokens": 1717,
+          "output_tokens": 1728,
+          "cache_read_input_tokens": 35311,
+          "cache_creation_input_tokens": 789,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 1717
+            "ephemeral_1h_input_tokens": 789
           },
           "type": "message"
         }
@@ -79,11 +79,11 @@
     "modelUsage": {
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 1605,
-        "cacheReadInputTokens": 35160,
-        "cacheCreationInputTokens": 1717,
+        "outputTokens": 1728,
+        "cacheReadInputTokens": 35311,
+        "cacheCreationInputTokens": 789,
         "webSearchRequests": 0,
-        "costUSD": 0.06846625,
+        "costUSD": 0.06581675,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -91,6 +91,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "f9f259a7-4dce-4068-a6ac-a5aaf5c5bffc"
+    "uuid": "724ed855-2c4f-47d7-9ae4-ebae15f8771b"
   }
 }

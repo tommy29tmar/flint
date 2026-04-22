@@ -14,61 +14,61 @@
   ],
   "digest_hex": "b0eeadf6370d53c38ab46c1c682c894eb1c04899ce7fb9c5cde713f602ef439d",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:09:39.148522+00:00",
-  "output_tokens_tiktoken": 30,
-  "output_tokens_anthropic": 51,
+  "timestamp": "2026-04-22T09:34:41.330704+00:00",
+  "output_tokens_tiktoken": 47,
+  "output_tokens_anthropic": 71,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 18758,
+  "cache_creation_input_tokens": 18486,
   "cache_read_input_tokens": 16805,
-  "total_input_tokens": 35569,
+  "total_input_tokens": 35297,
   "cache_state": "warm",
-  "wallclock_ms": 9941.877306991955,
-  "duration_ms": 3931,
-  "duration_api_ms": 4964,
-  "wrapper_overhead_ms": 4977.877306991955,
+  "wallclock_ms": 12697.315794008318,
+  "duration_ms": 6142,
+  "duration_api_ms": 6871,
+  "wrapper_overhead_ms": 5826.315794008318,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "d9f4408e-78c6-424a-9c5c-fcdfa78568e3",
-  "total_cost_usd": 0.12737300000000001,
+  "session_id": "f838dd41-877c-4e43-8e61-8473e8c30378",
+  "total_cost_usd": 0.12617799999999998,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "@hewn v0 hybrid\nG: debounce\nC: keyspam\nP: wait_idle\nV: fewer_req\nA: set_ms",
+  "result": "Stops firing search on every keystroke. Waits til user pauses typing (e.g. 300ms), then fires once.\n\nSaves: API calls, render thrash, race conditions from stale responses landing out of order.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 3931,
-    "duration_api_ms": 4964,
+    "duration_ms": 6142,
+    "duration_api_ms": 6871,
     "num_turns": 1,
-    "result": "@hewn v0 hybrid\nG: debounce\nC: keyspam\nP: wait_idle\nV: fewer_req\nA: set_ms",
+    "result": "Stops firing search on every keystroke. Waits til user pauses typing (e.g. 300ms), then fires once.\n\nSaves: API calls, render thrash, race conditions from stale responses landing out of order.",
     "stop_reason": "end_turn",
-    "session_id": "d9f4408e-78c6-424a-9c5c-fcdfa78568e3",
-    "total_cost_usd": 0.12737300000000001,
+    "session_id": "f838dd41-877c-4e43-8e61-8473e8c30378",
+    "total_cost_usd": 0.12617799999999998,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 18758,
+      "cache_creation_input_tokens": 18486,
       "cache_read_input_tokens": 16805,
-      "output_tokens": 51,
+      "output_tokens": 71,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 18758,
+        "ephemeral_1h_input_tokens": 18486,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 51,
+          "output_tokens": 71,
           "cache_read_input_tokens": 16805,
-          "cache_creation_input_tokens": 18758,
+          "cache_creation_input_tokens": 18486,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 18758
+            "ephemeral_1h_input_tokens": 18486
           },
           "type": "message"
         }
@@ -78,21 +78,21 @@
     "modelUsage": {
       "claude-haiku-4-5-20251001": {
         "inputTokens": 353,
-        "outputTokens": 15,
+        "outputTokens": 16,
         "cacheReadInputTokens": 0,
         "cacheCreationInputTokens": 0,
         "webSearchRequests": 0,
-        "costUSD": 0.000428,
+        "costUSD": 0.000433,
         "contextWindow": 200000,
         "maxOutputTokens": 32000
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 51,
+        "outputTokens": 71,
         "cacheReadInputTokens": 16805,
-        "cacheCreationInputTokens": 18758,
+        "cacheCreationInputTokens": 18486,
         "webSearchRequests": 0,
-        "costUSD": 0.126945,
+        "costUSD": 0.125745,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "a8609840-157f-492f-a2f2-6d5bb72fc51d"
+    "uuid": "fa0d8772-d020-4135-9c63-85ab9790e09b"
   }
 }

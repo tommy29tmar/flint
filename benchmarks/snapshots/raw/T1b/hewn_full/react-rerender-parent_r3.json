@@ -14,61 +14,61 @@
   ],
   "digest_hex": "9db0a4e23156b6e10f137f6d01d02ea6697bbbcd92143c8de9271ff5b7c47d68",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:06:39.523914+00:00",
-  "output_tokens_tiktoken": 31,
-  "output_tokens_anthropic": 50,
+  "timestamp": "2026-04-22T09:31:10.465004+00:00",
+  "output_tokens_tiktoken": 102,
+  "output_tokens_anthropic": 162,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 18759,
+  "cache_creation_input_tokens": 18487,
   "cache_read_input_tokens": 16805,
-  "total_input_tokens": 35570,
+  "total_input_tokens": 35298,
   "cache_state": "warm",
-  "wallclock_ms": 10298.878696979955,
-  "duration_ms": 4132,
-  "duration_api_ms": 5556,
-  "wrapper_overhead_ms": 4742.878696979955,
+  "wallclock_ms": 11870.32415298745,
+  "duration_ms": 5442,
+  "duration_api_ms": 6614,
+  "wrapper_overhead_ms": 5256.32415298745,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "f9bf64ee-b5dd-42c7-a405-dd6bbed624f6",
-  "total_cost_usd": 0.12735325000000003,
+  "session_id": "b6ad7d56-6d85-49c8-b8ec-e211b58a6d7f",
+  "total_cost_usd": 0.12845325000000002,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "@hewn v0 hybrid\nG: rerender\nC: parent_update\nP: ref_identity\nV: stable_props\nA: memo_component",
+  "result": "Parent re-render cascades to children default. React re-renders whole subtree on parent update unless child memoized.\n\nFix: wrap child in `React.memo(Child)`. Stops re-render when props shallow-equal.\n\nCatch: if parent passes new object/array/function each render (`{...}`, `[]`, `() => {}`), memo breaks — props differ by reference. Wrap those in `useMemo`/`useCallback`.\n\nShow me the parent + child code if you want exact fix.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 4132,
-    "duration_api_ms": 5556,
+    "duration_ms": 5442,
+    "duration_api_ms": 6614,
     "num_turns": 1,
-    "result": "@hewn v0 hybrid\nG: rerender\nC: parent_update\nP: ref_identity\nV: stable_props\nA: memo_component",
+    "result": "Parent re-render cascades to children default. React re-renders whole subtree on parent update unless child memoized.\n\nFix: wrap child in `React.memo(Child)`. Stops re-render when props shallow-equal.\n\nCatch: if parent passes new object/array/function each render (`{...}`, `[]`, `() => {}`), memo breaks — props differ by reference. Wrap those in `useMemo`/`useCallback`.\n\nShow me the parent + child code if you want exact fix.",
     "stop_reason": "end_turn",
-    "session_id": "f9bf64ee-b5dd-42c7-a405-dd6bbed624f6",
-    "total_cost_usd": 0.12735325000000003,
+    "session_id": "b6ad7d56-6d85-49c8-b8ec-e211b58a6d7f",
+    "total_cost_usd": 0.12845325000000002,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 18759,
+      "cache_creation_input_tokens": 18487,
       "cache_read_input_tokens": 16805,
-      "output_tokens": 50,
+      "output_tokens": 162,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 18759,
+        "ephemeral_1h_input_tokens": 18487,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 50,
+          "output_tokens": 162,
           "cache_read_input_tokens": 16805,
-          "cache_creation_input_tokens": 18759,
+          "cache_creation_input_tokens": 18487,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 18759
+            "ephemeral_1h_input_tokens": 18487
           },
           "type": "message"
         }
@@ -88,11 +88,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 50,
+        "outputTokens": 162,
         "cacheReadInputTokens": 16805,
-        "cacheCreationInputTokens": 18759,
+        "cacheCreationInputTokens": 18487,
         "webSearchRequests": 0,
-        "costUSD": 0.12692625000000002,
+        "costUSD": 0.12802625,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "aa8ec83b-025b-4c2d-abf5-3b9280507b83"
+    "uuid": "29fd5b9d-353c-4b1a-8e89-634ae68e7015"
   }
 }

@@ -1,0 +1,105 @@
+{
+  "track": "T2",
+  "arm": "hewn_prompt_only",
+  "prompt_id": "spaghetti-code",
+  "run_index": 2,
+  "arm_order_index": 2,
+  "arm_order_full": [
+    "baseline",
+    "caveman_full",
+    "hewn_prompt_only",
+    "caveman_full_plus_ultra_directive",
+    "hewn_full",
+    "terse"
+  ],
+  "digest_hex": "c5b7a91bb866632a665b169537e636c6632c835cd292573b5020e32ca3fec5f2",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:14:08.676222+00:00",
+  "output_tokens_tiktoken": 230,
+  "output_tokens_anthropic": 396,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 17032,
+  "cache_read_input_tokens": 16796,
+  "total_input_tokens": 33834,
+  "cache_state": "warm",
+  "wallclock_ms": 16157.696208014386,
+  "duration_ms": 9808,
+  "duration_api_ms": 11499,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "e51724f6-4942-49fd-9b06-423f1362757c",
+  "total_cost_usd": 0.125217,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "Three habits fix most of it:\n\n1. **Name things honestly.** If a function does two things, its name will be vague (`handleData`, `processStuff`). That vagueness is the signal — split it until each name is a verb phrase you could explain in one breath (`parseCsvRow`, `validateUserEmail`).\n\n2. **Separate \"decide\" from \"do\".** Spaghetti usually means branching logic and side effects are tangled. Pull the decisions up (pure functions returning what should happen), keep the side effects (DB writes, HTTP calls, file I/O) at the edges. You can read the top of the file and know the shape without tracing calls.\n\n3. **Delete aggressively.** Dead code, unused params, commented-out blocks, \"just in case\" abstractions — they all add tracking cost. If it isn't used *now*, remove it. Git remembers.\n\nBonus: when you open a file tomorrow and feel lost, that's the moment to refactor — not later. The confusion is the bug report.\n\nWant me to look at a specific file and point out where it tangles?",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 9808,
+    "duration_api_ms": 11499,
+    "num_turns": 1,
+    "result": "Three habits fix most of it:\n\n1. **Name things honestly.** If a function does two things, its name will be vague (`handleData`, `processStuff`). That vagueness is the signal — split it until each name is a verb phrase you could explain in one breath (`parseCsvRow`, `validateUserEmail`).\n\n2. **Separate \"decide\" from \"do\".** Spaghetti usually means branching logic and side effects are tangled. Pull the decisions up (pure functions returning what should happen), keep the side effects (DB writes, HTTP calls, file I/O) at the edges. You can read the top of the file and know the shape without tracing calls.\n\n3. **Delete aggressively.** Dead code, unused params, commented-out blocks, \"just in case\" abstractions — they all add tracking cost. If it isn't used *now*, remove it. Git remembers.\n\nBonus: when you open a file tomorrow and feel lost, that's the moment to refactor — not later. The confusion is the bug report.\n\nWant me to look at a specific file and point out where it tangles?",
+    "stop_reason": "end_turn",
+    "session_id": "e51724f6-4942-49fd-9b06-423f1362757c",
+    "total_cost_usd": 0.125217,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 17032,
+      "cache_read_input_tokens": 16796,
+      "output_tokens": 396,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 17032,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 396,
+          "cache_read_input_tokens": 16796,
+          "cache_creation_input_tokens": 17032,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 17032
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 359,
+        "outputTokens": 16,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.000439,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 396,
+        "cacheReadInputTokens": 16796,
+        "cacheCreationInputTokens": 17032,
+        "webSearchRequests": 0,
+        "costUSD": 0.12477799999999999,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "6c13fc3b-94bf-4552-837b-d6e6631f1369"
+  }
+}

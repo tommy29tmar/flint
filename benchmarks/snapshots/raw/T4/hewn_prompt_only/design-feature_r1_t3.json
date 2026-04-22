@@ -14,62 +14,62 @@
   ],
   "digest_hex": "30a2f9a62df0d790c0598917c3ab42509bbadd672a0a484741ea201d2da3b44f",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:33:08.994984+00:00",
-  "session_id_used_for_resume": "dbae8038-082c-4770-a429-b9b4f798bbc6",
-  "output_tokens_tiktoken": 701,
-  "output_tokens_anthropic": 1926,
+  "timestamp": "2026-04-22T10:02:36.629821+00:00",
+  "session_id_used_for_resume": "dc1168d0-f9c6-48dd-9150-791599c75151",
+  "output_tokens_tiktoken": 624,
+  "output_tokens_anthropic": 2318,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 1725,
-  "cache_read_input_tokens": 35680,
-  "total_input_tokens": 37411,
+  "cache_creation_input_tokens": 1693,
+  "cache_read_input_tokens": 35016,
+  "total_input_tokens": 36715,
   "cache_state": "warm",
-  "wallclock_ms": 46825.149871001486,
-  "duration_ms": 40599,
-  "duration_api_ms": 40568,
+  "wallclock_ms": 42824.321351974504,
+  "duration_ms": 36971,
+  "duration_api_ms": 36935,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "dbae8038-082c-4770-a429-b9b4f798bbc6",
-  "total_cost_usd": 0.07680124999999999,
+  "session_id": "dc1168d0-f9c6-48dd-9150-791599c75151",
+  "total_cost_usd": 0.08606925,
   "model_used": "claude-opus-4-7",
-  "result": "The core primitive is a **conditional atomic UPDATE** — don't do read-then-write in application code.\n\n```sql\nUPDATE gift_cards\nSET balance = balance - :amount\nWHERE id = :card_id\n  AND balance >= :amount;\n```\n\nCheck affected rows. If 0, the card either doesn't exist or didn't have enough — reject. One statement, no lock held across round trips, works in any isolation level, safe under arbitrary concurrency. Two sessions both seeing \"balance is $50\" doesn't matter; only one of them wins the conditional update.\n\n`SELECT ... FOR UPDATE` also works and is fine if you need to validate multiple conditions in one transaction, but for a single-card debit the conditional UPDATE is simpler and has less lock contention.\n\n**But debit-at-checkout isn't quite what you want.** Checkout is multi-step: user submits → you authorize card payment → capture on ship/confirm. If you debit the gift card at step 1 and the card auth fails at step 2, you've got to refund. If you debit at step 3, another session can drain the balance in between. The standard pattern is **reserve → commit/release**:\n\n1. **Reserve**: conditional UPDATE debits the balance *and* writes a row to `gift_card_transactions` with `status='held'`, `order_id=:order_id`.\n2. **Commit**: on successful payment capture, flip the transaction row to `status='consumed'`. Balance already reflects it.\n3. **Release**: on cancel/timeout/payment failure, conditional UPDATE credits the balance back and marks the transaction `status='released'`.\n\nHolds should have a TTL and a sweeper that auto-releases stale ones, otherwise abandoned carts permanently lock balance.\n\n**Idempotency** — the same checkout will retry (network blip, payment webhook replay, user double-click). Put a unique constraint on `(gift_card_id, order_id, intent)` in the transactions table so a retried reserve for the same order is a no-op rather than a second debit. The conditional UPDATE protects against concurrent *different* orders; the unique constraint protects against the *same* order arriving twice.\n\n**What not to do:**\n- Read balance → check in app code → UPDATE. Classic TOCTOU; the check and the write aren't atomic.\n- Reach for Redis/distributed locks. Your database already does this correctly and cheaply; adding a lock service adds a new failure mode (lock server down = checkout down) without fixing anything the DB didn't already handle.\n- Serializable isolation across the whole checkout transaction. It works but causes serialization failures under load and is overkill when one conditional UPDATE gets you there.\n- Debit + credit balance on refund as *new transaction rows with opposite sign* rather than mutating or deleting the original hold row. Keeps the transactions table append-only even though the balance column is mutable — preserves the audit trail you wanted from the middle-ground compromise.\n\nOne thing to decide: **what does \"reserve\" return to the caller?** Either (a) the amount actually reserved (min of balance and order total) so the caller knows how much to charge the card, or (b) reserves only if the full ask fits, and the caller handles partial coverage by making two separate calls. (a) is more ergonomic, (b) is more composable when multiple gift cards stack. Given you're not stacking yet, (a) is fine.",
+  "result": "Three primitives, picked in this order:\n\n**1. Atomic conditional decrement (the core safety net)**\n```sql\nUPDATE gift_card\nSET balance = balance - :amount\nWHERE id = :id AND balance >= :amount\n```\nIf `rowcount = 0`, either the card is gone or someone beat you to it. This is the single line that prevents double-spend — the DB enforces it, not your application. No version column needed; `balance >= :amount` is a more expressive guard than a version CAS for this domain.\n\n**Avoid `SELECT ... FOR UPDATE`.** It works, but checkout holds the transaction open across a payment-gateway call (seconds, sometimes tens of seconds). Holding a row lock across an external API is how you turn a slow Stripe into a full DB outage.\n\n**2. Two-phase reserve → commit (for the checkout lifecycle)**\n\nBecause payment auth sits between \"I know I can use $30 of gift card\" and \"the order is final,\" you need a hold:\n\n- **Reserve** (checkout starts): atomic decrement above, insert `gift_card_transaction(type='reservation', reservation_id, gift_card_id, order_id, delta=-30, expires_at=now()+15min)` in the same DB transaction.\n- **Commit** (payment succeeds): update reservation row to `type='redemption'`. Balance already decremented — nothing more to do.\n- **Release** (payment fails, user abandons, or expiry): insert compensating `type='release'` row *and* `UPDATE balance = balance + 30`. Never mutate the original reservation row.\n\nA background job sweeps expired reservations and releases them. Make the release itself idempotent (reservation row has a `released_at` timestamp, sweep skips non-null).\n\n**3. Idempotency key on the reservation**\n\nUnique constraint on `(gift_card_id, order_id)` for reservation rows. Double-submit from the client (network retry, double-click, ghost tap on mobile) hits the constraint and no-ops instead of creating a second reservation. Pair with `INSERT ... ON CONFLICT DO NOTHING RETURNING id` so the happy path and the retry path return the same reservation.\n\n**Multi-card orders:** each card gets its own atomic decrement. If card #2 fails (insufficient balance, or expired), you have to release card #1 — that's saga logic, not something the DB solves. Do the decrements sequentially, not in parallel, so compensations are straightforward.\n\n**The one thing people get wrong:** storing the reservation as \"I intend to spend $30\" without actually decrementing the balance, reasoning that the balance is only \"really\" spent on commit. This recreates the race: two checkouts both see $30 available, both reserve intent, both try to commit. Decrement at reservation time — the reservation *is* the spend, release is the refund.\n\nWant me to sketch the table schema for `gift_card` + `gift_card_transaction` next, or move on to the refund semantics question?",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 40599,
-    "duration_api_ms": 40568,
+    "duration_ms": 36971,
+    "duration_api_ms": 36935,
     "num_turns": 1,
-    "result": "The core primitive is a **conditional atomic UPDATE** — don't do read-then-write in application code.\n\n```sql\nUPDATE gift_cards\nSET balance = balance - :amount\nWHERE id = :card_id\n  AND balance >= :amount;\n```\n\nCheck affected rows. If 0, the card either doesn't exist or didn't have enough — reject. One statement, no lock held across round trips, works in any isolation level, safe under arbitrary concurrency. Two sessions both seeing \"balance is $50\" doesn't matter; only one of them wins the conditional update.\n\n`SELECT ... FOR UPDATE` also works and is fine if you need to validate multiple conditions in one transaction, but for a single-card debit the conditional UPDATE is simpler and has less lock contention.\n\n**But debit-at-checkout isn't quite what you want.** Checkout is multi-step: user submits → you authorize card payment → capture on ship/confirm. If you debit the gift card at step 1 and the card auth fails at step 2, you've got to refund. If you debit at step 3, another session can drain the balance in between. The standard pattern is **reserve → commit/release**:\n\n1. **Reserve**: conditional UPDATE debits the balance *and* writes a row to `gift_card_transactions` with `status='held'`, `order_id=:order_id`.\n2. **Commit**: on successful payment capture, flip the transaction row to `status='consumed'`. Balance already reflects it.\n3. **Release**: on cancel/timeout/payment failure, conditional UPDATE credits the balance back and marks the transaction `status='released'`.\n\nHolds should have a TTL and a sweeper that auto-releases stale ones, otherwise abandoned carts permanently lock balance.\n\n**Idempotency** — the same checkout will retry (network blip, payment webhook replay, user double-click). Put a unique constraint on `(gift_card_id, order_id, intent)` in the transactions table so a retried reserve for the same order is a no-op rather than a second debit. The conditional UPDATE protects against concurrent *different* orders; the unique constraint protects against the *same* order arriving twice.\n\n**What not to do:**\n- Read balance → check in app code → UPDATE. Classic TOCTOU; the check and the write aren't atomic.\n- Reach for Redis/distributed locks. Your database already does this correctly and cheaply; adding a lock service adds a new failure mode (lock server down = checkout down) without fixing anything the DB didn't already handle.\n- Serializable isolation across the whole checkout transaction. It works but causes serialization failures under load and is overkill when one conditional UPDATE gets you there.\n- Debit + credit balance on refund as *new transaction rows with opposite sign* rather than mutating or deleting the original hold row. Keeps the transactions table append-only even though the balance column is mutable — preserves the audit trail you wanted from the middle-ground compromise.\n\nOne thing to decide: **what does \"reserve\" return to the caller?** Either (a) the amount actually reserved (min of balance and order total) so the caller knows how much to charge the card, or (b) reserves only if the full ask fits, and the caller handles partial coverage by making two separate calls. (a) is more ergonomic, (b) is more composable when multiple gift cards stack. Given you're not stacking yet, (a) is fine.",
+    "result": "Three primitives, picked in this order:\n\n**1. Atomic conditional decrement (the core safety net)**\n```sql\nUPDATE gift_card\nSET balance = balance - :amount\nWHERE id = :id AND balance >= :amount\n```\nIf `rowcount = 0`, either the card is gone or someone beat you to it. This is the single line that prevents double-spend — the DB enforces it, not your application. No version column needed; `balance >= :amount` is a more expressive guard than a version CAS for this domain.\n\n**Avoid `SELECT ... FOR UPDATE`.** It works, but checkout holds the transaction open across a payment-gateway call (seconds, sometimes tens of seconds). Holding a row lock across an external API is how you turn a slow Stripe into a full DB outage.\n\n**2. Two-phase reserve → commit (for the checkout lifecycle)**\n\nBecause payment auth sits between \"I know I can use $30 of gift card\" and \"the order is final,\" you need a hold:\n\n- **Reserve** (checkout starts): atomic decrement above, insert `gift_card_transaction(type='reservation', reservation_id, gift_card_id, order_id, delta=-30, expires_at=now()+15min)` in the same DB transaction.\n- **Commit** (payment succeeds): update reservation row to `type='redemption'`. Balance already decremented — nothing more to do.\n- **Release** (payment fails, user abandons, or expiry): insert compensating `type='release'` row *and* `UPDATE balance = balance + 30`. Never mutate the original reservation row.\n\nA background job sweeps expired reservations and releases them. Make the release itself idempotent (reservation row has a `released_at` timestamp, sweep skips non-null).\n\n**3. Idempotency key on the reservation**\n\nUnique constraint on `(gift_card_id, order_id)` for reservation rows. Double-submit from the client (network retry, double-click, ghost tap on mobile) hits the constraint and no-ops instead of creating a second reservation. Pair with `INSERT ... ON CONFLICT DO NOTHING RETURNING id` so the happy path and the retry path return the same reservation.\n\n**Multi-card orders:** each card gets its own atomic decrement. If card #2 fails (insufficient balance, or expired), you have to release card #1 — that's saga logic, not something the DB solves. Do the decrements sequentially, not in parallel, so compensations are straightforward.\n\n**The one thing people get wrong:** storing the reservation as \"I intend to spend $30\" without actually decrementing the balance, reasoning that the balance is only \"really\" spent on commit. This recreates the race: two checkouts both see $30 available, both reserve intent, both try to commit. Decrement at reservation time — the reservation *is* the spend, release is the refund.\n\nWant me to sketch the table schema for `gift_card` + `gift_card_transaction` next, or move on to the refund semantics question?",
     "stop_reason": "end_turn",
-    "session_id": "dbae8038-082c-4770-a429-b9b4f798bbc6",
-    "total_cost_usd": 0.07680124999999999,
+    "session_id": "dc1168d0-f9c6-48dd-9150-791599c75151",
+    "total_cost_usd": 0.08606925,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 1725,
-      "cache_read_input_tokens": 35680,
-      "output_tokens": 1926,
+      "cache_creation_input_tokens": 1693,
+      "cache_read_input_tokens": 35016,
+      "output_tokens": 2318,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 1725,
+        "ephemeral_1h_input_tokens": 1693,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 1926,
-          "cache_read_input_tokens": 35680,
-          "cache_creation_input_tokens": 1725,
+          "output_tokens": 2318,
+          "cache_read_input_tokens": 35016,
+          "cache_creation_input_tokens": 1693,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 1725
+            "ephemeral_1h_input_tokens": 1693
           },
           "type": "message"
         }
@@ -79,11 +79,11 @@
     "modelUsage": {
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 1926,
-        "cacheReadInputTokens": 35680,
-        "cacheCreationInputTokens": 1725,
+        "outputTokens": 2318,
+        "cacheReadInputTokens": 35016,
+        "cacheCreationInputTokens": 1693,
         "webSearchRequests": 0,
-        "costUSD": 0.07680124999999999,
+        "costUSD": 0.08606925,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -91,6 +91,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "e1e4cfab-dc21-4de4-91f5-85381a26b0d2"
+    "uuid": "a2bea713-01b9-4040-97a6-456708c0ac0b"
   }
 }

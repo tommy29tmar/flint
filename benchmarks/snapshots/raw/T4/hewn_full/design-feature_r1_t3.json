@@ -14,62 +14,62 @@
   ],
   "digest_hex": "30a2f9a62df0d790c0598917c3ab42509bbadd672a0a484741ea201d2da3b44f",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:30:39.901919+00:00",
-  "session_id_used_for_resume": "a5b861a6-3ae3-47ab-bc99-1526aaf8a5f4",
-  "output_tokens_tiktoken": 147,
-  "output_tokens_anthropic": 239,
+  "timestamp": "2026-04-22T09:59:57.867205+00:00",
+  "session_id_used_for_resume": "50814b8c-e427-4d01-9d32-ef1364cdb4d9",
+  "output_tokens_tiktoken": 536,
+  "output_tokens_anthropic": 969,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 415,
-  "cache_read_input_tokens": 35433,
-  "total_input_tokens": 35854,
+  "cache_creation_input_tokens": 1158,
+  "cache_read_input_tokens": 36484,
+  "total_input_tokens": 37648,
   "cache_state": "warm",
-  "wallclock_ms": 12982.421952998266,
-  "duration_ms": 6393,
-  "duration_api_ms": 6295,
-  "wrapper_overhead_ms": 6687.421952998266,
+  "wallclock_ms": 26071.12569498713,
+  "duration_ms": 19480,
+  "duration_api_ms": 19385,
+  "wrapper_overhead_ms": 6686.125694987131,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "a5b861a6-3ae3-47ab-bc99-1526aaf8a5f4",
-  "total_cost_usd": 0.02631525,
+  "session_id": "50814b8c-e427-4d01-9d32-ef1364cdb4d9",
+  "total_cost_usd": 0.0497345,
   "model_used": "claude-opus-4-7",
-  "result": "Pessimistic lock is simplest: `SELECT ... FOR UPDATE` on the gift card row inside the checkout transaction, so the second session blocks until the first commits or rolls back. Works if your checkout already runs in a DB transaction and latency on the lock is acceptable.\n\nOptimistic alternative: add a `version` column, read balance + version, then `UPDATE ... WHERE id = ? AND version = ?` — if zero rows affected, retry. Scales better under contention but you own the retry loop.\n\nEither way, do the debit before authorizing the card charge, and treat the debit as conditional until the charge succeeds (compensating write on failure) — otherwise a failed card auth leaves the gift card drained.",
+  "result": "Four main options.\n\nPessimistic lock (SELECT ... FOR UPDATE): lock row at start of redeem tx, read balance, UPDATE, commit. Other tx blocks until first commits.\nPros: simple, correct, easy to reason about. Cons: holds lock for tx duration — keep tx short, no external API calls (card auth) while holding it. Risk of deadlock if you lock multiple cards in inconsistent order.\n\nOptimistic (version/CAS): SELECT balance, version. UPDATE ... WHERE id=? AND version=? SET balance=?, version=version+1. If rowcount=0, retry.\nPros: no locks, scales well, safe across long workflows. Cons: needs retry loop, livelock under heavy contention (rare for gift cards — one user, maybe two sessions).\n\nConditional UPDATE with balance guard: UPDATE ... SET balance = balance - :amount WHERE id=? AND balance >= :amount. Atomic, rowcount tells you if it applied.\nPros: single statement, no read-modify-write, no version column needed. Cons: doesn't give you pre/post balance without RETURNING (Postgres has it, MySQL doesn't until 8.0.21).\n\nSerializable isolation: let DB detect conflict, one tx aborts, retry.\nPros: correctness by default. Cons: more aborts, app must handle retry, perf cost.\n\nReserve vs capture matters too. If gift card applies before card auth, and auth fails, you need to release. Two approaches:\n- Deduct on redeem, credit back on auth failure (compensating write). Ledger-friendly. With mutable row, still works: two UPDATEs.\n- Reserve table: separate row holding \"pending\" amount with TTL. balance = card.balance - SUM(active reservations). More moving parts.\n\nFor gift cards, recommend conditional UPDATE with guard (option 3). Single atomic statement, no lock held across card auth, no retry loop. Pattern:\n\n1. BEGIN tx\n2. UPDATE gift_card SET balance = balance - :amt WHERE id=? AND balance >= :amt RETURNING balance\n3. If rowcount=0, reject (\"insufficient balance\" or \"card changed\")\n4. Insert redemption record with order_id for idempotency + audit\n5. COMMIT\n6. Attempt card auth for remainder\n7. On auth failure: compensating UPDATE balance = balance + :amt, mark redemption reversed\n\nIdempotency key on redemption (order_id + card_id unique) prevents double-apply if checkout retries.\n\nMissing input: does your order flow already have an idempotency key per attempt? And does payment auth happen in same service or via async webhook?",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 6393,
-    "duration_api_ms": 6295,
+    "duration_ms": 19480,
+    "duration_api_ms": 19385,
     "num_turns": 1,
-    "result": "Pessimistic lock is simplest: `SELECT ... FOR UPDATE` on the gift card row inside the checkout transaction, so the second session blocks until the first commits or rolls back. Works if your checkout already runs in a DB transaction and latency on the lock is acceptable.\n\nOptimistic alternative: add a `version` column, read balance + version, then `UPDATE ... WHERE id = ? AND version = ?` — if zero rows affected, retry. Scales better under contention but you own the retry loop.\n\nEither way, do the debit before authorizing the card charge, and treat the debit as conditional until the charge succeeds (compensating write on failure) — otherwise a failed card auth leaves the gift card drained.",
+    "result": "Four main options.\n\nPessimistic lock (SELECT ... FOR UPDATE): lock row at start of redeem tx, read balance, UPDATE, commit. Other tx blocks until first commits.\nPros: simple, correct, easy to reason about. Cons: holds lock for tx duration — keep tx short, no external API calls (card auth) while holding it. Risk of deadlock if you lock multiple cards in inconsistent order.\n\nOptimistic (version/CAS): SELECT balance, version. UPDATE ... WHERE id=? AND version=? SET balance=?, version=version+1. If rowcount=0, retry.\nPros: no locks, scales well, safe across long workflows. Cons: needs retry loop, livelock under heavy contention (rare for gift cards — one user, maybe two sessions).\n\nConditional UPDATE with balance guard: UPDATE ... SET balance = balance - :amount WHERE id=? AND balance >= :amount. Atomic, rowcount tells you if it applied.\nPros: single statement, no read-modify-write, no version column needed. Cons: doesn't give you pre/post balance without RETURNING (Postgres has it, MySQL doesn't until 8.0.21).\n\nSerializable isolation: let DB detect conflict, one tx aborts, retry.\nPros: correctness by default. Cons: more aborts, app must handle retry, perf cost.\n\nReserve vs capture matters too. If gift card applies before card auth, and auth fails, you need to release. Two approaches:\n- Deduct on redeem, credit back on auth failure (compensating write). Ledger-friendly. With mutable row, still works: two UPDATEs.\n- Reserve table: separate row holding \"pending\" amount with TTL. balance = card.balance - SUM(active reservations). More moving parts.\n\nFor gift cards, recommend conditional UPDATE with guard (option 3). Single atomic statement, no lock held across card auth, no retry loop. Pattern:\n\n1. BEGIN tx\n2. UPDATE gift_card SET balance = balance - :amt WHERE id=? AND balance >= :amt RETURNING balance\n3. If rowcount=0, reject (\"insufficient balance\" or \"card changed\")\n4. Insert redemption record with order_id for idempotency + audit\n5. COMMIT\n6. Attempt card auth for remainder\n7. On auth failure: compensating UPDATE balance = balance + :amt, mark redemption reversed\n\nIdempotency key on redemption (order_id + card_id unique) prevents double-apply if checkout retries.\n\nMissing input: does your order flow already have an idempotency key per attempt? And does payment auth happen in same service or via async webhook?",
     "stop_reason": "end_turn",
-    "session_id": "a5b861a6-3ae3-47ab-bc99-1526aaf8a5f4",
-    "total_cost_usd": 0.02631525,
+    "session_id": "50814b8c-e427-4d01-9d32-ef1364cdb4d9",
+    "total_cost_usd": 0.0497345,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 415,
-      "cache_read_input_tokens": 35433,
-      "output_tokens": 239,
+      "cache_creation_input_tokens": 1158,
+      "cache_read_input_tokens": 36484,
+      "output_tokens": 969,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 415,
+        "ephemeral_1h_input_tokens": 1158,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 239,
-          "cache_read_input_tokens": 35433,
-          "cache_creation_input_tokens": 415,
+          "output_tokens": 969,
+          "cache_read_input_tokens": 36484,
+          "cache_creation_input_tokens": 1158,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 415
+            "ephemeral_1h_input_tokens": 1158
           },
           "type": "message"
         }
@@ -79,11 +79,11 @@
     "modelUsage": {
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 239,
-        "cacheReadInputTokens": 35433,
-        "cacheCreationInputTokens": 415,
+        "outputTokens": 969,
+        "cacheReadInputTokens": 36484,
+        "cacheCreationInputTokens": 1158,
         "webSearchRequests": 0,
-        "costUSD": 0.02631525,
+        "costUSD": 0.0497345,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -91,6 +91,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "39c4855a-dffc-4e46-9ffa-8903860d9c12"
+    "uuid": "3f5bc920-89e9-4191-bf23-38af58db8025"
   }
 }

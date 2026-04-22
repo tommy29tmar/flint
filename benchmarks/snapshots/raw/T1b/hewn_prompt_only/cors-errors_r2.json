@@ -14,61 +14,61 @@
   ],
   "digest_hex": "258887ceb8366586f3dea59b17c1ef6a12bb3fbc92c09a2a53837c2cc3a1ccbf",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:04:48.997936+00:00",
-  "output_tokens_tiktoken": 287,
-  "output_tokens_anthropic": 467,
+  "timestamp": "2026-04-22T09:29:01.629183+00:00",
+  "output_tokens_tiktoken": 305,
+  "output_tokens_anthropic": 732,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17025,
+  "cache_creation_input_tokens": 17051,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33827,
+  "total_input_tokens": 33853,
   "cache_state": "warm",
-  "wallclock_ms": 15348.958571994444,
-  "duration_ms": 9388,
-  "duration_api_ms": 10588,
+  "wallclock_ms": 18508.966664987383,
+  "duration_ms": 12151,
+  "duration_api_ms": 13257,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "dc01dbd0-282c-46d6-b32f-3913ec2d46f8",
-  "total_cost_usd": 0.12692925,
+  "session_id": "31e73555-cf7f-4e85-830b-a3b86ccb4667",
+  "total_cost_usd": 0.13373174999999998,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "CORS errors happen when your frontend (origin A) requests a resource from a backend (origin B) that doesn't return the expected `Access-Control-Allow-Origin` header. The browser blocks the response; the server usually saw the request fine.\n\nCommon causes:\n- **Missing/mismatched `Access-Control-Allow-Origin`** on the server. Must match the request's `Origin` exactly (or be `*`, but `*` is incompatible with credentials).\n- **Preflight (OPTIONS) failing.** Triggered by non-simple methods (`PUT`, `DELETE`), custom headers (`Authorization`, `X-*`), or `Content-Type: application/json`. Server must respond 2xx with `Access-Control-Allow-Methods` and `Access-Control-Allow-Headers`.\n- **Credentials mode.** If you send cookies (`credentials: 'include'`), the server needs `Access-Control-Allow-Credentials: true` **and** a specific origin (not `*`).\n- **Redirects.** CORS doesn't follow redirects on preflight.\n- **Proxy/CDN stripping headers.** Check the response in DevTools → Network, not just the console.\n\nTo diagnose: open DevTools → Network → click the failing request → look at the actual response headers and the exact error text. The message tells you which check failed.\n\nIf you share the console error and your server framework, I can point to the specific fix.",
+  "result": "CORS errors mean the browser blocked a cross-origin request because the server's response didn't include the right `Access-Control-Allow-*` headers for your origin.\n\nCommon causes:\n\n1. **Server missing headers** — API must return `Access-Control-Allow-Origin: <your-origin>` (or `*`). Fix on the server, not the client.\n2. **Preflight failing** — Non-simple requests (custom headers, `PUT`/`DELETE`, `Content-Type: application/json`) trigger an `OPTIONS` preflight. Server must handle `OPTIONS` and return `Access-Control-Allow-Methods` / `Access-Control-Allow-Headers`.\n3. **Credentials mismatch** — If you send `credentials: 'include'`, server must return `Access-Control-Allow-Credentials: true` **and** a specific origin (not `*`).\n4. **Wrong origin in config** — `http://localhost:3000` ≠ `http://127.0.0.1:3000`; `http` ≠ `https`; port matters.\n5. **Redirects** — Preflights don't follow redirects. Call the final URL directly.\n\nQuickest diagnosis: open DevTools → Network → click the failing request → check response headers and the preflight `OPTIONS` call. The exact missing header is named in the console error.\n\nDev-only workaround: proxy the API through your dev server (e.g. Vite/Next.js `proxy` config) so the browser sees it as same-origin.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 9388,
-    "duration_api_ms": 10588,
+    "duration_ms": 12151,
+    "duration_api_ms": 13257,
     "num_turns": 1,
-    "result": "CORS errors happen when your frontend (origin A) requests a resource from a backend (origin B) that doesn't return the expected `Access-Control-Allow-Origin` header. The browser blocks the response; the server usually saw the request fine.\n\nCommon causes:\n- **Missing/mismatched `Access-Control-Allow-Origin`** on the server. Must match the request's `Origin` exactly (or be `*`, but `*` is incompatible with credentials).\n- **Preflight (OPTIONS) failing.** Triggered by non-simple methods (`PUT`, `DELETE`), custom headers (`Authorization`, `X-*`), or `Content-Type: application/json`. Server must respond 2xx with `Access-Control-Allow-Methods` and `Access-Control-Allow-Headers`.\n- **Credentials mode.** If you send cookies (`credentials: 'include'`), the server needs `Access-Control-Allow-Credentials: true` **and** a specific origin (not `*`).\n- **Redirects.** CORS doesn't follow redirects on preflight.\n- **Proxy/CDN stripping headers.** Check the response in DevTools → Network, not just the console.\n\nTo diagnose: open DevTools → Network → click the failing request → look at the actual response headers and the exact error text. The message tells you which check failed.\n\nIf you share the console error and your server framework, I can point to the specific fix.",
+    "result": "CORS errors mean the browser blocked a cross-origin request because the server's response didn't include the right `Access-Control-Allow-*` headers for your origin.\n\nCommon causes:\n\n1. **Server missing headers** — API must return `Access-Control-Allow-Origin: <your-origin>` (or `*`). Fix on the server, not the client.\n2. **Preflight failing** — Non-simple requests (custom headers, `PUT`/`DELETE`, `Content-Type: application/json`) trigger an `OPTIONS` preflight. Server must handle `OPTIONS` and return `Access-Control-Allow-Methods` / `Access-Control-Allow-Headers`.\n3. **Credentials mismatch** — If you send `credentials: 'include'`, server must return `Access-Control-Allow-Credentials: true` **and** a specific origin (not `*`).\n4. **Wrong origin in config** — `http://localhost:3000` ≠ `http://127.0.0.1:3000`; `http` ≠ `https`; port matters.\n5. **Redirects** — Preflights don't follow redirects. Call the final URL directly.\n\nQuickest diagnosis: open DevTools → Network → click the failing request → check response headers and the preflight `OPTIONS` call. The exact missing header is named in the console error.\n\nDev-only workaround: proxy the API through your dev server (e.g. Vite/Next.js `proxy` config) so the browser sees it as same-origin.",
     "stop_reason": "end_turn",
-    "session_id": "dc01dbd0-282c-46d6-b32f-3913ec2d46f8",
-    "total_cost_usd": 0.12692925,
+    "session_id": "31e73555-cf7f-4e85-830b-a3b86ccb4667",
+    "total_cost_usd": 0.13373174999999998,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17025,
+      "cache_creation_input_tokens": 17051,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 467,
+      "output_tokens": 732,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17025,
+        "ephemeral_1h_input_tokens": 17051,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 467,
+          "output_tokens": 732,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17025,
+          "cache_creation_input_tokens": 17051,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17025
+            "ephemeral_1h_input_tokens": 17051
           },
           "type": "message"
         }
@@ -78,21 +78,21 @@
     "modelUsage": {
       "claude-haiku-4-5-20251001": {
         "inputTokens": 350,
-        "outputTokens": 14,
+        "outputTokens": 17,
         "cacheReadInputTokens": 0,
         "cacheCreationInputTokens": 0,
         "webSearchRequests": 0,
-        "costUSD": 0.00042,
+        "costUSD": 0.000435,
         "contextWindow": 200000,
         "maxOutputTokens": 32000
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 467,
+        "outputTokens": 732,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17025,
+        "cacheCreationInputTokens": 17051,
         "webSearchRequests": 0,
-        "costUSD": 0.12650925,
+        "costUSD": 0.13329675,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "ffdb3ef9-34f8-4bc2-a1cf-02c021dc68f5"
+    "uuid": "6e2c91fa-986f-449a-b89d-7f2ec14fde28"
   }
 }

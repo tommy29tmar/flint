@@ -14,62 +14,62 @@
   ],
   "digest_hex": "3191b019d37f08f3d5b68d9000f1aeb1e1a3524225f9daa893803df1e240ffd1",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:37:58.468525+00:00",
+  "timestamp": "2026-04-22T10:07:34.248629+00:00",
   "session_id_used_for_resume": null,
-  "output_tokens_tiktoken": 377,
-  "output_tokens_anthropic": 1205,
+  "output_tokens_tiktoken": 382,
+  "output_tokens_anthropic": 1330,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17079,
+  "cache_creation_input_tokens": 17105,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33881,
+  "total_input_tokens": 33907,
   "cache_state": "warm",
-  "wallclock_ms": 28349.21161000966,
-  "duration_ms": 22213,
-  "duration_api_ms": 23270,
+  "wallclock_ms": 32713.022317999275,
+  "duration_ms": 26619,
+  "duration_api_ms": 29433,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "ca9e1511-157b-402b-982e-a059f045fd4d",
-  "total_cost_usd": 0.14575275000000001,
+  "session_id": "8dc1bbb1-b63e-45ed-98f1-6fda973ed692",
+  "total_cost_usd": 0.14904025,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "The big ones, roughly in order of how much they'll bite you later:\n\n1. **Ledger vs. balance field.** Append-only ledger of debits/credits (auditable, supports disputes, refunds, partial redemptions cleanly) vs. a single `remaining_balance` column (simpler, harder to reconstruct history). Ledger is usually worth it.\n2. **Tax & discount ordering.** Gift card applied *before* tax (treated like a discount — reduces taxable amount) or *after* (treated like tender — tax computed on full price, then balance pays part of the total). These have different legal/accounting implications; in most jurisdictions gift cards are tender, not a discount.\n3. **Concurrency.** Two sessions redeeming the same code, or one session double-submitting. Needs a row lock or atomic decrement — otherwise you oversell balance.\n4. **Refund path.** If the order is refunded, does value go back to the gift card, to the original card, or split proportionally to how it was paid? Pick one rule and stick to it.\n5. **Code security & generation.** Entropy (guessable short codes get brute-forced), rate limiting on the redeem endpoint, whether codes are one-use or reusable-until-empty.\n6. **Scope of balance.** One code one order, or persistent balance across orders? Stackable with promos/other gift cards? Expiry?\n7. **Build vs. buy.** Stripe, Shopify, and others have gift-card primitives. If you're already on one, using theirs handles 1, 3, 4, and part of 2 for free.\n\nWhich of these do you already have opinions on? The answers cascade — especially #2 (tax treatment) and #7 (PSP vs. in-house) determine a lot of the rest.",
+  "result": "Quick flag: this repo (SIGIL/Hewn) is a Claude Code CLI wrapper — no checkout code here. Answering as a general design question.\n\nThe decisions that actually bite:\n\n1. **Ledger vs balance field.** Append-only transaction log (auditable, refund-friendly) vs mutable `balance` column (simpler, harder to reconcile). Pick ledger unless you're certain you'll never need an audit trail.\n2. **Atomicity of redemption.** Two users racing the same code, or a partial charge where card auth fails *after* gift card decrement. Need a transactional decrement + compensation path (authorize card first, then commit gift card debit on capture — or two-phase with a reversal).\n3. **Refund routing.** Refund to original tender proportionally? All to gift card? All to card? This has legal and UX implications and is the thing teams most often get wrong on v1.\n4. **Stacking rules.** Can you apply multiple gift cards? Does the gift card apply before or after discounts, tax, shipping? Order matters for tax calculation and is often legally constrained.\n5. **Code security.** Hash at rest (codes are bearer instruments — treat like passwords), rate-limit lookup by IP+account, constant-time compare, avoid leaking \"code exists but empty\" vs \"code invalid\".\n6. **Lifecycle.** Expiration (many jurisdictions restrict or forbid this — US: federal 5yr min), dormancy fees, reissuance on lost codes, whether a zero-balance card stays queryable.\n7. **Scope.** Single-currency? Per-store or group-wide? Tied to an account on first use, or bearer-forever?\n\nThe one I'd force a decision on first is **#2 (ordering + atomicity)** — it constrains the data model and the payment integration, and retrofitting it is painful.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 22213,
-    "duration_api_ms": 23270,
+    "duration_ms": 26619,
+    "duration_api_ms": 29433,
     "num_turns": 1,
-    "result": "The big ones, roughly in order of how much they'll bite you later:\n\n1. **Ledger vs. balance field.** Append-only ledger of debits/credits (auditable, supports disputes, refunds, partial redemptions cleanly) vs. a single `remaining_balance` column (simpler, harder to reconstruct history). Ledger is usually worth it.\n2. **Tax & discount ordering.** Gift card applied *before* tax (treated like a discount — reduces taxable amount) or *after* (treated like tender — tax computed on full price, then balance pays part of the total). These have different legal/accounting implications; in most jurisdictions gift cards are tender, not a discount.\n3. **Concurrency.** Two sessions redeeming the same code, or one session double-submitting. Needs a row lock or atomic decrement — otherwise you oversell balance.\n4. **Refund path.** If the order is refunded, does value go back to the gift card, to the original card, or split proportionally to how it was paid? Pick one rule and stick to it.\n5. **Code security & generation.** Entropy (guessable short codes get brute-forced), rate limiting on the redeem endpoint, whether codes are one-use or reusable-until-empty.\n6. **Scope of balance.** One code one order, or persistent balance across orders? Stackable with promos/other gift cards? Expiry?\n7. **Build vs. buy.** Stripe, Shopify, and others have gift-card primitives. If you're already on one, using theirs handles 1, 3, 4, and part of 2 for free.\n\nWhich of these do you already have opinions on? The answers cascade — especially #2 (tax treatment) and #7 (PSP vs. in-house) determine a lot of the rest.",
+    "result": "Quick flag: this repo (SIGIL/Hewn) is a Claude Code CLI wrapper — no checkout code here. Answering as a general design question.\n\nThe decisions that actually bite:\n\n1. **Ledger vs balance field.** Append-only transaction log (auditable, refund-friendly) vs mutable `balance` column (simpler, harder to reconcile). Pick ledger unless you're certain you'll never need an audit trail.\n2. **Atomicity of redemption.** Two users racing the same code, or a partial charge where card auth fails *after* gift card decrement. Need a transactional decrement + compensation path (authorize card first, then commit gift card debit on capture — or two-phase with a reversal).\n3. **Refund routing.** Refund to original tender proportionally? All to gift card? All to card? This has legal and UX implications and is the thing teams most often get wrong on v1.\n4. **Stacking rules.** Can you apply multiple gift cards? Does the gift card apply before or after discounts, tax, shipping? Order matters for tax calculation and is often legally constrained.\n5. **Code security.** Hash at rest (codes are bearer instruments — treat like passwords), rate-limit lookup by IP+account, constant-time compare, avoid leaking \"code exists but empty\" vs \"code invalid\".\n6. **Lifecycle.** Expiration (many jurisdictions restrict or forbid this — US: federal 5yr min), dormancy fees, reissuance on lost codes, whether a zero-balance card stays queryable.\n7. **Scope.** Single-currency? Per-store or group-wide? Tied to an account on first use, or bearer-forever?\n\nThe one I'd force a decision on first is **#2 (ordering + atomicity)** — it constrains the data model and the payment integration, and retrofitting it is painful.",
     "stop_reason": "end_turn",
-    "session_id": "ca9e1511-157b-402b-982e-a059f045fd4d",
-    "total_cost_usd": 0.14575275000000001,
+    "session_id": "8dc1bbb1-b63e-45ed-98f1-6fda973ed692",
+    "total_cost_usd": 0.14904025,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17079,
+      "cache_creation_input_tokens": 17105,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 1205,
+      "output_tokens": 1330,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17079,
+        "ephemeral_1h_input_tokens": 17105,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 1205,
+          "output_tokens": 1330,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17079,
+          "cache_creation_input_tokens": 17105,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17079
+            "ephemeral_1h_input_tokens": 17105
           },
           "type": "message"
         }
@@ -89,11 +89,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 1205,
+        "outputTokens": 1330,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17079,
+        "cacheCreationInputTokens": 17105,
         "webSearchRequests": 0,
-        "costUSD": 0.14529675,
+        "costUSD": 0.14858425,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -101,6 +101,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "9f48c375-21d6-4d42-8edb-eac9c372cbc7"
+    "uuid": "a6aacd5a-c646-4ebb-8c5c-6302900be6d7"
   }
 }

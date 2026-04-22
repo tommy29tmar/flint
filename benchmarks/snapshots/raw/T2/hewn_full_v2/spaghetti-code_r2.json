@@ -1,0 +1,105 @@
+{
+  "track": "T2",
+  "arm": "hewn_full",
+  "prompt_id": "spaghetti-code",
+  "run_index": 2,
+  "arm_order_index": 4,
+  "arm_order_full": [
+    "baseline",
+    "caveman_full",
+    "hewn_prompt_only",
+    "caveman_full_plus_ultra_directive",
+    "hewn_full",
+    "terse"
+  ],
+  "digest_hex": "c5b7a91bb866632a665b169537e636c6632c835cd292573b5020e32ca3fec5f2",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:14:24.835233+00:00",
+  "output_tokens_tiktoken": 38,
+  "output_tokens_anthropic": 55,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 35006,
+  "total_input_tokens": 35012,
+  "cache_state": "warm",
+  "wallclock_ms": 13631.84724599705,
+  "duration_ms": 7012,
+  "duration_api_ms": 7730,
+  "wrapper_overhead_ms": 5901.847245997051,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "01e9ee13-61da-4b09-b1d8-1107967c2151",
+  "total_cost_usd": 0.019347,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "Name things for what they do, then split when a function spans two ideas. Keep data shapes close to where they're used. If you share a snippet I can point at the specific knots.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 7012,
+    "duration_api_ms": 7730,
+    "num_turns": 1,
+    "result": "Name things for what they do, then split when a function spans two ideas. Keep data shapes close to where they're used. If you share a snippet I can point at the specific knots.",
+    "stop_reason": "end_turn",
+    "session_id": "01e9ee13-61da-4b09-b1d8-1107967c2151",
+    "total_cost_usd": 0.019347,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 35006,
+      "output_tokens": 55,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 55,
+          "cache_read_input_tokens": 35006,
+          "cache_creation_input_tokens": 0,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 359,
+        "outputTokens": 16,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.000439,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 55,
+        "cacheReadInputTokens": 35006,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.018908,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "6b0d1a1e-26a9-4af0-b45f-e14b62010f76"
+  }
+}

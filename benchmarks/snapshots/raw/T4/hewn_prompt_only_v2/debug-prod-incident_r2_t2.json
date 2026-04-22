@@ -1,0 +1,96 @@
+{
+  "track": "T4",
+  "arm": "hewn_prompt_only",
+  "sequence_id": "debug-prod-incident",
+  "run_index": 2,
+  "turn": 2,
+  "arm_order_index": 3,
+  "arm_order_full": [
+    "caveman_full",
+    "terse",
+    "hewn_full",
+    "hewn_prompt_only",
+    "baseline"
+  ],
+  "digest_hex": "522341918a5177210ef438fa55486ec5b622aaa576febbd731536d82595ec31b",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:36:28.653629+00:00",
+  "session_id_used_for_resume": "f349cd15-26d0-4a3f-979a-a8e27980ef9b",
+  "output_tokens_tiktoken": 223,
+  "output_tokens_anthropic": 394,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 585,
+  "cache_read_input_tokens": 33888,
+  "total_input_tokens": 34479,
+  "cache_state": "warm",
+  "wallclock_ms": 14904.32808501646,
+  "duration_ms": 8631,
+  "duration_api_ms": 8606,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "f349cd15-26d0-4a3f-979a-a8e27980ef9b",
+  "total_cost_usd": 0.03048025,
+  "model_used": "claude-opus-4-7",
+  "result": "The refactor dropped `items` from the returned object. `createOrder` (or something it calls) is consuming `buildCart(cart)` and reading `.items` off the result — now undefined, hence the TypeError.\n\nThe input `cart.items` still exists; it's the *output* shape that changed. Whoever wrote the refactor assumed `items` was redundant since `total` is derived from it, but a downstream caller still needs the array.\n\nTo confirm: grep for `buildCart(` usages and look for `.items` access on the result. That's your broken call site.\n\nFix options, in order of preference:\n1. **Put `items` back in the return.** Simplest, restores the contract. If the PR author thought it was dead, they missed a caller.\n2. If `items` truly shouldn't be there (e.g., a serialization boundary that intentionally strips it), fix the caller to read from the source `cart` instead of the `buildCart` result.\n\nDon't do `?.items ?? []` on the caller — that silently returns an empty order.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 8631,
+    "duration_api_ms": 8606,
+    "num_turns": 1,
+    "result": "The refactor dropped `items` from the returned object. `createOrder` (or something it calls) is consuming `buildCart(cart)` and reading `.items` off the result — now undefined, hence the TypeError.\n\nThe input `cart.items` still exists; it's the *output* shape that changed. Whoever wrote the refactor assumed `items` was redundant since `total` is derived from it, but a downstream caller still needs the array.\n\nTo confirm: grep for `buildCart(` usages and look for `.items` access on the result. That's your broken call site.\n\nFix options, in order of preference:\n1. **Put `items` back in the return.** Simplest, restores the contract. If the PR author thought it was dead, they missed a caller.\n2. If `items` truly shouldn't be there (e.g., a serialization boundary that intentionally strips it), fix the caller to read from the source `cart` instead of the `buildCart` result.\n\nDon't do `?.items ?? []` on the caller — that silently returns an empty order.",
+    "stop_reason": "end_turn",
+    "session_id": "f349cd15-26d0-4a3f-979a-a8e27980ef9b",
+    "total_cost_usd": 0.03048025,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 585,
+      "cache_read_input_tokens": 33888,
+      "output_tokens": 394,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 585,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 394,
+          "cache_read_input_tokens": 33888,
+          "cache_creation_input_tokens": 585,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 585
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 394,
+        "cacheReadInputTokens": 33888,
+        "cacheCreationInputTokens": 585,
+        "webSearchRequests": 0,
+        "costUSD": 0.03048025,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "1254d879-c982-40b5-a847-d24b3e9d4ba3"
+  }
+}

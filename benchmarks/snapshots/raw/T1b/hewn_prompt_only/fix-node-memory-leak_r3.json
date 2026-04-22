@@ -14,61 +14,61 @@
   ],
   "digest_hex": "4fad0128f3b71ccca34936e81d2277af496e07dac1dbb2166396e12e2256680f",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:07:47.968298+00:00",
-  "output_tokens_tiktoken": 349,
-  "output_tokens_anthropic": 649,
+  "timestamp": "2026-04-22T09:32:30.492533+00:00",
+  "output_tokens_tiktoken": 326,
+  "output_tokens_anthropic": 599,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17029,
+  "cache_creation_input_tokens": 17055,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33831,
+  "total_input_tokens": 33857,
   "cache_state": "warm",
-  "wallclock_ms": 19183.973084000172,
-  "duration_ms": 13193,
-  "duration_api_ms": 14665,
+  "wallclock_ms": 19176.45776999416,
+  "duration_ms": 12950,
+  "duration_api_ms": 13754,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "715360af-72c9-4aba-bc9c-5fcc24966da2",
-  "total_cost_usd": 0.13151924999999998,
+  "session_id": "828c3507-4502-452b-a819-8f87989a5be1",
+  "total_cost_usd": 0.13043174999999999,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "1. **Reproduce and measure.** Run with `--inspect` and take heap snapshots at intervals in Chrome DevTools (Memory tab). Compare snapshots — sort by \"Retained Size\" and look for objects growing between snapshots.\n\n2. **Common culprits:**\n   - **Closures capturing large scopes** — event handlers holding references to request/response objects.\n   - **Unbounded caches/maps** — use `LRUCache` or `WeakMap`/`WeakRef` where appropriate.\n   - **EventEmitter listener leaks** — watch for `MaxListenersExceededWarning`; call `.removeListener()` or use `.once()`.\n   - **Timers/intervals** not cleared on shutdown paths.\n   - **Global arrays** pushed to but never drained (logs, buffers, metrics).\n   - **Promises retained** in long-lived arrays.\n\n3. **Tools:**\n   - `node --heapsnapshot-signal=SIGUSR2` to dump heap on signal in production.\n   - `clinic.js doctor` / `clinic heapprofiler` for guided diagnosis.\n   - `process.memoryUsage()` logged periodically to confirm the leak shape (gradual rise vs. sawtooth).\n\n4. **Fix pattern:** find the retainer chain in the snapshot (DevTools shows it), break the reference at the shallowest point, re-run the snapshot diff to confirm the object count stabilizes.\n\n5. **Guardrails:** set `--max-old-space-size` appropriately, add a health check that restarts the process if RSS exceeds a threshold (belt-and-suspenders, not a substitute for the fix).\n\nStart with a heap snapshot diff — it almost always points straight at the retainer.",
+  "result": "1. **Reproduce under load** — run the process with `--inspect` and a realistic workload until heap grows.\n\n2. **Capture heap snapshots** at intervals (Chrome DevTools → Memory → Take heap snapshot, or `v8.writeHeapSnapshot()`). Take 2–3, then use the **Comparison** view to find objects that keep growing.\n\n3. **Common culprits to check first**:\n   - Unbounded caches / `Map` / `Set` without eviction → use `lru-cache` with `max`\n   - Event listeners added in hot paths without `removeListener` → watch for `MaxListenersExceededWarning`\n   - Closures capturing large objects (especially in callbacks/promises retained by timers or queues)\n   - Global arrays/objects accumulating items\n   - Unresolved promises holding references\n   - Native modules / Buffers (heap snapshot won't show these — check RSS vs heap)\n\n4. **Diff snapshots**: sort by \"Retained Size\", look for retainer chains pointing to your code (filter out `(closure)` noise by jumping to the application frame).\n\n5. **Targeted profiling** with `clinic.js heapprofiler` or `--heap-prof` for sampling allocation sites — faster than full snapshots on large heaps.\n\n6. **Fix and verify** by re-running the same load and confirming heap plateaus instead of climbing.\n\nIf RSS grows but V8 heap stays flat → it's native (Buffers, addons, fragmentation). Try `--max-old-space-size` tuning and check `process.memoryUsage()` for `external` and `arrayBuffers`.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 13193,
-    "duration_api_ms": 14665,
+    "duration_ms": 12950,
+    "duration_api_ms": 13754,
     "num_turns": 1,
-    "result": "1. **Reproduce and measure.** Run with `--inspect` and take heap snapshots at intervals in Chrome DevTools (Memory tab). Compare snapshots — sort by \"Retained Size\" and look for objects growing between snapshots.\n\n2. **Common culprits:**\n   - **Closures capturing large scopes** — event handlers holding references to request/response objects.\n   - **Unbounded caches/maps** — use `LRUCache` or `WeakMap`/`WeakRef` where appropriate.\n   - **EventEmitter listener leaks** — watch for `MaxListenersExceededWarning`; call `.removeListener()` or use `.once()`.\n   - **Timers/intervals** not cleared on shutdown paths.\n   - **Global arrays** pushed to but never drained (logs, buffers, metrics).\n   - **Promises retained** in long-lived arrays.\n\n3. **Tools:**\n   - `node --heapsnapshot-signal=SIGUSR2` to dump heap on signal in production.\n   - `clinic.js doctor` / `clinic heapprofiler` for guided diagnosis.\n   - `process.memoryUsage()` logged periodically to confirm the leak shape (gradual rise vs. sawtooth).\n\n4. **Fix pattern:** find the retainer chain in the snapshot (DevTools shows it), break the reference at the shallowest point, re-run the snapshot diff to confirm the object count stabilizes.\n\n5. **Guardrails:** set `--max-old-space-size` appropriately, add a health check that restarts the process if RSS exceeds a threshold (belt-and-suspenders, not a substitute for the fix).\n\nStart with a heap snapshot diff — it almost always points straight at the retainer.",
+    "result": "1. **Reproduce under load** — run the process with `--inspect` and a realistic workload until heap grows.\n\n2. **Capture heap snapshots** at intervals (Chrome DevTools → Memory → Take heap snapshot, or `v8.writeHeapSnapshot()`). Take 2–3, then use the **Comparison** view to find objects that keep growing.\n\n3. **Common culprits to check first**:\n   - Unbounded caches / `Map` / `Set` without eviction → use `lru-cache` with `max`\n   - Event listeners added in hot paths without `removeListener` → watch for `MaxListenersExceededWarning`\n   - Closures capturing large objects (especially in callbacks/promises retained by timers or queues)\n   - Global arrays/objects accumulating items\n   - Unresolved promises holding references\n   - Native modules / Buffers (heap snapshot won't show these — check RSS vs heap)\n\n4. **Diff snapshots**: sort by \"Retained Size\", look for retainer chains pointing to your code (filter out `(closure)` noise by jumping to the application frame).\n\n5. **Targeted profiling** with `clinic.js heapprofiler` or `--heap-prof` for sampling allocation sites — faster than full snapshots on large heaps.\n\n6. **Fix and verify** by re-running the same load and confirming heap plateaus instead of climbing.\n\nIf RSS grows but V8 heap stays flat → it's native (Buffers, addons, fragmentation). Try `--max-old-space-size` tuning and check `process.memoryUsage()` for `external` and `arrayBuffers`.",
     "stop_reason": "end_turn",
-    "session_id": "715360af-72c9-4aba-bc9c-5fcc24966da2",
-    "total_cost_usd": 0.13151924999999998,
+    "session_id": "828c3507-4502-452b-a819-8f87989a5be1",
+    "total_cost_usd": 0.13043174999999999,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17029,
+      "cache_creation_input_tokens": 17055,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 649,
+      "output_tokens": 599,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17029,
+        "ephemeral_1h_input_tokens": 17055,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 649,
+          "output_tokens": 599,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17029,
+          "cache_creation_input_tokens": 17055,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17029
+            "ephemeral_1h_input_tokens": 17055
           },
           "type": "message"
         }
@@ -88,11 +88,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 649,
+        "outputTokens": 599,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17029,
+        "cacheCreationInputTokens": 17055,
         "webSearchRequests": 0,
-        "costUSD": 0.13108424999999999,
+        "costUSD": 0.12999675,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "6de8203b-307e-468c-b721-9526d6bdcc34"
+    "uuid": "5cfdf9ba-0da1-472d-9c53-4a623741a5f7"
   }
 }

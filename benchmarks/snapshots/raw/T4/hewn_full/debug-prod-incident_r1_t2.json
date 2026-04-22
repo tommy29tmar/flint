@@ -14,62 +14,62 @@
   ],
   "digest_hex": "c436155c1e87e76d88e6f2c66d47c90c16ae78237b0a8de1b93824cf92fb5c9b",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:28:10.857073+00:00",
-  "session_id_used_for_resume": "c579d119-eec3-4ec9-86e2-73fdfa7c99ed",
-  "output_tokens_tiktoken": 34,
-  "output_tokens_anthropic": 57,
+  "timestamp": "2026-04-22T09:55:39.423625+00:00",
+  "session_id_used_for_resume": "da4960e5-0b72-4644-92e3-36ad58ade0c4",
+  "output_tokens_tiktoken": 37,
+  "output_tokens_anthropic": 62,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 989,
-  "cache_read_input_tokens": 35066,
-  "total_input_tokens": 36061,
+  "cache_creation_input_tokens": 1036,
+  "cache_read_input_tokens": 35359,
+  "total_input_tokens": 36401,
   "cache_state": "warm",
-  "wallclock_ms": 10184.0013070032,
-  "duration_ms": 3255,
-  "duration_api_ms": 3158,
-  "wrapper_overhead_ms": 7026.0013070032,
+  "wallclock_ms": 9888.032115995884,
+  "duration_ms": 3404,
+  "duration_api_ms": 3308,
+  "wrapper_overhead_ms": 6580.032115995884,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "c579d119-eec3-4ec9-86e2-73fdfa7c99ed",
-  "total_cost_usd": 0.02516925,
+  "session_id": "da4960e5-0b72-4644-92e3-36ad58ade0c4",
+  "total_cost_usd": 0.0257345,
   "model_used": "claude-opus-4-7",
-  "result": "@hewn v0 hybrid\nG: find_break\nC: items_dropped\nP: downstream_reads_items\nV: undefined_access\nA: restore_items_field",
+  "result": "@hewn v0 hybrid\nG: find_break\nC: items_dropped_from_payload\nP: downstream_reads_items\nV: restore_items_field\nA: add_items_back",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 3255,
-    "duration_api_ms": 3158,
+    "duration_ms": 3404,
+    "duration_api_ms": 3308,
     "num_turns": 1,
-    "result": "@hewn v0 hybrid\nG: find_break\nC: items_dropped\nP: downstream_reads_items\nV: undefined_access\nA: restore_items_field",
+    "result": "@hewn v0 hybrid\nG: find_break\nC: items_dropped_from_payload\nP: downstream_reads_items\nV: restore_items_field\nA: add_items_back",
     "stop_reason": "end_turn",
-    "session_id": "c579d119-eec3-4ec9-86e2-73fdfa7c99ed",
-    "total_cost_usd": 0.02516925,
+    "session_id": "da4960e5-0b72-4644-92e3-36ad58ade0c4",
+    "total_cost_usd": 0.0257345,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 989,
-      "cache_read_input_tokens": 35066,
-      "output_tokens": 57,
+      "cache_creation_input_tokens": 1036,
+      "cache_read_input_tokens": 35359,
+      "output_tokens": 62,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 989,
+        "ephemeral_1h_input_tokens": 1036,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 57,
-          "cache_read_input_tokens": 35066,
-          "cache_creation_input_tokens": 989,
+          "output_tokens": 62,
+          "cache_read_input_tokens": 35359,
+          "cache_creation_input_tokens": 1036,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 989
+            "ephemeral_1h_input_tokens": 1036
           },
           "type": "message"
         }
@@ -79,11 +79,11 @@
     "modelUsage": {
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 57,
-        "cacheReadInputTokens": 35066,
-        "cacheCreationInputTokens": 989,
+        "outputTokens": 62,
+        "cacheReadInputTokens": 35359,
+        "cacheCreationInputTokens": 1036,
         "webSearchRequests": 0,
-        "costUSD": 0.02516925,
+        "costUSD": 0.0257345,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -91,6 +91,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "a7502595-391f-47d0-9028-4e613f38906e"
+    "uuid": "778ab03a-e027-4323-8d4d-041ac930c2cc"
   }
 }

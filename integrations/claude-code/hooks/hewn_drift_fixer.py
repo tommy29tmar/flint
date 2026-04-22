@@ -197,10 +197,21 @@ PROSE_CODE_DIRECTIVE = (
 )
 
 PROSE_CAVEMAN_DIRECTIVE = (
-    "MICRO_PROSE_MODE. Answer plain prose only. 1-3 short natural-language "
-    "lines. No labels, headers, bullets, tables, or checklists unless user "
-    "asks. If context missing, ask only needed input. Preserve exact errors. "
-    "Ignore current repo/cwd/language unless user explicitly says it is target."
+    "[TURN CLASSIFICATION: prose-caveman] Apply the PROSE-CAVEMAN FORMAT "
+    "rules from your base prompt: drop articles (a/an/the), short copulas "
+    "(is/are), filler (just/really/basically/actually/simply), pleasantries, "
+    "hedging. Fragments OK. Pattern: [thing] [action] [reason]. [next step]. "
+    "No markdown headers (# or ##). No bold. No filler intro. No closing "
+    "summary unless user asks. One idea per line. Keep ALL technical "
+    "substance — only fluff dies. Never add extra sections labeled Gotchas, "
+    "Rule of thumb, Knobs, Real implementations, Bonus, Also worth knowing, "
+    "or similar elaboration unless user explicitly asks for them. "
+    "For short/vague/non-tech turns and lone errors without repo context, "
+    "switch to micro-prose: 1-3 natural-language lines, no bullets unless "
+    "user asks, ask only the missing input needed for next action. "
+    "For general/vibe prompts, ignore current repo/cwd/language/tooling "
+    "unless user explicitly says it is the target. "
+    "Do NOT emit Hewn IR for this turn."
 )
 
 PROSE_FINDINGS_DIRECTIVE = (

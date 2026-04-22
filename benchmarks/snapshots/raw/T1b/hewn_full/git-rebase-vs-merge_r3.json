@@ -14,61 +14,61 @@
   ],
   "digest_hex": "77ec1f71a402506faa30ccacb9847ce285754a0a0f5675f39158950f756d4fe1",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:09:49.091026+00:00",
-  "output_tokens_tiktoken": 37,
-  "output_tokens_anthropic": 66,
+  "timestamp": "2026-04-22T09:34:54.028662+00:00",
+  "output_tokens_tiktoken": 109,
+  "output_tokens_anthropic": 180,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 18755,
+  "cache_creation_input_tokens": 18483,
   "cache_read_input_tokens": 16805,
-  "total_input_tokens": 35566,
+  "total_input_tokens": 35294,
   "cache_state": "warm",
-  "wallclock_ms": 9333.74212498893,
-  "duration_ms": 3312,
-  "duration_api_ms": 4069,
-  "wrapper_overhead_ms": 5264.74212498893,
+  "wallclock_ms": 12663.840557012009,
+  "duration_ms": 6034,
+  "duration_api_ms": 7142,
+  "wrapper_overhead_ms": 5521.8405570120085,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "b1ba4de6-d0ba-486e-846f-a78b9bea4108",
-  "total_cost_usd": 0.12771925,
+  "session_id": "6f679f34-edc2-4ee0-853d-b1623d821ff9",
+  "total_cost_usd": 0.12886925000000002,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "@hewn v0 hybrid\nG: rebase_vs_merge\nC: history_shape\nP: replay_vs_join\nV: linear_vs_branchy\nA: pick_by_policy",
+  "result": "Both combine changes from one branch into another. Different history shape.\n\nmerge: creates new merge commit tying two branches together. Preserves full history, branching visible. Non-destructive.\n\nrebase: replays your commits on top of target branch. Linear history, no merge commit. Rewrites commit SHAs.\n\nUse merge for shared/public branches — rewriting published history breaks collaborators.\nUse rebase for local cleanup before pushing, or to keep feature branch current with main without merge noise.\n\nGolden rule: never rebase commits others have based work on.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 3312,
-    "duration_api_ms": 4069,
+    "duration_ms": 6034,
+    "duration_api_ms": 7142,
     "num_turns": 1,
-    "result": "@hewn v0 hybrid\nG: rebase_vs_merge\nC: history_shape\nP: replay_vs_join\nV: linear_vs_branchy\nA: pick_by_policy",
+    "result": "Both combine changes from one branch into another. Different history shape.\n\nmerge: creates new merge commit tying two branches together. Preserves full history, branching visible. Non-destructive.\n\nrebase: replays your commits on top of target branch. Linear history, no merge commit. Rewrites commit SHAs.\n\nUse merge for shared/public branches — rewriting published history breaks collaborators.\nUse rebase for local cleanup before pushing, or to keep feature branch current with main without merge noise.\n\nGolden rule: never rebase commits others have based work on.",
     "stop_reason": "end_turn",
-    "session_id": "b1ba4de6-d0ba-486e-846f-a78b9bea4108",
-    "total_cost_usd": 0.12771925,
+    "session_id": "6f679f34-edc2-4ee0-853d-b1623d821ff9",
+    "total_cost_usd": 0.12886925000000002,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 18755,
+      "cache_creation_input_tokens": 18483,
       "cache_read_input_tokens": 16805,
-      "output_tokens": 66,
+      "output_tokens": 180,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 18755,
+        "ephemeral_1h_input_tokens": 18483,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 66,
+          "output_tokens": 180,
           "cache_read_input_tokens": 16805,
-          "cache_creation_input_tokens": 18755,
+          "cache_creation_input_tokens": 18483,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 18755
+            "ephemeral_1h_input_tokens": 18483
           },
           "type": "message"
         }
@@ -88,11 +88,11 @@
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 66,
+        "outputTokens": 180,
         "cacheReadInputTokens": 16805,
-        "cacheCreationInputTokens": 18755,
+        "cacheCreationInputTokens": 18483,
         "webSearchRequests": 0,
-        "costUSD": 0.12730125,
+        "costUSD": 0.12845125000000002,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "66d1fa50-90d7-4c23-a89a-64b02d388c92"
+    "uuid": "3f2a018b-db8c-4d63-9502-b816cfb32f4f"
   }
 }

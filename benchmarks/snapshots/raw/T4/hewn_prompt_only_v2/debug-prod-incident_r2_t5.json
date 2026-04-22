@@ -1,0 +1,96 @@
+{
+  "track": "T4",
+  "arm": "hewn_prompt_only",
+  "sequence_id": "debug-prod-incident",
+  "run_index": 2,
+  "turn": 5,
+  "arm_order_index": 3,
+  "arm_order_full": [
+    "caveman_full",
+    "terse",
+    "hewn_full",
+    "hewn_prompt_only",
+    "baseline"
+  ],
+  "digest_hex": "522341918a5177210ef438fa55486ec5b622aaa576febbd731536d82595ec31b",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:37:30.117625+00:00",
+  "session_id_used_for_resume": "f349cd15-26d0-4a3f-979a-a8e27980ef9b",
+  "output_tokens_tiktoken": 333,
+  "output_tokens_anthropic": 937,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 823,
+  "cache_read_input_tokens": 35555,
+  "total_input_tokens": 36384,
+  "cache_state": "warm",
+  "wallclock_ms": 22965.261338016717,
+  "duration_ms": 16830,
+  "duration_api_ms": 16799,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "f349cd15-26d0-4a3f-979a-a8e27980ef9b",
+  "total_cost_usd": 0.04637625000000001,
+  "model_used": "claude-opus-4-7",
+  "result": "Batched query. One `SELECT ... WHERE sku = ANY($1)` (or `IN (...)`), one connection, one round trip regardless of N.\n\n```js\nconst rows = await db.query(\n  'SELECT sku, stock, price FROM inventory WHERE sku = ANY($1)',\n  [skus]\n);\nconst bySku = new Map(rows.map(r => [r.sku, r]));\nconst results = skus.map(sku => bySku.get(sku)); // preserves caller order\n```\n\nWhy this beats `p-limit`:\n- **Common case (3 SKUs) is faster,** not unchanged. One round trip instead of three parallel — you save 2× network latency.\n- **47-SKU case is dramatically faster.** One query instead of ~10 batches of 5.\n- **Constant pool pressure.** 1 connection per order regardless of cart size. `p-limit(5)` still holds 5.\n\nTwo things to verify when making the change:\n\n1. **Missing SKUs.** `ANY` returns only matching rows. If a SKU doesn't exist, `bySku.get(sku)` is `undefined`. The old sequential/parallel code probably threw or returned null per-SKU — preserve whatever the caller expects. Don't silently drop.\n2. **Per-SKU side effects.** If the old lookup did per-SKU logging, cache fills, or auth checks, batching collapses those. Usually fine, but worth a glance.\n\nIf there's a reason batching won't work (different query per SKU, external API not your DB, etc.), then `p-limit(5)` is the fallback.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 16830,
+    "duration_api_ms": 16799,
+    "num_turns": 1,
+    "result": "Batched query. One `SELECT ... WHERE sku = ANY($1)` (or `IN (...)`), one connection, one round trip regardless of N.\n\n```js\nconst rows = await db.query(\n  'SELECT sku, stock, price FROM inventory WHERE sku = ANY($1)',\n  [skus]\n);\nconst bySku = new Map(rows.map(r => [r.sku, r]));\nconst results = skus.map(sku => bySku.get(sku)); // preserves caller order\n```\n\nWhy this beats `p-limit`:\n- **Common case (3 SKUs) is faster,** not unchanged. One round trip instead of three parallel — you save 2× network latency.\n- **47-SKU case is dramatically faster.** One query instead of ~10 batches of 5.\n- **Constant pool pressure.** 1 connection per order regardless of cart size. `p-limit(5)` still holds 5.\n\nTwo things to verify when making the change:\n\n1. **Missing SKUs.** `ANY` returns only matching rows. If a SKU doesn't exist, `bySku.get(sku)` is `undefined`. The old sequential/parallel code probably threw or returned null per-SKU — preserve whatever the caller expects. Don't silently drop.\n2. **Per-SKU side effects.** If the old lookup did per-SKU logging, cache fills, or auth checks, batching collapses those. Usually fine, but worth a glance.\n\nIf there's a reason batching won't work (different query per SKU, external API not your DB, etc.), then `p-limit(5)` is the fallback.",
+    "stop_reason": "end_turn",
+    "session_id": "f349cd15-26d0-4a3f-979a-a8e27980ef9b",
+    "total_cost_usd": 0.04637625000000001,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 823,
+      "cache_read_input_tokens": 35555,
+      "output_tokens": 937,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 823,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 937,
+          "cache_read_input_tokens": 35555,
+          "cache_creation_input_tokens": 823,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 823
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 937,
+        "cacheReadInputTokens": 35555,
+        "cacheCreationInputTokens": 823,
+        "webSearchRequests": 0,
+        "costUSD": 0.04637625000000001,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "468a581e-4aef-4dff-8aec-a31438e90125"
+  }
+}

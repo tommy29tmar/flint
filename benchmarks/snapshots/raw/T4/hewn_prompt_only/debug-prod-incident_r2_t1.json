@@ -14,62 +14,62 @@
   ],
   "digest_hex": "522341918a5177210ef438fa55486ec5b622aaa576febbd731536d82595ec31b",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:36:13.748442+00:00",
+  "timestamp": "2026-04-22T10:05:47.368333+00:00",
   "session_id_used_for_resume": null,
-  "output_tokens_tiktoken": 266,
-  "output_tokens_anthropic": 391,
+  "output_tokens_tiktoken": 215,
+  "output_tokens_anthropic": 313,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17092,
+  "cache_creation_input_tokens": 17118,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33894,
+  "total_input_tokens": 33920,
   "cache_state": "warm",
-  "wallclock_ms": 16203.270106983837,
-  "duration_ms": 9776,
-  "duration_api_ms": 10778,
+  "wallclock_ms": 13862.173068017,
+  "duration_ms": 7762,
+  "duration_api_ms": 8588,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "f349cd15-26d0-4a3f-979a-a8e27980ef9b",
-  "total_cost_usd": 0.125524,
+  "session_id": "946b8940-22b4-481f-950e-511305adddcd",
+  "total_cost_usd": 0.12372150000000001,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "Roll back the 14:18 deploy, then investigate. Five minutes between deploy and errors is the signal — revert first, debug second.\n\nWhile rolling back, check in parallel:\n\n1. **The diff.** `git log --oneline 14:18-deploy..HEAD` — look at `createOrder` and anything it calls. The error says `items` is undefined on some object; find where that object is constructed or destructured.\n2. **Request shape.** Grab a failing request from logs. Is the client sending `{ items: [...] }` or did the deploy change the expected payload key (e.g. renamed to `lineItems`, moved under `cart.items`)? Schema/validator change is the most common cause of this exact error post-deploy.\n3. **Upstream call.** If `items` comes from a DB/service response rather than the request body, check whether that dependency changed — a migration, a cache returning `null`, or a downstream service now returning `{}` instead of `{ items: [] }`.\n\nThe stack trace line number will tell you which of these it is in about 10 seconds — get that first if you haven't.\n\nDon't add a `?.items ?? []` defensive guard as the fix. That hides whichever of the three above is actually broken.",
+  "result": "Roll back the 14:18 deploy first, then investigate. 5 minutes of 500s on orders is revenue loss; the diff will still be there after rollback.\n\nOnce rolled back, check in this order:\n1. **The diff** — `git log 14:18..HEAD` on the deploy, focus on `createOrder` and anything touching the request body shape (middleware, body-parser, validation, schema changes).\n2. **The caller** — did the client/contract change? A missing `items` on the request body usually means either (a) a new required field the client isn't sending, or (b) body parsing broke (wrong Content-Type handling, middleware order changed, body consumed twice).\n3. **Destructuring site** — find where `.items` is read in `createOrder`. If it's `const { items } = req.body` with no guard, `req.body` itself is likely undefined — that points at middleware, not payload.\n\nShare the diff and the exact stack trace line and I'll pinpoint it.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 9776,
-    "duration_api_ms": 10778,
+    "duration_ms": 7762,
+    "duration_api_ms": 8588,
     "num_turns": 1,
-    "result": "Roll back the 14:18 deploy, then investigate. Five minutes between deploy and errors is the signal — revert first, debug second.\n\nWhile rolling back, check in parallel:\n\n1. **The diff.** `git log --oneline 14:18-deploy..HEAD` — look at `createOrder` and anything it calls. The error says `items` is undefined on some object; find where that object is constructed or destructured.\n2. **Request shape.** Grab a failing request from logs. Is the client sending `{ items: [...] }` or did the deploy change the expected payload key (e.g. renamed to `lineItems`, moved under `cart.items`)? Schema/validator change is the most common cause of this exact error post-deploy.\n3. **Upstream call.** If `items` comes from a DB/service response rather than the request body, check whether that dependency changed — a migration, a cache returning `null`, or a downstream service now returning `{}` instead of `{ items: [] }`.\n\nThe stack trace line number will tell you which of these it is in about 10 seconds — get that first if you haven't.\n\nDon't add a `?.items ?? []` defensive guard as the fix. That hides whichever of the three above is actually broken.",
+    "result": "Roll back the 14:18 deploy first, then investigate. 5 minutes of 500s on orders is revenue loss; the diff will still be there after rollback.\n\nOnce rolled back, check in this order:\n1. **The diff** — `git log 14:18..HEAD` on the deploy, focus on `createOrder` and anything touching the request body shape (middleware, body-parser, validation, schema changes).\n2. **The caller** — did the client/contract change? A missing `items` on the request body usually means either (a) a new required field the client isn't sending, or (b) body parsing broke (wrong Content-Type handling, middleware order changed, body consumed twice).\n3. **Destructuring site** — find where `.items` is read in `createOrder`. If it's `const { items } = req.body` with no guard, `req.body` itself is likely undefined — that points at middleware, not payload.\n\nShare the diff and the exact stack trace line and I'll pinpoint it.",
     "stop_reason": "end_turn",
-    "session_id": "f349cd15-26d0-4a3f-979a-a8e27980ef9b",
-    "total_cost_usd": 0.125524,
+    "session_id": "946b8940-22b4-481f-950e-511305adddcd",
+    "total_cost_usd": 0.12372150000000001,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17092,
+      "cache_creation_input_tokens": 17118,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 391,
+      "output_tokens": 313,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17092,
+        "ephemeral_1h_input_tokens": 17118,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 391,
+          "output_tokens": 313,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17092,
+          "cache_creation_input_tokens": 17118,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17092
+            "ephemeral_1h_input_tokens": 17118
           },
           "type": "message"
         }
@@ -79,21 +79,21 @@
     "modelUsage": {
       "claude-haiku-4-5-20251001": {
         "inputTokens": 396,
-        "outputTokens": 20,
+        "outputTokens": 17,
         "cacheReadInputTokens": 0,
         "cacheCreationInputTokens": 0,
         "webSearchRequests": 0,
-        "costUSD": 0.000496,
+        "costUSD": 0.000481,
         "contextWindow": 200000,
         "maxOutputTokens": 32000
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 391,
+        "outputTokens": 313,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17092,
+        "cacheCreationInputTokens": 17118,
         "webSearchRequests": 0,
-        "costUSD": 0.125028,
+        "costUSD": 0.12324050000000002,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -101,6 +101,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "27beb6c6-f62d-4ffb-82b1-39bbdee1fb02"
+    "uuid": "6b05844a-4210-45e5-b5cd-57afb492d720"
   }
 }

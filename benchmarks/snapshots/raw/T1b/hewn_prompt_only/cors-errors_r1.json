@@ -14,61 +14,61 @@
   ],
   "digest_hex": "884a34005020aaa2decf7247298a83a400cb843e18bc330b080d55c1b5324fb3",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:00:29.598232+00:00",
-  "output_tokens_tiktoken": 325,
-  "output_tokens_anthropic": 570,
+  "timestamp": "2026-04-22T09:24:04.965266+00:00",
+  "output_tokens_tiktoken": 370,
+  "output_tokens_anthropic": 732,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17025,
+  "cache_creation_input_tokens": 17051,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33827,
+  "total_input_tokens": 33853,
   "cache_state": "warm",
-  "wallclock_ms": 18621.838797989767,
-  "duration_ms": 12753,
-  "duration_api_ms": 13517,
+  "wallclock_ms": 20396.16043600836,
+  "duration_ms": 14275,
+  "duration_api_ms": 15896,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "f5f94033-31c7-437b-b971-fd0355ab2bce",
-  "total_cost_usd": 0.12950425,
+  "session_id": "8d88ee8a-3e52-4506-a6c7-51995fc3d056",
+  "total_cost_usd": 0.13372175,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "CORS errors mean your frontend is making a request to an origin (scheme+host+port) that differs from the page's origin, and the server isn't returning the headers the browser needs to authorize it.\n\nCommon causes:\n\n1. **Missing `Access-Control-Allow-Origin`** on the response. The server must echo your origin (or `*` for public APIs without credentials).\n2. **Preflight (OPTIONS) not handled.** Requests with custom headers, `Content-Type: application/json`, or non-GET/POST methods trigger an OPTIONS preflight. The server must respond 2xx with `Access-Control-Allow-Methods` and `Access-Control-Allow-Headers`.\n3. **Credentials mismatch.** If you set `credentials: 'include'` (or `withCredentials`), the server must return `Access-Control-Allow-Credentials: true` and a specific origin — `*` is rejected.\n4. **Dev server talking to a different port.** `localhost:3000` → `localhost:8000` is cross-origin. Fix with a dev proxy (Vite `server.proxy`, CRA `\"proxy\"`, Next.js `rewrites`) or enable CORS on the API.\n5. **Redirects.** A cross-origin redirect can strip CORS headers; the final response must also include them.\n\nTo diagnose: open DevTools → Network → click the failing request → check **Response Headers**. The exact CORS message in the console tells you which header is missing.\n\nIf you share the console message and the request/response headers, I can point at the specific fix.",
+  "result": "CORS (Cross-Origin Resource Sharing) errors happen when your browser blocks a request from one origin (scheme + host + port) to another because the server didn't explicitly permit it.\n\n**Common causes:**\n- Server doesn't return `Access-Control-Allow-Origin` matching your page's origin\n- Preflight `OPTIONS` request fails (missing `Access-Control-Allow-Methods` / `-Headers`)\n- Sending credentials (`fetch(..., {credentials: 'include'})`) while server returns `Access-Control-Allow-Origin: *` — not allowed; must echo the exact origin and add `Access-Control-Allow-Credentials: true`\n- Custom header (e.g. `Authorization`, `X-Requested-With`) triggering preflight the server doesn't handle\n- Hitting `http://` from an `https://` page (mixed content, sometimes surfaces as CORS)\n\n**How to debug:**\n1. Open DevTools → Network → click the failing request → check **Response Headers** for `Access-Control-Allow-*`.\n2. Look for a preceding `OPTIONS` request; if it's 4xx/5xx, fix the preflight on the server.\n3. Compare the page origin with the request URL — if they differ, CORS applies.\n\n**Fixes (pick one):**\n- Configure the server to send proper CORS headers (e.g. Express: `cors` middleware; nginx: `add_header Access-Control-Allow-Origin ...`).\n- Proxy the request through your own backend / dev server (e.g. Vite/webpack `proxy` config) so the browser sees a same-origin call.\n- For local dev only: a browser extension or `--disable-web-security` Chrome flag — never in production.\n\nIf you paste the exact console message and the request/response headers, I can pinpoint which of these it is.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 12753,
-    "duration_api_ms": 13517,
+    "duration_ms": 14275,
+    "duration_api_ms": 15896,
     "num_turns": 1,
-    "result": "CORS errors mean your frontend is making a request to an origin (scheme+host+port) that differs from the page's origin, and the server isn't returning the headers the browser needs to authorize it.\n\nCommon causes:\n\n1. **Missing `Access-Control-Allow-Origin`** on the response. The server must echo your origin (or `*` for public APIs without credentials).\n2. **Preflight (OPTIONS) not handled.** Requests with custom headers, `Content-Type: application/json`, or non-GET/POST methods trigger an OPTIONS preflight. The server must respond 2xx with `Access-Control-Allow-Methods` and `Access-Control-Allow-Headers`.\n3. **Credentials mismatch.** If you set `credentials: 'include'` (or `withCredentials`), the server must return `Access-Control-Allow-Credentials: true` and a specific origin — `*` is rejected.\n4. **Dev server talking to a different port.** `localhost:3000` → `localhost:8000` is cross-origin. Fix with a dev proxy (Vite `server.proxy`, CRA `\"proxy\"`, Next.js `rewrites`) or enable CORS on the API.\n5. **Redirects.** A cross-origin redirect can strip CORS headers; the final response must also include them.\n\nTo diagnose: open DevTools → Network → click the failing request → check **Response Headers**. The exact CORS message in the console tells you which header is missing.\n\nIf you share the console message and the request/response headers, I can point at the specific fix.",
+    "result": "CORS (Cross-Origin Resource Sharing) errors happen when your browser blocks a request from one origin (scheme + host + port) to another because the server didn't explicitly permit it.\n\n**Common causes:**\n- Server doesn't return `Access-Control-Allow-Origin` matching your page's origin\n- Preflight `OPTIONS` request fails (missing `Access-Control-Allow-Methods` / `-Headers`)\n- Sending credentials (`fetch(..., {credentials: 'include'})`) while server returns `Access-Control-Allow-Origin: *` — not allowed; must echo the exact origin and add `Access-Control-Allow-Credentials: true`\n- Custom header (e.g. `Authorization`, `X-Requested-With`) triggering preflight the server doesn't handle\n- Hitting `http://` from an `https://` page (mixed content, sometimes surfaces as CORS)\n\n**How to debug:**\n1. Open DevTools → Network → click the failing request → check **Response Headers** for `Access-Control-Allow-*`.\n2. Look for a preceding `OPTIONS` request; if it's 4xx/5xx, fix the preflight on the server.\n3. Compare the page origin with the request URL — if they differ, CORS applies.\n\n**Fixes (pick one):**\n- Configure the server to send proper CORS headers (e.g. Express: `cors` middleware; nginx: `add_header Access-Control-Allow-Origin ...`).\n- Proxy the request through your own backend / dev server (e.g. Vite/webpack `proxy` config) so the browser sees a same-origin call.\n- For local dev only: a browser extension or `--disable-web-security` Chrome flag — never in production.\n\nIf you paste the exact console message and the request/response headers, I can pinpoint which of these it is.",
     "stop_reason": "end_turn",
-    "session_id": "f5f94033-31c7-437b-b971-fd0355ab2bce",
-    "total_cost_usd": 0.12950425,
+    "session_id": "8d88ee8a-3e52-4506-a6c7-51995fc3d056",
+    "total_cost_usd": 0.13372175,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17025,
+      "cache_creation_input_tokens": 17051,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 570,
+      "output_tokens": 732,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17025,
+        "ephemeral_1h_input_tokens": 17051,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 570,
+          "output_tokens": 732,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17025,
+          "cache_creation_input_tokens": 17051,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17025
+            "ephemeral_1h_input_tokens": 17051
           },
           "type": "message"
         }
@@ -78,21 +78,21 @@
     "modelUsage": {
       "claude-haiku-4-5-20251001": {
         "inputTokens": 350,
-        "outputTokens": 14,
+        "outputTokens": 15,
         "cacheReadInputTokens": 0,
         "cacheCreationInputTokens": 0,
         "webSearchRequests": 0,
-        "costUSD": 0.00042,
+        "costUSD": 0.00042500000000000003,
         "contextWindow": 200000,
         "maxOutputTokens": 32000
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 570,
+        "outputTokens": 732,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17025,
+        "cacheCreationInputTokens": 17051,
         "webSearchRequests": 0,
-        "costUSD": 0.12908424999999998,
+        "costUSD": 0.13329675,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "86e5b8bb-36f0-4644-8dc8-e95aa00cb3c8"
+    "uuid": "685da5c8-3cf5-4209-b8f1-9317db0a0f1f"
   }
 }

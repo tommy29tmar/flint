@@ -1,0 +1,105 @@
+{
+  "track": "T1b",
+  "arm": "hewn_prompt_only",
+  "prompt_id": "queue-vs-topic",
+  "run_index": 2,
+  "arm_order_index": 4,
+  "arm_order_full": [
+    "hewn_full",
+    "baseline",
+    "caveman_full_plus_ultra_directive",
+    "caveman_full",
+    "hewn_prompt_only",
+    "terse"
+  ],
+  "digest_hex": "ba122dedeb7c9e40d10ca6693f455c91383e96df0a7c5d4f1c430894bae59f91",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:06:09.017209+00:00",
+  "output_tokens_tiktoken": 172,
+  "output_tokens_anthropic": 270,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 17027,
+  "cache_read_input_tokens": 16796,
+  "total_input_tokens": 33829,
+  "cache_state": "warm",
+  "wallclock_ms": 12966.738783987239,
+  "duration_ms": 6950,
+  "duration_api_ms": 8313,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "0ec65ff4-f0ef-4e7e-8169-6e07005f54e0",
+  "total_cost_usd": 0.12201275,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "**Queue**: point-to-point. One message → one consumer (of a group). Use for work distribution where each job must be processed exactly once — task queues, order processing, email sending.\n\n**Topic**: publish-subscribe. One message → every subscriber gets a copy. Use for event fan-out where multiple independent systems need to react — domain events, notifications, cache invalidation, audit logs.\n\nRule of thumb: if adding a second consumer means \"split the work,\" use a queue. If it means \"also notify this new system,\" use a topic.\n\nNote: Kafka blurs the line — its \"topics\" with consumer groups behave like queues within a group and topics across groups. RabbitMQ keeps them distinct (queues vs exchanges). SQS is queue-only; SNS is topic-only (often paired: SNS → SQS fan-out).",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 6950,
+    "duration_api_ms": 8313,
+    "num_turns": 1,
+    "result": "**Queue**: point-to-point. One message → one consumer (of a group). Use for work distribution where each job must be processed exactly once — task queues, order processing, email sending.\n\n**Topic**: publish-subscribe. One message → every subscriber gets a copy. Use for event fan-out where multiple independent systems need to react — domain events, notifications, cache invalidation, audit logs.\n\nRule of thumb: if adding a second consumer means \"split the work,\" use a queue. If it means \"also notify this new system,\" use a topic.\n\nNote: Kafka blurs the line — its \"topics\" with consumer groups behave like queues within a group and topics across groups. RabbitMQ keeps them distinct (queues vs exchanges). SQS is queue-only; SNS is topic-only (often paired: SNS → SQS fan-out).",
+    "stop_reason": "end_turn",
+    "session_id": "0ec65ff4-f0ef-4e7e-8169-6e07005f54e0",
+    "total_cost_usd": 0.12201275,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 17027,
+      "cache_read_input_tokens": 16796,
+      "output_tokens": 270,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 17027,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 270,
+          "cache_read_input_tokens": 16796,
+          "cache_creation_input_tokens": 17027,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 17027
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 351,
+        "outputTokens": 13,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.00041600000000000003,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 270,
+        "cacheReadInputTokens": 16796,
+        "cacheCreationInputTokens": 17027,
+        "webSearchRequests": 0,
+        "costUSD": 0.12159675,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "f5240e8b-27fb-464c-a742-29df3fe88b7a"
+  }
+}

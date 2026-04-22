@@ -14,61 +14,61 @@
   ],
   "digest_hex": "4b03fc8be3949c05b432d9b1384c3888f2497445b9d83c4262c2a2a4a9712965",
   "seed": "hewn-bench-v1",
-  "timestamp": "2026-04-22T08:12:17.448108+00:00",
-  "output_tokens_tiktoken": 288,
-  "output_tokens_anthropic": 453,
+  "timestamp": "2026-04-22T09:37:22.353035+00:00",
+  "output_tokens_tiktoken": 304,
+  "output_tokens_anthropic": 518,
   "input_tokens_anthropic": 6,
-  "cache_creation_input_tokens": 17032,
+  "cache_creation_input_tokens": 17058,
   "cache_read_input_tokens": 16796,
-  "total_input_tokens": 33834,
+  "total_input_tokens": 33860,
   "cache_state": "warm",
-  "wallclock_ms": 18734.44540699711,
-  "duration_ms": 12701,
-  "duration_api_ms": 13758,
+  "wallclock_ms": 17645.823811006267,
+  "duration_ms": 11178,
+  "duration_api_ms": 12440,
   "wrapper_overhead_ms": null,
   "stop_reason": "end_turn",
   "num_turns": 1,
-  "session_id": "c7a1010d-8a6a-4ca9-900c-5c7ede2b6e3d",
-  "total_cost_usd": 0.12663699999999997,
+  "session_id": "f29f0e3b-c671-4756-8859-0fd4ce8fdff0",
+  "total_cost_usd": 0.1284295,
   "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
-  "result": "A few things that actually help, in order of payoff:\n\n1. **Name things for what they mean, not what they do.** `calculateTotal` is worse than `priceWithTax`. If you can't name it, you don't understand it yet — that's the real signal.\n\n2. **One function, one job.** If you say \"and\" describing what it does, split it. 10-20 lines is a good ceiling; past that you're usually hiding a second function inside the first.\n\n3. **Flatten the nesting.** Early returns kill pyramids. `if (!user) return null` at the top beats wrapping the whole function in `if (user) { ... }`.\n\n4. **Group by feature, not by type.** `users/` containing its routes, logic, and types beats `routes/`, `services/`, `types/` folders where one feature smears across three places.\n\n5. **Delete dead code aggressively.** Commented-out blocks, unused helpers, \"might need later\" — all lies. Git remembers.\n\n6. **Write the call site first.** Before implementing, write how you'd *use* the function. If the call reads weird, the API is wrong — fix it before writing the body.\n\nThe losing-track feeling usually isn't bad code — it's code that lies about what it does. Names and boundaries are 80% of the fix.",
+  "result": "The core trick: **every function should do one thing, named for what it does**. If you can't name it without \"and\", split it.\n\nConcrete habits that kill spaghetti:\n\n1. **Name things for their job, not their shape.** `fetch_user_json` → `get_user`. If the name reads like English, you can skim code without reading bodies.\n2. **Keep functions short.** If it scrolls, it's probably two functions. ~20 lines is a good gut-check, not a rule.\n3. **Separate layers.** I/O (network, disk, DB) stays in thin wrappers. Pure logic (transform, decide, validate) stays in functions you can call with plain values. Mixing them is the #1 source of spaghetti.\n4. **Return early.** Nested ifs hide the happy path. `if (bad) return;` flattens everything.\n5. **Don't reach across modules.** If `billing.py` imports from `ui.py`, something's wrong. Dependencies should point one direction.\n6. **Delete dead code the moment it's dead.** Commented-out blocks and \"just in case\" helpers are where comprehension goes to die.\n7. **When lost, draw the data flow on paper.** One box per function, arrows for what calls what. The mess becomes visible; the fix usually becomes obvious.\n\nWant me to look at a specific file of yours and point out where it's tangled? That's faster than general advice.",
   "assertion_pass": true,
   "raw_payload": {
     "type": "result",
     "subtype": "success",
     "is_error": false,
     "api_error_status": null,
-    "duration_ms": 12701,
-    "duration_api_ms": 13758,
+    "duration_ms": 11178,
+    "duration_api_ms": 12440,
     "num_turns": 1,
-    "result": "A few things that actually help, in order of payoff:\n\n1. **Name things for what they mean, not what they do.** `calculateTotal` is worse than `priceWithTax`. If you can't name it, you don't understand it yet — that's the real signal.\n\n2. **One function, one job.** If you say \"and\" describing what it does, split it. 10-20 lines is a good ceiling; past that you're usually hiding a second function inside the first.\n\n3. **Flatten the nesting.** Early returns kill pyramids. `if (!user) return null` at the top beats wrapping the whole function in `if (user) { ... }`.\n\n4. **Group by feature, not by type.** `users/` containing its routes, logic, and types beats `routes/`, `services/`, `types/` folders where one feature smears across three places.\n\n5. **Delete dead code aggressively.** Commented-out blocks, unused helpers, \"might need later\" — all lies. Git remembers.\n\n6. **Write the call site first.** Before implementing, write how you'd *use* the function. If the call reads weird, the API is wrong — fix it before writing the body.\n\nThe losing-track feeling usually isn't bad code — it's code that lies about what it does. Names and boundaries are 80% of the fix.",
+    "result": "The core trick: **every function should do one thing, named for what it does**. If you can't name it without \"and\", split it.\n\nConcrete habits that kill spaghetti:\n\n1. **Name things for their job, not their shape.** `fetch_user_json` → `get_user`. If the name reads like English, you can skim code without reading bodies.\n2. **Keep functions short.** If it scrolls, it's probably two functions. ~20 lines is a good gut-check, not a rule.\n3. **Separate layers.** I/O (network, disk, DB) stays in thin wrappers. Pure logic (transform, decide, validate) stays in functions you can call with plain values. Mixing them is the #1 source of spaghetti.\n4. **Return early.** Nested ifs hide the happy path. `if (bad) return;` flattens everything.\n5. **Don't reach across modules.** If `billing.py` imports from `ui.py`, something's wrong. Dependencies should point one direction.\n6. **Delete dead code the moment it's dead.** Commented-out blocks and \"just in case\" helpers are where comprehension goes to die.\n7. **When lost, draw the data flow on paper.** One box per function, arrows for what calls what. The mess becomes visible; the fix usually becomes obvious.\n\nWant me to look at a specific file of yours and point out where it's tangled? That's faster than general advice.",
     "stop_reason": "end_turn",
-    "session_id": "c7a1010d-8a6a-4ca9-900c-5c7ede2b6e3d",
-    "total_cost_usd": 0.12663699999999997,
+    "session_id": "f29f0e3b-c671-4756-8859-0fd4ce8fdff0",
+    "total_cost_usd": 0.1284295,
     "usage": {
       "input_tokens": 6,
-      "cache_creation_input_tokens": 17032,
+      "cache_creation_input_tokens": 17058,
       "cache_read_input_tokens": 16796,
-      "output_tokens": 453,
+      "output_tokens": 518,
       "server_tool_use": {
         "web_search_requests": 0,
         "web_fetch_requests": 0
       },
       "service_tier": "standard",
       "cache_creation": {
-        "ephemeral_1h_input_tokens": 17032,
+        "ephemeral_1h_input_tokens": 17058,
         "ephemeral_5m_input_tokens": 0
       },
       "inference_geo": "",
       "iterations": [
         {
           "input_tokens": 6,
-          "output_tokens": 453,
+          "output_tokens": 518,
           "cache_read_input_tokens": 16796,
-          "cache_creation_input_tokens": 17032,
+          "cache_creation_input_tokens": 17058,
           "cache_creation": {
             "ephemeral_5m_input_tokens": 0,
-            "ephemeral_1h_input_tokens": 17032
+            "ephemeral_1h_input_tokens": 17058
           },
           "type": "message"
         }
@@ -78,21 +78,21 @@
     "modelUsage": {
       "claude-haiku-4-5-20251001": {
         "inputTokens": 359,
-        "outputTokens": 15,
+        "outputTokens": 16,
         "cacheReadInputTokens": 0,
         "cacheCreationInputTokens": 0,
         "webSearchRequests": 0,
-        "costUSD": 0.00043400000000000003,
+        "costUSD": 0.000439,
         "contextWindow": 200000,
         "maxOutputTokens": 32000
       },
       "claude-opus-4-7": {
         "inputTokens": 6,
-        "outputTokens": 453,
+        "outputTokens": 518,
         "cacheReadInputTokens": 16796,
-        "cacheCreationInputTokens": 17032,
+        "cacheCreationInputTokens": 17058,
         "webSearchRequests": 0,
-        "costUSD": 0.12620299999999998,
+        "costUSD": 0.1279905,
         "contextWindow": 1000000,
         "maxOutputTokens": 64000
       }
@@ -100,6 +100,6 @@
     "permission_denials": [],
     "terminal_reason": "completed",
     "fast_mode_state": "off",
-    "uuid": "f3d4c992-fab0-49e3-9737-ed550c221823"
+    "uuid": "d6d86cc7-43a8-461e-948f-9bd7a2866b87"
   }
 }

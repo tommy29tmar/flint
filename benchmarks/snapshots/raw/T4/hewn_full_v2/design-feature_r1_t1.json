@@ -1,0 +1,106 @@
+{
+  "track": "T4",
+  "arm": "hewn_full",
+  "sequence_id": "design-feature",
+  "run_index": 1,
+  "turn": 1,
+  "arm_order_index": 0,
+  "arm_order_full": [
+    "hewn_full",
+    "hewn_prompt_only",
+    "terse",
+    "baseline",
+    "caveman_full"
+  ],
+  "digest_hex": "30a2f9a62df0d790c0598917c3ab42509bbadd672a0a484741ea201d2da3b44f",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:30:14.617114+00:00",
+  "session_id_used_for_resume": null,
+  "output_tokens_tiktoken": 97,
+  "output_tokens_anthropic": 162,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 18248,
+  "cache_read_input_tokens": 16805,
+  "total_input_tokens": 35059,
+  "cache_state": "warm",
+  "wallclock_ms": 12589.785208983812,
+  "duration_ms": 5937,
+  "duration_api_ms": 6947,
+  "wrapper_overhead_ms": 5642.7852089838125,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "a5b861a6-3ae3-47ab-bc99-1526aaf8a5f4",
+  "total_cost_usd": 0.1269885,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "Need repo context or greenfield? If greenfield, share stack (payments provider, DB, auth model). If existing, point me at checkout code.\n\nMain decisions either way: single-use vs reloadable balance, currency/FX handling, partial redemption + refund flow (refund to card or back to gift card?), fraud controls (rate-limit code attempts, code entropy), tax treatment (gift card as tender vs discount — big accounting difference), concurrency (two sessions redeeming same card).",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 5937,
+    "duration_api_ms": 6947,
+    "num_turns": 1,
+    "result": "Need repo context or greenfield? If greenfield, share stack (payments provider, DB, auth model). If existing, point me at checkout code.\n\nMain decisions either way: single-use vs reloadable balance, currency/FX handling, partial redemption + refund flow (refund to card or back to gift card?), fraud controls (rate-limit code attempts, code entropy), tax treatment (gift card as tender vs discount — big accounting difference), concurrency (two sessions redeeming same card).",
+    "stop_reason": "end_turn",
+    "session_id": "a5b861a6-3ae3-47ab-bc99-1526aaf8a5f4",
+    "total_cost_usd": 0.1269885,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 18248,
+      "cache_read_input_tokens": 16805,
+      "output_tokens": 162,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 18248,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 162,
+          "cache_read_input_tokens": 16805,
+          "cache_creation_input_tokens": 18248,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 18248
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 391,
+        "outputTokens": 13,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.000456,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 162,
+        "cacheReadInputTokens": 16805,
+        "cacheCreationInputTokens": 18248,
+        "webSearchRequests": 0,
+        "costUSD": 0.1265325,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "b3e3c668-20d0-4dbf-b026-fd8f888f92bb"
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "track": "T3",
+  "arm": "hewn_full",
+  "prompt_id": "rate-limit-xff-review",
+  "run_index": 3,
+  "arm_order_index": 3,
+  "arm_order_full": [
+    "hewn_prompt_only",
+    "baseline",
+    "caveman_full_plus_ultra_directive",
+    "hewn_full",
+    "terse",
+    "caveman_full"
+  ],
+  "digest_hex": "cffe317c5c73922535ac9a56d76b012bce4c891ed45ea6f65a6644bb758137e0",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-22T08:23:31.059709+00:00",
+  "output_tokens_tiktoken": 19,
+  "output_tokens_anthropic": 201,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 42295,
+  "total_input_tokens": 42301,
+  "cache_state": "warm",
+  "wallclock_ms": 11322.388677013805,
+  "duration_ms": 5003,
+  "duration_api_ms": 6602,
+  "wrapper_overhead_ms": 4720.388677013805,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "a9a27b72-8f90-4894-ac21-57121956f003",
+  "total_cost_usd": 0.0317725,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "Task empty. What do you want reviewed — diff, file, or handbook itself for gaps?",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 5003,
+    "duration_api_ms": 6602,
+    "num_turns": 1,
+    "result": "Task empty. What do you want reviewed — diff, file, or handbook itself for gaps?",
+    "stop_reason": "end_turn",
+    "session_id": "a9a27b72-8f90-4894-ac21-57121956f003",
+    "total_cost_usd": 0.0317725,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 42295,
+      "output_tokens": 201,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 201,
+          "cache_read_input_tokens": 42295,
+          "cache_creation_input_tokens": 0,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 5505,
+        "outputTokens": 13,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.00557,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 201,
+        "cacheReadInputTokens": 42295,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.0262025,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "8e4c5e83-0a06-4e2c-b233-07964e6f028d"
+  }
+}
