@@ -45,14 +45,6 @@ type `claude`.
 
 ## Beyond the headline
 
-- **Long-context task comprehension** — On a long-context security
-  review with compact IR-style task framing, Hewn is the **only arm
-  that completes the task** (89% concepts captured) — Verbose Claude,
-  Caveman Full, and Caveman Ultra-style all reply *"no task specified"*
-  (0%). See [`examples/atlas-xff-review.md`](examples/atlas-xff-review.md)
-  for the full input/output triplet.
-  *Source: T3 `rate-limit-xff-review`, 3 runs per arm.*
-
 - **The drift-fix hook is doing real work** — In multi-turn sessions,
   removing Hewn's classifier hook costs **+4,700 to +5,300 cumulative
   tokens** per 5-turn workflow. The hook earns its keep.
@@ -70,24 +62,28 @@ type `claude`.
   at **100%**.
   *Source: T1b literal preservation, 15 judgments per arm.*
 
+- **Vibe trade-off is explicit** — On non-tech prompts, Hewn averages
+  **63%** concept coverage vs Caveman **78%** while using about **3×
+  fewer tokens**. Different design philosophy, visible in the data.
+  *Source: T2, 5 prompts × 3 runs per arm.*
+
 → Full per-prompt breakdown and raw judgments:
 [`benchmarks/report/REPORT.md`](benchmarks/report/REPORT.md)
 
 ## Where Hewn doesn't win
 
-Honesty matters. The benchmark shows three areas where Hewn is not the
-right tool:
+Honesty matters. In practice there are three cases where Hewn is not
+the right tool:
 
-- **Expansive prose tasks** (apology emails, release notes) — all arms
-  including Hewn produce near-stub responses on these prompts (~0%
-  rubric concepts across the board). Use plain `claude` for marketing
-  copy.
 - **Vibe / non-tech prompts** — Hewn 63% concept coverage vs Caveman 78%.
   Hewn is agent-mode (asks before guessing); Caveman is tutorial-mode
   (enumerates options). Different design philosophy, both valid.
+- **Polished marketing / apology copy** — Hewn is tuned for technical
+  compression, not expansive prose. If you want the model to lean into
+  voice and polish, use plain `claude`.
 - **Tasks that genuinely need a long answer** — when the prompt
   legitimately requires a full plan, Hewn uses similar tokens to
-  baseline. Compression gracefully degrades when there's nothing to cut.
+  baseline. Compression degrades when there is little fluff to cut.
 
 ## How it works
 

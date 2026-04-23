@@ -1,10 +1,10 @@
 # Long-prompt example — Atlas API security review
 
-Real Opus 4.7 stress-bench row from the benchmark suite (track T3,
-prompt id `rate-limit-xff-review`). Same model, same 16k-token project
-handbook, same task across all three modes.
+Illustrative Atlas side-by-side example from an earlier benchmark
+iteration. Use it as a qualitative prompt-shape example; use the
+current benchmark report for aggregate numbers.
 
-## Result
+## Historical result
 
 | Mode | Output tokens | Latency |
 | --- | ---: | ---: |
@@ -105,9 +105,3 @@ A: ! header_spoof ∧ ! key_unbounded ∧ ? proxy_chain
 
 Same risk, mitigation, and verification. Hewn compresses the answer and
 GCs the context: keep what changes the fix, drop what only burns tokens.
-
-In the benchmark this is also the only arm that **completes the task at
-all** on this prompt shape — Verbose Claude, Caveman Full, and Caveman
-Ultra-style all reply "no task specified" on the same input. See
-[T3 results](../benchmarks/report/REPORT.md#t3--long-context-5k-handbook-prefix)
-in the full report.

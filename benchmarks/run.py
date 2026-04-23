@@ -20,6 +20,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -247,13 +248,21 @@ def load_vibe_en() -> list[tuple[str, str]]:
 def load_blocks(filename: str, ids: list[str]) -> list[tuple[str, str]]:
     """Read prompts file split by `---PROMPT---` separator lines."""
     raw = (PROMPTS / filename).read_text()
-    parts = [p.strip() for p in raw.split("---PROMPT---") if p.strip()
-             and not p.lstrip().startswith("#")]
-    # the leading comment block also gets returned by split if not preceded by separator;
-    # filter blocks that look like all-comment headers
-    parts = [p for p in parts
-             if not all(line.startswith("#") or not line.strip()
-                        for line in p.splitlines())]
+    parts = [
+        p.strip()
+        for p in re.split(r"(?m)^\s*---PROMPT---\s*$", raw)
+    ]
+    # Keep comment headers legal above the first separator line without letting
+    # quoted mentions like `"---PROMPT---"` shift prompt ids.
+    parts = [
+        p for p in parts
+        if p and not all(line.lstrip().startswith("#") or not line.strip()
+                         for line in p.splitlines())
+    ]
+    if len(parts) != len(ids):
+        raise ValueError(
+            f"{filename}: expected {len(ids)} prompt blocks, found {len(parts)}"
+        )
     return list(zip(ids, parts))
 
 
