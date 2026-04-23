@@ -1,0 +1,97 @@
+{
+  "track": "T4",
+  "arm": "caveman_full_plus_ultra_directive",
+  "sequence_id": "debug-prod-incident",
+  "run_index": 2,
+  "turn": 3,
+  "arm_order_index": 3,
+  "arm_order_full": [
+    "hewn_full",
+    "caveman_full",
+    "hewn_prompt_only",
+    "caveman_full_plus_ultra_directive",
+    "baseline",
+    "terse"
+  ],
+  "digest_hex": "522341918a5177210ef438fa55486ec5b622aaa576febbd731536d82595ec31b",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-23T07:42:55.380047+00:00",
+  "session_id_used_for_resume": "9c0089ec-00c8-4fcb-aada-67496faec3a8",
+  "output_tokens_tiktoken": 123,
+  "output_tokens_anthropic": 182,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 150,
+  "cache_read_input_tokens": 26080,
+  "total_input_tokens": 26236,
+  "cache_state": "warm",
+  "wallclock_ms": 7377.46100500226,
+  "duration_ms": 4238,
+  "duration_api_ms": 4207,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "9c0089ec-00c8-4fcb-aada-67496faec3a8",
+  "total_cost_usd": 0.0185575,
+  "model_used": "claude-opus-4-7",
+  "result": "```js\ndescribe('buildCart', () => {\n  const cart = { id: 'c1', items: [{ price: 10, qty: 2 }] };\n\n  it('preserves items in output', () => {\n    expect(buildCart(cart).items).toEqual(cart.items);\n  });\n\n  it('returns id, items, total', () => {\n    expect(buildCart(cart)).toEqual({\n      id: 'c1',\n      items: cart.items,\n      total: 20,\n    });\n  });\n});\n```\n\nSecond test = contract lock. Drop any field → fail.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 4238,
+    "duration_api_ms": 4207,
+    "num_turns": 1,
+    "result": "```js\ndescribe('buildCart', () => {\n  const cart = { id: 'c1', items: [{ price: 10, qty: 2 }] };\n\n  it('preserves items in output', () => {\n    expect(buildCart(cart).items).toEqual(cart.items);\n  });\n\n  it('returns id, items, total', () => {\n    expect(buildCart(cart)).toEqual({\n      id: 'c1',\n      items: cart.items,\n      total: 20,\n    });\n  });\n});\n```\n\nSecond test = contract lock. Drop any field → fail.",
+    "stop_reason": "end_turn",
+    "session_id": "9c0089ec-00c8-4fcb-aada-67496faec3a8",
+    "total_cost_usd": 0.0185575,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 150,
+      "cache_read_input_tokens": 26080,
+      "output_tokens": 182,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 150,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 182,
+          "cache_read_input_tokens": 26080,
+          "cache_creation_input_tokens": 150,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 150
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 182,
+        "cacheReadInputTokens": 26080,
+        "cacheCreationInputTokens": 150,
+        "webSearchRequests": 0,
+        "costUSD": 0.0185575,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "e98c722c-5734-44f8-a428-25c8dc012d51"
+  }
+}

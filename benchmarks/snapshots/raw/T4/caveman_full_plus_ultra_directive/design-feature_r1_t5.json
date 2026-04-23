@@ -1,0 +1,97 @@
+{
+  "track": "T4",
+  "arm": "caveman_full_plus_ultra_directive",
+  "sequence_id": "design-feature",
+  "run_index": 1,
+  "turn": 5,
+  "arm_order_index": 0,
+  "arm_order_full": [
+    "caveman_full_plus_ultra_directive",
+    "terse",
+    "caveman_full",
+    "hewn_prompt_only",
+    "baseline",
+    "hewn_full"
+  ],
+  "digest_hex": "30a2f9a62df0d790c0598917c3ab42509bbadd672a0a484741ea201d2da3b44f",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-23T07:42:32.956361+00:00",
+  "session_id_used_for_resume": "3fabcb3f-a49e-4728-850a-d64f7eb301e1",
+  "output_tokens_tiktoken": 1122,
+  "output_tokens_anthropic": 2318,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 960,
+  "cache_read_input_tokens": 29001,
+  "total_input_tokens": 29967,
+  "cache_state": "warm",
+  "wallclock_ms": 40542.415485018864,
+  "duration_ms": 37735,
+  "duration_api_ms": 37706,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "3fabcb3f-a49e-4728-850a-d64f7eb301e1",
+  "total_cost_usd": 0.07848050000000001,
+  "model_used": "claude-opus-4-7",
+  "result": "**Policy options** (pick one, document it):\n\n| Policy | Behavior | Best for |\n|--------|----------|----------|\n| **Card-first** | Refund card until card-paid exhausted, remainder → gift | User-friendly (real $ back) |\n| **Gift-first** | Refund gift until gift-used exhausted, remainder → card | Merchant-friendly (preserves cash) |\n| **Pro-rata** | Split refund in same ratio as original payment | Cleanest accounting, fairest |\n| **LIFO** | Reverse in reverse order applied at checkout | Rare, matches payment stack |\n\n**Recommendation: pro-rata.** Reasons:\n- Symmetric w/ payment: refund $20 of $100 order → $6 gift, $14 card (same 30/70 split). Auditable, no surprise\n- Full refund = all money back where it came from\n- No incentive to game partial refunds\n- Simple formula: `refund_to_method = refund_total × (method_paid / order_total)`\n\nCard-first is common in retail (Amazon etc.) but requires documenting + user-facing copy. Pick, write in T&Cs.\n\n**Data model** (already have ledger for gift; need equivalent for card):\n\n```\norder_payments:\n  id, order_id, method ('gift_card'|'card'), gift_card_id?,\n  amount, gateway_txn_id?, captured_at\nrefunds:\n  id, order_id, total_amount, reason, created_at\nrefund_allocations:\n  id, refund_id, payment_id, amount  -- how this refund splits\n```\n\n**Code path** (pro-rata, partial refund):\n\n```\nrefund_order(order_id, refund_amount, idempotency_key):\n  BEGIN tx\n\n  # idempotency: bail if key already processed → return prior result\n  lock on order row (FOR UPDATE)\n\n  payments = SELECT * FROM order_payments WHERE order_id=?\n  already_refunded = SUM(refund_allocations where order_id=?)\n  refundable = order_total - already_refunded\n  assert refund_amount <= refundable   # else 422\n\n  # compute allocations pro-rata on *remaining* refundable per payment\n  for p in payments:\n      p.remaining = p.amount - SUM(refund_allocations where payment_id=p.id)\n  total_remaining = sum(p.remaining)\n  for p in payments:\n      p.alloc = round(refund_amount × p.remaining / total_remaining)\n  fix_rounding(allocations)   # ensure sum == refund_amount, last gets delta\n\n  refund = INSERT refunds(...)\n\n  for p, alloc in allocations:\n      if alloc == 0: continue\n      INSERT refund_allocations(refund.id, p.id, alloc)\n\n      if p.method == 'gift_card':\n          # credit back to gift card\n          UPDATE gift_cards\n            SET remaining_balance = remaining_balance + alloc\n            WHERE id = p.gift_card_id;     # FOR UPDATE earlier\n          INSERT gift_card_ledger(\n            card_id=p.gift_card_id, delta=+alloc,\n            type='refund', order_id=order_id, refund_id=refund.id)\n\n      elif p.method == 'card':\n          # external call — see note\n          gateway.refund(p.gateway_txn_id, alloc, idempotency_key=...)\n          # persist gateway response\n\n  COMMIT\n```\n\n**Critical rules:**\n\n1. **Don't call gateway inside DB tx.** Two-phase:\n   - tx 1: allocate refund, mark `pending`, commit\n   - call gateway (idempotent w/ key)\n   - tx 2: mark `succeeded`/`failed`, on gift-card leg credit balance here or on success only\n   \n   Simpler alternative: credit gift-card immediately in tx 1 (it's internal), queue card refund async. Gift user sees balance back instantly, card takes days anyway.\n\n2. **Idempotency key** on refund request. Replay = same result. Pass through to gateway.\n\n3. **Rounding**: integer cents. `floor` per-allocation, assign remainder to largest. Never over-refund.\n\n4. **Expired gift card at refund time**: policy call. Options:\n   - Re-credit + auto-extend expiry (user-friendly, common)\n   - Credit to new replacement card\n   - Convert to store credit / different instrument\n   - Refuse gift leg, push all to card (problem if card gone too)\n   \n   Pick \"re-credit + extend 90d from refund\". Document.\n\n5. **Gift card deleted/disabled**: fall back to card for that allocation, or issue new gift, or customer-service escalation. Write explicit branch.\n\n6. **Refund on gift-only order w/ expired/gone card**: store-credit fallback or manual queue.\n\n7. **Accounting**: gift-card refund reverses breakage-liability direction. Ledger entry is the source — accounting queries it, not balance snapshot.\n\n8. **Partial refund sequence**: test N small partials sum correctly. Pro-rata on *remaining* (not original) is key — otherwise last refund can under/over allocate.\n\n**Edge to test:**\n- Refund exactly gift portion\n- Refund exactly card portion  \n- Refund spanning both\n- Multiple partials summing to full\n- Refund after gift expired\n- Concurrent refund requests (row lock on order handles)\n- Rounding: $10 refund on 33/67 split\n- Full refund = sum(payments) exactly, no penny drift",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 37735,
+    "duration_api_ms": 37706,
+    "num_turns": 1,
+    "result": "**Policy options** (pick one, document it):\n\n| Policy | Behavior | Best for |\n|--------|----------|----------|\n| **Card-first** | Refund card until card-paid exhausted, remainder → gift | User-friendly (real $ back) |\n| **Gift-first** | Refund gift until gift-used exhausted, remainder → card | Merchant-friendly (preserves cash) |\n| **Pro-rata** | Split refund in same ratio as original payment | Cleanest accounting, fairest |\n| **LIFO** | Reverse in reverse order applied at checkout | Rare, matches payment stack |\n\n**Recommendation: pro-rata.** Reasons:\n- Symmetric w/ payment: refund $20 of $100 order → $6 gift, $14 card (same 30/70 split). Auditable, no surprise\n- Full refund = all money back where it came from\n- No incentive to game partial refunds\n- Simple formula: `refund_to_method = refund_total × (method_paid / order_total)`\n\nCard-first is common in retail (Amazon etc.) but requires documenting + user-facing copy. Pick, write in T&Cs.\n\n**Data model** (already have ledger for gift; need equivalent for card):\n\n```\norder_payments:\n  id, order_id, method ('gift_card'|'card'), gift_card_id?,\n  amount, gateway_txn_id?, captured_at\nrefunds:\n  id, order_id, total_amount, reason, created_at\nrefund_allocations:\n  id, refund_id, payment_id, amount  -- how this refund splits\n```\n\n**Code path** (pro-rata, partial refund):\n\n```\nrefund_order(order_id, refund_amount, idempotency_key):\n  BEGIN tx\n\n  # idempotency: bail if key already processed → return prior result\n  lock on order row (FOR UPDATE)\n\n  payments = SELECT * FROM order_payments WHERE order_id=?\n  already_refunded = SUM(refund_allocations where order_id=?)\n  refundable = order_total - already_refunded\n  assert refund_amount <= refundable   # else 422\n\n  # compute allocations pro-rata on *remaining* refundable per payment\n  for p in payments:\n      p.remaining = p.amount - SUM(refund_allocations where payment_id=p.id)\n  total_remaining = sum(p.remaining)\n  for p in payments:\n      p.alloc = round(refund_amount × p.remaining / total_remaining)\n  fix_rounding(allocations)   # ensure sum == refund_amount, last gets delta\n\n  refund = INSERT refunds(...)\n\n  for p, alloc in allocations:\n      if alloc == 0: continue\n      INSERT refund_allocations(refund.id, p.id, alloc)\n\n      if p.method == 'gift_card':\n          # credit back to gift card\n          UPDATE gift_cards\n            SET remaining_balance = remaining_balance + alloc\n            WHERE id = p.gift_card_id;     # FOR UPDATE earlier\n          INSERT gift_card_ledger(\n            card_id=p.gift_card_id, delta=+alloc,\n            type='refund', order_id=order_id, refund_id=refund.id)\n\n      elif p.method == 'card':\n          # external call — see note\n          gateway.refund(p.gateway_txn_id, alloc, idempotency_key=...)\n          # persist gateway response\n\n  COMMIT\n```\n\n**Critical rules:**\n\n1. **Don't call gateway inside DB tx.** Two-phase:\n   - tx 1: allocate refund, mark `pending`, commit\n   - call gateway (idempotent w/ key)\n   - tx 2: mark `succeeded`/`failed`, on gift-card leg credit balance here or on success only\n   \n   Simpler alternative: credit gift-card immediately in tx 1 (it's internal), queue card refund async. Gift user sees balance back instantly, card takes days anyway.\n\n2. **Idempotency key** on refund request. Replay = same result. Pass through to gateway.\n\n3. **Rounding**: integer cents. `floor` per-allocation, assign remainder to largest. Never over-refund.\n\n4. **Expired gift card at refund time**: policy call. Options:\n   - Re-credit + auto-extend expiry (user-friendly, common)\n   - Credit to new replacement card\n   - Convert to store credit / different instrument\n   - Refuse gift leg, push all to card (problem if card gone too)\n   \n   Pick \"re-credit + extend 90d from refund\". Document.\n\n5. **Gift card deleted/disabled**: fall back to card for that allocation, or issue new gift, or customer-service escalation. Write explicit branch.\n\n6. **Refund on gift-only order w/ expired/gone card**: store-credit fallback or manual queue.\n\n7. **Accounting**: gift-card refund reverses breakage-liability direction. Ledger entry is the source — accounting queries it, not balance snapshot.\n\n8. **Partial refund sequence**: test N small partials sum correctly. Pro-rata on *remaining* (not original) is key — otherwise last refund can under/over allocate.\n\n**Edge to test:**\n- Refund exactly gift portion\n- Refund exactly card portion  \n- Refund spanning both\n- Multiple partials summing to full\n- Refund after gift expired\n- Concurrent refund requests (row lock on order handles)\n- Rounding: $10 refund on 33/67 split\n- Full refund = sum(payments) exactly, no penny drift",
+    "stop_reason": "end_turn",
+    "session_id": "3fabcb3f-a49e-4728-850a-d64f7eb301e1",
+    "total_cost_usd": 0.07848050000000001,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 960,
+      "cache_read_input_tokens": 29001,
+      "output_tokens": 2318,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 960,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 2318,
+          "cache_read_input_tokens": 29001,
+          "cache_creation_input_tokens": 960,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 960
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 2318,
+        "cacheReadInputTokens": 29001,
+        "cacheCreationInputTokens": 960,
+        "webSearchRequests": 0,
+        "costUSD": 0.07848050000000001,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "1957d588-cd87-4154-9e46-c7595f427120"
+  }
+}

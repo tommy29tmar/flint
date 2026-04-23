@@ -1,0 +1,107 @@
+{
+  "track": "T4",
+  "arm": "caveman_full_plus_ultra_directive",
+  "sequence_id": "debug-prod-incident",
+  "run_index": 1,
+  "turn": 1,
+  "arm_order_index": 5,
+  "arm_order_full": [
+    "terse",
+    "hewn_full",
+    "hewn_prompt_only",
+    "caveman_full",
+    "baseline",
+    "caveman_full_plus_ultra_directive"
+  ],
+  "digest_hex": "c436155c1e87e76d88e6f2c66d47c90c16ae78237b0a8de1b93824cf92fb5c9b",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-23T07:39:44.191821+00:00",
+  "session_id_used_for_resume": null,
+  "output_tokens_tiktoken": 113,
+  "output_tokens_anthropic": 187,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 25716,
+  "cache_read_input_tokens": 0,
+  "total_input_tokens": 25722,
+  "cache_state": "cold",
+  "wallclock_ms": 14103.933992009843,
+  "duration_ms": 7289,
+  "duration_api_ms": 8354,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "e77cf94d-010a-4e03-95fe-e5d1e2147137",
+  "total_cost_usd": 0.165911,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "Rollback deploy 14:18 now. Stop bleed first.\n\nThen check:\n1. Git diff 14:18 deploy → `createOrder` handler. Look req body parse / destructure `items`.\n2. Client payload shape change? Check `Content-Type`, body schema vs handler expect.\n3. Middleware order — body-parser before route? New middleware strip `items`?\n4. Validation layer (zod/joi) removed or moved post-handler?\n\nMost likely: handler reads `req.body.items` but deploy changed body shape or removed parser/validator.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 7289,
+    "duration_api_ms": 8354,
+    "num_turns": 1,
+    "result": "Rollback deploy 14:18 now. Stop bleed first.\n\nThen check:\n1. Git diff 14:18 deploy → `createOrder` handler. Look req body parse / destructure `items`.\n2. Client payload shape change? Check `Content-Type`, body schema vs handler expect.\n3. Middleware order — body-parser before route? New middleware strip `items`?\n4. Validation layer (zod/joi) removed or moved post-handler?\n\nMost likely: handler reads `req.body.items` but deploy changed body shape or removed parser/validator.",
+    "stop_reason": "end_turn",
+    "session_id": "e77cf94d-010a-4e03-95fe-e5d1e2147137",
+    "total_cost_usd": 0.165911,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 25716,
+      "cache_read_input_tokens": 0,
+      "output_tokens": 187,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 25716,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 187,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 25716,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 25716
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 396,
+        "outputTokens": 17,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.000481,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 187,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 25716,
+        "webSearchRequests": 0,
+        "costUSD": 0.16543,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "5f264470-8b1e-4023-82b5-9945e89f1af7"
+  }
+}

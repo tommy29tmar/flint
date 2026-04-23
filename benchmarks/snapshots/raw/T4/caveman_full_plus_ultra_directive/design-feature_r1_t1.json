@@ -1,0 +1,107 @@
+{
+  "track": "T4",
+  "arm": "caveman_full_plus_ultra_directive",
+  "sequence_id": "design-feature",
+  "run_index": 1,
+  "turn": 1,
+  "arm_order_index": 0,
+  "arm_order_full": [
+    "caveman_full_plus_ultra_directive",
+    "terse",
+    "caveman_full",
+    "hewn_prompt_only",
+    "baseline",
+    "hewn_full"
+  ],
+  "digest_hex": "30a2f9a62df0d790c0598917c3ab42509bbadd672a0a484741ea201d2da3b44f",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-23T07:40:43.151950+00:00",
+  "session_id_used_for_resume": null,
+  "output_tokens_tiktoken": 462,
+  "output_tokens_anthropic": 875,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 10504,
+  "cache_read_input_tokens": 15199,
+  "total_input_tokens": 25709,
+  "cache_state": "warm",
+  "wallclock_ms": 21763.42311798362,
+  "duration_ms": 18843,
+  "duration_api_ms": 20171,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "3fabcb3f-a49e-4728-850a-d64f7eb301e1",
+  "total_cost_usd": 0.0956105,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "Main decisions:\n\n1. **Code model**: single-use vs reusable w/ balance. Codes unique per card or shared? Length/format (human-type vs scan)?\n2. **Storage**: `gift_cards` table — code (hashed?), initial_balance, remaining_balance, currency, status, expiry. Hash code → lookup by hash, not plaintext.\n3. **Currency**: single vs multi. Reject mismatch or FX convert?\n4. **Atomicity**: redemption = debit balance + create order. Race cond on concurrent redeem → row lock (`SELECT FOR UPDATE`) or optimistic version. Prevents double-spend.\n5. **Partial redemption**: split payment order. Gift covers $X, card covers $Y. Payment intent = order_total − gift_applied. Record both legs.\n6. **Refund flow**: refund to gift first or card first? Re-credit gift balance on refund? Policy decision.\n7. **Failure handling**: card charge fails after gift debit → rollback gift debit. Use saga/2PC or debit gift only on payment success (reserve pattern).\n8. **Reserve vs debit**: soft-hold balance at checkout init → commit on payment success, release on abandon. Prevents double-apply across tabs.\n9. **Validation rules**: expired, zero-balance, disabled, wrong region, min order, stackable w/ promo codes?\n10. **Fraud**: rate-limit code entry (brute force), CAPTCHA, log attempts, lock after N fails.\n11. **Issuance**: how cards born — purchase flow, promo, admin grant. Tax treatment differs (gift purchase usually non-taxable at sale, taxed at redemption).\n12. **Audit**: immutable ledger of debits/credits per card. Reconciliation + support tooling.\n13. **Accounting**: liability on balance sheet til redeemed. Breakage policy (expired unused funds).\n14. **API surface**: `POST /checkout/apply-gift`, `DELETE /checkout/gift` (remove), display remaining.\n15. **PCI/compliance**: gift ≠ PAN but treat codes as secrets. TLS, no logging plaintext.\n\nBiggest traps: double-spend (→ locking), partial-payment rollback (→ reserve pattern), refund policy.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 18843,
+    "duration_api_ms": 20171,
+    "num_turns": 1,
+    "result": "Main decisions:\n\n1. **Code model**: single-use vs reusable w/ balance. Codes unique per card or shared? Length/format (human-type vs scan)?\n2. **Storage**: `gift_cards` table — code (hashed?), initial_balance, remaining_balance, currency, status, expiry. Hash code → lookup by hash, not plaintext.\n3. **Currency**: single vs multi. Reject mismatch or FX convert?\n4. **Atomicity**: redemption = debit balance + create order. Race cond on concurrent redeem → row lock (`SELECT FOR UPDATE`) or optimistic version. Prevents double-spend.\n5. **Partial redemption**: split payment order. Gift covers $X, card covers $Y. Payment intent = order_total − gift_applied. Record both legs.\n6. **Refund flow**: refund to gift first or card first? Re-credit gift balance on refund? Policy decision.\n7. **Failure handling**: card charge fails after gift debit → rollback gift debit. Use saga/2PC or debit gift only on payment success (reserve pattern).\n8. **Reserve vs debit**: soft-hold balance at checkout init → commit on payment success, release on abandon. Prevents double-apply across tabs.\n9. **Validation rules**: expired, zero-balance, disabled, wrong region, min order, stackable w/ promo codes?\n10. **Fraud**: rate-limit code entry (brute force), CAPTCHA, log attempts, lock after N fails.\n11. **Issuance**: how cards born — purchase flow, promo, admin grant. Tax treatment differs (gift purchase usually non-taxable at sale, taxed at redemption).\n12. **Audit**: immutable ledger of debits/credits per card. Reconciliation + support tooling.\n13. **Accounting**: liability on balance sheet til redeemed. Breakage policy (expired unused funds).\n14. **API surface**: `POST /checkout/apply-gift`, `DELETE /checkout/gift` (remove), display remaining.\n15. **PCI/compliance**: gift ≠ PAN but treat codes as secrets. TLS, no logging plaintext.\n\nBiggest traps: double-spend (→ locking), partial-payment rollback (→ reserve pattern), refund policy.",
+    "stop_reason": "end_turn",
+    "session_id": "3fabcb3f-a49e-4728-850a-d64f7eb301e1",
+    "total_cost_usd": 0.0956105,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 10504,
+      "cache_read_input_tokens": 15199,
+      "output_tokens": 875,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 10504,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 875,
+          "cache_read_input_tokens": 15199,
+          "cache_creation_input_tokens": 10504,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 10504
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 391,
+        "outputTokens": 13,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.000456,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 875,
+        "cacheReadInputTokens": 15199,
+        "cacheCreationInputTokens": 10504,
+        "webSearchRequests": 0,
+        "costUSD": 0.0951545,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "20666c1c-3a93-4abe-8bb4-4e5402ba7549"
+  }
+}

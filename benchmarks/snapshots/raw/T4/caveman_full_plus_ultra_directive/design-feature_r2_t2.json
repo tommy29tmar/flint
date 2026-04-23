@@ -1,0 +1,97 @@
+{
+  "track": "T4",
+  "arm": "caveman_full_plus_ultra_directive",
+  "sequence_id": "design-feature",
+  "run_index": 2,
+  "turn": 2,
+  "arm_order_index": 3,
+  "arm_order_full": [
+    "terse",
+    "hewn_full",
+    "baseline",
+    "caveman_full_plus_ultra_directive",
+    "caveman_full",
+    "hewn_prompt_only"
+  ],
+  "digest_hex": "3191b019d37f08f3d5b68d9000f1aeb1e1a3524225f9daa893803df1e240ffd1",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-23T07:44:00.832825+00:00",
+  "session_id_used_for_resume": "19a5cba5-2b3f-4b64-a24a-e8678cbd2c7d",
+  "output_tokens_tiktoken": 509,
+  "output_tokens_anthropic": 933,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 833,
+  "cache_read_input_tokens": 25703,
+  "total_input_tokens": 26542,
+  "cache_state": "warm",
+  "wallclock_ms": 27314.394715998787,
+  "duration_ms": 24274,
+  "duration_api_ms": 24242,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "19a5cba5-2b3f-4b64-a24a-e8678cbd2c7d",
+  "total_cost_usd": 0.041412750000000005,
+  "model_used": "claude-opus-4-7",
+  "result": "**Mutable row** (`balance` col, `UPDATE ... SET balance = balance - X WHERE balance >= X`)\n\nPros:\n- Matches existing wallet pattern → consistent mental model, shared code/ORM\n- Simple reads (1 row = current state)\n- Cheap — no fold over events\n- Row lock / conditional update solves concurrency cleanly\n\nCons:\n- History lost unless paired w/ audit log (most shops end up adding one anyway → half-event-sourced)\n- Reconciliation harder — no ground truth for \"how did we get to $12.47?\"\n- Bugs silently corrupt balance; no replay to detect/repair\n- Refund/chargeback/reversal logic mutates state again → more bug surface\n\n**Event-sourced** (`gift_card_ledger` append-only, balance = SUM(delta))\n\nPros:\n- Full audit trail by construction — required for accounting/finance anyway (liability tracking, breakage, disputes)\n- Immutable → tamper-evident, easier SOX/PCI story\n- Reversals = compensating entry, no destructive update\n- Replay → rebuild balance, detect drift, fix bugs retroactively\n- Natural fit for double-entry if finance wants it later\n\nCons:\n- Reads need SUM or cached snapshot (`balance_cache` col updated in txn w/ insert)\n- More code than wallet pattern → divergence from existing convention\n- Concurrency still needs care: two concurrent inserts can both read stale sum → need serialization (row lock on card, or unique-constraint on monotonic seq)\n- Team learning curve if unfamiliar\n\n**Recommendation for gift cards specifically:**\n\nEvent-sourced, w/ cached balance column for fast reads. Reasons gift cards differ from wallets:\n\n1. Money-like instrument → accounting treats as liability on balance sheet → finance *will* demand ledger eventually\n2. Legal expiry/escheatment → need dated event history per jurisdiction\n3. Refunds/chargebacks on orders paid partly by gift card → reversals common → compensating entries cleaner than mutating\n4. Fraud investigation → \"show me every txn on this code\" is a first-class query\n5. Breakage revenue recognition needs txn dates\n\nWallet divergence acceptable — different domain, different requirements. Or: migrate wallet to ledger later if it hits same pain.\n\nPattern: `gift_card_ledger(id, card_id, delta, reason, order_id, created_at)` + `gift_cards.balance_cache` updated in same txn, `SELECT ... FOR UPDATE` on card row to serialize.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 24274,
+    "duration_api_ms": 24242,
+    "num_turns": 1,
+    "result": "**Mutable row** (`balance` col, `UPDATE ... SET balance = balance - X WHERE balance >= X`)\n\nPros:\n- Matches existing wallet pattern → consistent mental model, shared code/ORM\n- Simple reads (1 row = current state)\n- Cheap — no fold over events\n- Row lock / conditional update solves concurrency cleanly\n\nCons:\n- History lost unless paired w/ audit log (most shops end up adding one anyway → half-event-sourced)\n- Reconciliation harder — no ground truth for \"how did we get to $12.47?\"\n- Bugs silently corrupt balance; no replay to detect/repair\n- Refund/chargeback/reversal logic mutates state again → more bug surface\n\n**Event-sourced** (`gift_card_ledger` append-only, balance = SUM(delta))\n\nPros:\n- Full audit trail by construction — required for accounting/finance anyway (liability tracking, breakage, disputes)\n- Immutable → tamper-evident, easier SOX/PCI story\n- Reversals = compensating entry, no destructive update\n- Replay → rebuild balance, detect drift, fix bugs retroactively\n- Natural fit for double-entry if finance wants it later\n\nCons:\n- Reads need SUM or cached snapshot (`balance_cache` col updated in txn w/ insert)\n- More code than wallet pattern → divergence from existing convention\n- Concurrency still needs care: two concurrent inserts can both read stale sum → need serialization (row lock on card, or unique-constraint on monotonic seq)\n- Team learning curve if unfamiliar\n\n**Recommendation for gift cards specifically:**\n\nEvent-sourced, w/ cached balance column for fast reads. Reasons gift cards differ from wallets:\n\n1. Money-like instrument → accounting treats as liability on balance sheet → finance *will* demand ledger eventually\n2. Legal expiry/escheatment → need dated event history per jurisdiction\n3. Refunds/chargebacks on orders paid partly by gift card → reversals common → compensating entries cleaner than mutating\n4. Fraud investigation → \"show me every txn on this code\" is a first-class query\n5. Breakage revenue recognition needs txn dates\n\nWallet divergence acceptable — different domain, different requirements. Or: migrate wallet to ledger later if it hits same pain.\n\nPattern: `gift_card_ledger(id, card_id, delta, reason, order_id, created_at)` + `gift_cards.balance_cache` updated in same txn, `SELECT ... FOR UPDATE` on card row to serialize.",
+    "stop_reason": "end_turn",
+    "session_id": "19a5cba5-2b3f-4b64-a24a-e8678cbd2c7d",
+    "total_cost_usd": 0.041412750000000005,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 833,
+      "cache_read_input_tokens": 25703,
+      "output_tokens": 933,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 833,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 933,
+          "cache_read_input_tokens": 25703,
+          "cache_creation_input_tokens": 833,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 833
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 933,
+        "cacheReadInputTokens": 25703,
+        "cacheCreationInputTokens": 833,
+        "webSearchRequests": 0,
+        "costUSD": 0.041412750000000005,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "6ae64f5b-2f05-4574-b1e1-158a3cd18e0f"
+  }
+}

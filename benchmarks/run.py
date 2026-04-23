@@ -217,6 +217,7 @@ EXTENDED_ARMS = [
     "hewn_prompt_only", "hewn_full",
 ]
 T4_ARMS = ["baseline", "terse", "caveman_full",
+           "caveman_full_plus_ultra_directive",
            "hewn_prompt_only", "hewn_full"]
 
 

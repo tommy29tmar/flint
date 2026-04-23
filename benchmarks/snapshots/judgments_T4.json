@@ -4030,5 +4030,453 @@
     },
     "concepts_count_present": 2,
     "concepts_count_total": 2
+  },
+  "caveman_full_plus_ultra_directive/debug-prod-incident_r1_t1": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "debug-prod-incident",
+    "run_index": 1,
+    "turn": 1,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 68,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "asks_for_or_describes_immediate_diagnosis_steps": true,
+      "mentions_correlating_with_recent_deploy": true,
+      "suggests_rollback_or_isolate_consideration": true
+    },
+    "concepts_count_present": 3,
+    "concepts_count_total": 3
+  },
+  "caveman_full_plus_ultra_directive/debug-prod-incident_r1_t2": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "debug-prod-incident",
+    "run_index": 1,
+    "turn": 2,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 46,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "identifies_items_field_was_removed_from_returned_object": true,
+      "names_downstream_consumer_expects_items": true
+    },
+    "concepts_count_present": 2,
+    "concepts_count_total": 2
+  },
+  "caveman_full_plus_ultra_directive/debug-prod-incident_r1_t3": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "debug-prod-incident",
+    "run_index": 1,
+    "turn": 3,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 86,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "proposes_jest_test_shape": true,
+      "test_asserts_items_field_present_in_buildCart_output": true
+    },
+    "concepts_count_present": 2,
+    "concepts_count_total": 2
+  },
+  "caveman_full_plus_ultra_directive/debug-prod-incident_r1_t4": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "debug-prod-incident",
+    "run_index": 1,
+    "turn": 4,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 122,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "identifies_pool_exhaustion_risk_with_promise_all_for_47_skus": true,
+      "considers_average_vs_max_case": true
+    },
+    "concepts_count_present": 2,
+    "concepts_count_total": 2
+  },
+  "caveman_full_plus_ultra_directive/debug-prod-incident_r1_t5": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "debug-prod-incident",
+    "run_index": 1,
+    "turn": 5,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 82,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "suggests_chunked_or_concurrency_limited_approach_e_g_p_limit_or_batched_promise_all": true,
+      "preserves_fast_path_for_typical_3_sku_case": true
+    },
+    "concepts_count_present": 2,
+    "concepts_count_total": 2
+  },
+  "caveman_full_plus_ultra_directive/debug-prod-incident_r2_t1": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "debug-prod-incident",
+    "run_index": 2,
+    "turn": 1,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 58,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "asks_for_or_describes_immediate_diagnosis_steps": true,
+      "mentions_correlating_with_recent_deploy": true,
+      "suggests_rollback_or_isolate_consideration": true
+    },
+    "concepts_count_present": 3,
+    "concepts_count_total": 3
+  },
+  "caveman_full_plus_ultra_directive/debug-prod-incident_r2_t2": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "debug-prod-incident",
+    "run_index": 2,
+    "turn": 2,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 28,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "identifies_items_field_was_removed_from_returned_object": true,
+      "names_downstream_consumer_expects_items": true
+    },
+    "concepts_count_present": 2,
+    "concepts_count_total": 2
+  },
+  "caveman_full_plus_ultra_directive/debug-prod-incident_r2_t3": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "debug-prod-incident",
+    "run_index": 2,
+    "turn": 3,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 56,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "proposes_jest_test_shape": true,
+      "test_asserts_items_field_present_in_buildCart_output": true
+    },
+    "concepts_count_present": 2,
+    "concepts_count_total": 2
+  },
+  "caveman_full_plus_ultra_directive/debug-prod-incident_r2_t4": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "debug-prod-incident",
+    "run_index": 2,
+    "turn": 4,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 90,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "identifies_pool_exhaustion_risk_with_promise_all_for_47_skus": true,
+      "considers_average_vs_max_case": true
+    },
+    "concepts_count_present": 2,
+    "concepts_count_total": 2
+  },
+  "caveman_full_plus_ultra_directive/debug-prod-incident_r2_t5": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "debug-prod-incident",
+    "run_index": 2,
+    "turn": 5,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 104,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "suggests_chunked_or_concurrency_limited_approach_e_g_p_limit_or_batched_promise_all": true,
+      "preserves_fast_path_for_typical_3_sku_case": true
+    },
+    "concepts_count_present": 2,
+    "concepts_count_total": 2
+  },
+  "caveman_full_plus_ultra_directive/design-feature_r1_t1": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "design-feature",
+    "run_index": 1,
+    "turn": 1,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 270,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "lists_design_decisions_e_g_storage_model_or_concurrency_or_expiry_or_refunds": true,
+      "covers_at_least_three_distinct_areas": true
+    },
+    "concepts_count_present": 2,
+    "concepts_count_total": 2
+  },
+  "caveman_full_plus_ultra_directive/design-feature_r1_t2": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "design-feature",
+    "run_index": 1,
+    "turn": 2,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 320,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "pros_of_event_sourced": true,
+      "cons_of_event_sourced": true,
+      "pros_of_mutable_row": true,
+      "cons_of_mutable_row": true
+    },
+    "concepts_count_present": 4,
+    "concepts_count_total": 4
+  },
+  "caveman_full_plus_ultra_directive/design-feature_r1_t3": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "design-feature",
+    "run_index": 1,
+    "turn": 3,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 1,
+        "leading_article_count": 0,
+        "words": 414,
+        "filler_per_100w": 0.24,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "names_select_for_update_or_advisory_lock_or_serializable_isolation": true,
+      "explains_why_simple_select_then_update_is_unsafe": false
+    },
+    "concepts_count_present": 1,
+    "concepts_count_total": 2
+  },
+  "caveman_full_plus_ultra_directive/design-feature_r1_t4": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "design-feature",
+    "run_index": 1,
+    "turn": 4,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 1,
+        "leading_article_count": 0,
+        "words": 294,
+        "filler_per_100w": 0.34,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "expiry_check_in_consumption_path": true,
+      "expiry_check_in_batch_job": true,
+      "explains_why_both": true
+    },
+    "concepts_count_present": 3,
+    "concepts_count_total": 3
+  },
+  "caveman_full_plus_ultra_directive/design-feature_r1_t5": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "design-feature",
+    "run_index": 1,
+    "turn": 5,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 623,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "proportional_refund_to_each_payment_method_or_a_clear_policy": true,
+      "describes_code_path_or_function_locations": true
+    },
+    "concepts_count_present": 2,
+    "concepts_count_total": 2
+  },
+  "caveman_full_plus_ultra_directive/design-feature_r2_t1": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "design-feature",
+    "run_index": 2,
+    "turn": 1,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 260,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "lists_design_decisions_e_g_storage_model_or_concurrency_or_expiry_or_refunds": true,
+      "covers_at_least_three_distinct_areas": true
+    },
+    "concepts_count_present": 2,
+    "concepts_count_total": 2
+  },
+  "caveman_full_plus_ultra_directive/design-feature_r2_t2": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "design-feature",
+    "run_index": 2,
+    "turn": 2,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 344,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "pros_of_event_sourced": true,
+      "cons_of_event_sourced": true,
+      "pros_of_mutable_row": true,
+      "cons_of_mutable_row": true
+    },
+    "concepts_count_present": 4,
+    "concepts_count_total": 4
+  },
+  "caveman_full_plus_ultra_directive/design-feature_r2_t3": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "design-feature",
+    "run_index": 2,
+    "turn": 3,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 452,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "names_select_for_update_or_advisory_lock_or_serializable_isolation": true,
+      "explains_why_simple_select_then_update_is_unsafe": false
+    },
+    "concepts_count_present": 1,
+    "concepts_count_total": 2
+  },
+  "caveman_full_plus_ultra_directive/design-feature_r2_t4": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "design-feature",
+    "run_index": 2,
+    "turn": 4,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 2,
+        "leading_article_count": 0,
+        "words": 432,
+        "filler_per_100w": 0.46,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "expiry_check_in_consumption_path": true,
+      "expiry_check_in_batch_job": true,
+      "explains_why_both": true
+    },
+    "concepts_count_present": 3,
+    "concepts_count_total": 3
+  },
+  "caveman_full_plus_ultra_directive/design-feature_r2_t5": {
+    "arm": "caveman_full_plus_ultra_directive",
+    "sequence_id": "design-feature",
+    "run_index": 2,
+    "turn": 5,
+    "format": {
+      "hewn_ir_valid": false,
+      "caveman_style": {
+        "filler_count": 0,
+        "leading_article_count": 0,
+        "words": 780,
+        "filler_per_100w": 0.0,
+        "leading_article_per_100w": 0.0
+      }
+    },
+    "concepts": {
+      "proportional_refund_to_each_payment_method_or_a_clear_policy": true,
+      "describes_code_path_or_function_locations": true
+    },
+    "concepts_count_present": 2,
+    "concepts_count_total": 2
   }
 }

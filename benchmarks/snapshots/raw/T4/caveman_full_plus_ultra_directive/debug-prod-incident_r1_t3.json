@@ -1,0 +1,97 @@
+{
+  "track": "T4",
+  "arm": "caveman_full_plus_ultra_directive",
+  "sequence_id": "debug-prod-incident",
+  "run_index": 1,
+  "turn": 3,
+  "arm_order_index": 5,
+  "arm_order_full": [
+    "terse",
+    "hewn_full",
+    "hewn_prompt_only",
+    "caveman_full",
+    "baseline",
+    "caveman_full_plus_ultra_directive"
+  ],
+  "digest_hex": "c436155c1e87e76d88e6f2c66d47c90c16ae78237b0a8de1b93824cf92fb5c9b",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-23T07:40:00.064080+00:00",
+  "session_id_used_for_resume": "e77cf94d-010a-4e03-95fe-e5d1e2147137",
+  "output_tokens_tiktoken": 204,
+  "output_tokens_anthropic": 311,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 186,
+  "cache_read_input_tokens": 26097,
+  "total_input_tokens": 26289,
+  "cache_state": "warm",
+  "wallclock_ms": 9062.040346005233,
+  "duration_ms": 5980,
+  "duration_api_ms": 5940,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "e77cf94d-010a-4e03-95fe-e5d1e2147137",
+  "total_cost_usd": 0.022016,
+  "model_used": "claude-opus-4-7",
+  "result": "```js\ndescribe('buildCart', () => {\n  const cart = { id: 'c1', items: [{ price: 10, qty: 2 }, { price: 5, qty: 1 }] };\n\n  it('returns items', () => {\n    expect(buildCart(cart).items).toEqual(cart.items);\n  });\n\n  it('returns id', () => {\n    expect(buildCart(cart).id).toBe('c1');\n  });\n\n  it('returns total', () => {\n    expect(buildCart(cart).total).toBe(25);\n  });\n\n  it('contract: id, items, total keys', () => {\n    expect(Object.keys(buildCart(cart)).sort()).toEqual(['id', 'items', 'total']);\n  });\n});\n```\n\nKey test = contract test (last one). Locks shape. Dropping field fails immediately.\n\nBonus: integration test `createOrder` end-to-end with real `buildCart` output — catch cross-boundary break.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 5980,
+    "duration_api_ms": 5940,
+    "num_turns": 1,
+    "result": "```js\ndescribe('buildCart', () => {\n  const cart = { id: 'c1', items: [{ price: 10, qty: 2 }, { price: 5, qty: 1 }] };\n\n  it('returns items', () => {\n    expect(buildCart(cart).items).toEqual(cart.items);\n  });\n\n  it('returns id', () => {\n    expect(buildCart(cart).id).toBe('c1');\n  });\n\n  it('returns total', () => {\n    expect(buildCart(cart).total).toBe(25);\n  });\n\n  it('contract: id, items, total keys', () => {\n    expect(Object.keys(buildCart(cart)).sort()).toEqual(['id', 'items', 'total']);\n  });\n});\n```\n\nKey test = contract test (last one). Locks shape. Dropping field fails immediately.\n\nBonus: integration test `createOrder` end-to-end with real `buildCart` output — catch cross-boundary break.",
+    "stop_reason": "end_turn",
+    "session_id": "e77cf94d-010a-4e03-95fe-e5d1e2147137",
+    "total_cost_usd": 0.022016,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 186,
+      "cache_read_input_tokens": 26097,
+      "output_tokens": 311,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 186,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 311,
+          "cache_read_input_tokens": 26097,
+          "cache_creation_input_tokens": 186,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 186
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 311,
+        "cacheReadInputTokens": 26097,
+        "cacheCreationInputTokens": 186,
+        "webSearchRequests": 0,
+        "costUSD": 0.022016,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "f34c880b-4e1d-48c5-af33-d44ec6bb49be"
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "track": "T4",
+  "arm": "caveman_full_plus_ultra_directive",
+  "sequence_id": "debug-prod-incident",
+  "run_index": 2,
+  "turn": 5,
+  "arm_order_index": 3,
+  "arm_order_full": [
+    "hewn_full",
+    "caveman_full",
+    "hewn_prompt_only",
+    "caveman_full_plus_ultra_directive",
+    "baseline",
+    "terse"
+  ],
+  "digest_hex": "522341918a5177210ef438fa55486ec5b622aaa576febbd731536d82595ec31b",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-23T07:43:13.753700+00:00",
+  "session_id_used_for_resume": "9c0089ec-00c8-4fcb-aada-67496faec3a8",
+  "output_tokens_tiktoken": 186,
+  "output_tokens_anthropic": 353,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 349,
+  "cache_read_input_tokens": 26499,
+  "total_input_tokens": 26854,
+  "cache_state": "warm",
+  "wallclock_ms": 9360.57488800725,
+  "duration_ms": 6299,
+  "duration_api_ms": 6264,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "9c0089ec-00c8-4fcb-aada-67496faec3a8",
+  "total_cost_usd": 0.02428575,
+  "model_used": "claude-opus-4-7",
+  "result": "Single `IN` query. 1 round-trip for 3 or 47 SKUs. No pool pressure, no concurrency tuning.\n\n```js\nasync function checkInventory(skus) {\n  const rows = await db.query(\n    'SELECT sku, stock FROM inventory WHERE sku = ANY($1)',\n    [skus]\n  );\n  const map = new Map(rows.map(r => [r.sku, r.stock]));\n  return skus.map(s => ({ sku: s, stock: map.get(s) ?? 0 }));\n}\n```\n\nWhy win:\n- 3 SKUs: 1 query vs 3 parallel → faster common case\n- 47 SKUs: 1 query vs 47 parallel → no pool spike\n- Flat latency curve, predictable\n\nFallback if schema blocks `IN`: `p-limit(5)` caps concurrency, worst case 47/5 ≈ 10 serial batches.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 6299,
+    "duration_api_ms": 6264,
+    "num_turns": 1,
+    "result": "Single `IN` query. 1 round-trip for 3 or 47 SKUs. No pool pressure, no concurrency tuning.\n\n```js\nasync function checkInventory(skus) {\n  const rows = await db.query(\n    'SELECT sku, stock FROM inventory WHERE sku = ANY($1)',\n    [skus]\n  );\n  const map = new Map(rows.map(r => [r.sku, r.stock]));\n  return skus.map(s => ({ sku: s, stock: map.get(s) ?? 0 }));\n}\n```\n\nWhy win:\n- 3 SKUs: 1 query vs 3 parallel → faster common case\n- 47 SKUs: 1 query vs 47 parallel → no pool spike\n- Flat latency curve, predictable\n\nFallback if schema blocks `IN`: `p-limit(5)` caps concurrency, worst case 47/5 ≈ 10 serial batches.",
+    "stop_reason": "end_turn",
+    "session_id": "9c0089ec-00c8-4fcb-aada-67496faec3a8",
+    "total_cost_usd": 0.02428575,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 349,
+      "cache_read_input_tokens": 26499,
+      "output_tokens": 353,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 349,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 353,
+          "cache_read_input_tokens": 26499,
+          "cache_creation_input_tokens": 349,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 349
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 353,
+        "cacheReadInputTokens": 26499,
+        "cacheCreationInputTokens": 349,
+        "webSearchRequests": 0,
+        "costUSD": 0.02428575,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "0825ac0e-a7d4-4cc2-a78d-873b4eabc904"
+  }
+}

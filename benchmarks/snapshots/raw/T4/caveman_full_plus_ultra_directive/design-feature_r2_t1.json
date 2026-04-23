@@ -1,0 +1,107 @@
+{
+  "track": "T4",
+  "arm": "caveman_full_plus_ultra_directive",
+  "sequence_id": "design-feature",
+  "run_index": 2,
+  "turn": 1,
+  "arm_order_index": 3,
+  "arm_order_full": [
+    "terse",
+    "hewn_full",
+    "baseline",
+    "caveman_full_plus_ultra_directive",
+    "caveman_full",
+    "hewn_prompt_only"
+  ],
+  "digest_hex": "3191b019d37f08f3d5b68d9000f1aeb1e1a3524225f9daa893803df1e240ffd1",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-23T07:43:33.517053+00:00",
+  "session_id_used_for_resume": null,
+  "output_tokens_tiktoken": 424,
+  "output_tokens_anthropic": 753,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 25703,
+  "total_input_tokens": 25709,
+  "cache_state": "warm",
+  "wallclock_ms": 19761.49434497347,
+  "duration_ms": 16908,
+  "duration_api_ms": 17981,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "19a5cba5-2b3f-4b64-a24a-e8678cbd2c7d",
+  "total_cost_usd": 0.0321625,
+  "model_used": "claude-haiku-4-5-20251001,claude-opus-4-7",
+  "result": "Main decisions:\n\n1. **Code model** — single-use vs reloadable. Fixed denom vs variable. One code = one balance, or code → account?\n2. **Storage** — `gift_cards` table (code hash, balance, currency, status, expiry). Never store raw code → hash + lookup prefix.\n3. **Code gen** — length, charset, collision check, rate-limit redemption attempts (brute-force defense).\n4. **Currency** — single or multi. Reject mismatch or FX convert?\n5. **Atomicity** — race on concurrent redeem. Row lock / `UPDATE ... WHERE balance >= X` / ledger-style append-only.\n6. **Partial consumption** — deduct exact, or authorize then capture? Tie to order lifecycle (refund → restore balance?).\n7. **Payment order** — gift card applied pre-tax or post-tax? Before or after other discounts? Affects tax calc + promo stacking.\n8. **Split tender** — payment provider support for 2 tenders, or charge card for `total - giftBalance` as single txn.\n9. **Refund flow** — refund to gift card first, then original card? Proportional? New gift card issued?\n10. **Expiry + dormancy** — legal (varies by jurisdiction, US state laws, EU rules). Escheatment.\n11. **Fraud** — velocity limits, code enumeration, stolen-card laundering via gift cards.\n12. **Audit ledger** — every debit/credit logged, immutable, reconcilable.\n13. **Failure modes** — balance debited but payment fails → rollback or compensating credit.\n14. **UX** — apply/remove at checkout, show remaining balance, receipt line item.\n15. **Accounting** — liability on balance sheet until redeemed; breakage recognition policy.\n16. **Issuance channel** — purchased (taxable? usually not at sale), promo/comp, refund-issued.\n\nBiggest traps: atomicity (#5), payment-failure rollback (#13), tax/discount ordering (#7), legal expiry (#10).",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 16908,
+    "duration_api_ms": 17981,
+    "num_turns": 1,
+    "result": "Main decisions:\n\n1. **Code model** — single-use vs reloadable. Fixed denom vs variable. One code = one balance, or code → account?\n2. **Storage** — `gift_cards` table (code hash, balance, currency, status, expiry). Never store raw code → hash + lookup prefix.\n3. **Code gen** — length, charset, collision check, rate-limit redemption attempts (brute-force defense).\n4. **Currency** — single or multi. Reject mismatch or FX convert?\n5. **Atomicity** — race on concurrent redeem. Row lock / `UPDATE ... WHERE balance >= X` / ledger-style append-only.\n6. **Partial consumption** — deduct exact, or authorize then capture? Tie to order lifecycle (refund → restore balance?).\n7. **Payment order** — gift card applied pre-tax or post-tax? Before or after other discounts? Affects tax calc + promo stacking.\n8. **Split tender** — payment provider support for 2 tenders, or charge card for `total - giftBalance` as single txn.\n9. **Refund flow** — refund to gift card first, then original card? Proportional? New gift card issued?\n10. **Expiry + dormancy** — legal (varies by jurisdiction, US state laws, EU rules). Escheatment.\n11. **Fraud** — velocity limits, code enumeration, stolen-card laundering via gift cards.\n12. **Audit ledger** — every debit/credit logged, immutable, reconcilable.\n13. **Failure modes** — balance debited but payment fails → rollback or compensating credit.\n14. **UX** — apply/remove at checkout, show remaining balance, receipt line item.\n15. **Accounting** — liability on balance sheet until redeemed; breakage recognition policy.\n16. **Issuance channel** — purchased (taxable? usually not at sale), promo/comp, refund-issued.\n\nBiggest traps: atomicity (#5), payment-failure rollback (#13), tax/discount ordering (#7), legal expiry (#10).",
+    "stop_reason": "end_turn",
+    "session_id": "19a5cba5-2b3f-4b64-a24a-e8678cbd2c7d",
+    "total_cost_usd": 0.0321625,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 25703,
+      "output_tokens": 753,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 753,
+          "cache_read_input_tokens": 25703,
+          "cache_creation_input_tokens": 0,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 391,
+        "outputTokens": 13,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.000456,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000
+      },
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 753,
+        "cacheReadInputTokens": 25703,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.0317065,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "1cd4c34d-80fc-4c87-8d01-a5f09d739f31"
+  }
+}

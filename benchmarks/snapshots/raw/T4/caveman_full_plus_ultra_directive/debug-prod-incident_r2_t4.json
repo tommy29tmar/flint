@@ -1,0 +1,97 @@
+{
+  "track": "T4",
+  "arm": "caveman_full_plus_ultra_directive",
+  "sequence_id": "debug-prod-incident",
+  "run_index": 2,
+  "turn": 4,
+  "arm_order_index": 3,
+  "arm_order_full": [
+    "hewn_full",
+    "caveman_full",
+    "hewn_prompt_only",
+    "caveman_full_plus_ultra_directive",
+    "baseline",
+    "terse"
+  ],
+  "digest_hex": "522341918a5177210ef438fa55486ec5b622aaa576febbd731536d82595ec31b",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-23T07:43:04.392321+00:00",
+  "session_id_used_for_resume": "9c0089ec-00c8-4fcb-aada-67496faec3a8",
+  "output_tokens_tiktoken": 158,
+  "output_tokens_anthropic": 272,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 269,
+  "cache_read_input_tokens": 26230,
+  "total_input_tokens": 26505,
+  "cache_state": "warm",
+  "wallclock_ms": 9011.510470008943,
+  "duration_ms": 5829,
+  "duration_api_ms": 5800,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "9c0089ec-00c8-4fcb-aada-67496faec3a8",
+  "total_cost_usd": 0.021626249999999996,
+  "model_used": "claude-opus-4-7",
+  "result": "Depends on cart size.\n\nRisk: `Promise.all(skus.map(lookup))` fires N queries parallel. Cart 50 items + 10 concurrent checkouts = 500 queries → pool exhaust → timeout.\n\nCheck:\n1. Max cart size? Unbounded → danger\n2. Pool 20, other traffic? Inventory hog starves rest\n3. Query time? Long queries × parallel = worse\n\nSafe pattern: `p-limit` or batch (chunk 5-10):\n```js\nimport pLimit from 'p-limit';\nconst limit = pLimit(5);\nawait Promise.all(skus.map(s => limit(() => lookup(s))));\n```\n\nOr single `WHERE sku IN (...)` query — 1 round-trip, no pool pressure.\n\nPrefer `IN` query.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 5829,
+    "duration_api_ms": 5800,
+    "num_turns": 1,
+    "result": "Depends on cart size.\n\nRisk: `Promise.all(skus.map(lookup))` fires N queries parallel. Cart 50 items + 10 concurrent checkouts = 500 queries → pool exhaust → timeout.\n\nCheck:\n1. Max cart size? Unbounded → danger\n2. Pool 20, other traffic? Inventory hog starves rest\n3. Query time? Long queries × parallel = worse\n\nSafe pattern: `p-limit` or batch (chunk 5-10):\n```js\nimport pLimit from 'p-limit';\nconst limit = pLimit(5);\nawait Promise.all(skus.map(s => limit(() => lookup(s))));\n```\n\nOr single `WHERE sku IN (...)` query — 1 round-trip, no pool pressure.\n\nPrefer `IN` query.",
+    "stop_reason": "end_turn",
+    "session_id": "9c0089ec-00c8-4fcb-aada-67496faec3a8",
+    "total_cost_usd": 0.021626249999999996,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 269,
+      "cache_read_input_tokens": 26230,
+      "output_tokens": 272,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 269,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 272,
+          "cache_read_input_tokens": 26230,
+          "cache_creation_input_tokens": 269,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 269
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 272,
+        "cacheReadInputTokens": 26230,
+        "cacheCreationInputTokens": 269,
+        "webSearchRequests": 0,
+        "costUSD": 0.021626249999999996,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "2461b09d-aaf8-4400-bd8f-f08c363797fe"
+  }
+}

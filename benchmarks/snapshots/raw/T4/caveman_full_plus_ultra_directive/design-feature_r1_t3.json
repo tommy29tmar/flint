@@ -1,0 +1,97 @@
+{
+  "track": "T4",
+  "arm": "caveman_full_plus_ultra_directive",
+  "sequence_id": "design-feature",
+  "run_index": 1,
+  "turn": 3,
+  "arm_order_index": 0,
+  "arm_order_full": [
+    "caveman_full_plus_ultra_directive",
+    "terse",
+    "caveman_full",
+    "hewn_prompt_only",
+    "baseline",
+    "hewn_full"
+  ],
+  "digest_hex": "30a2f9a62df0d790c0598917c3ab42509bbadd672a0a484741ea201d2da3b44f",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-23T07:41:31.879993+00:00",
+  "session_id_used_for_resume": "3fabcb3f-a49e-4728-850a-d64f7eb301e1",
+  "output_tokens_tiktoken": 679,
+  "output_tokens_anthropic": 1271,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 981,
+  "cache_read_input_tokens": 26658,
+  "total_input_tokens": 27645,
+  "cache_state": "warm",
+  "wallclock_ms": 23606.45715301507,
+  "duration_ms": 20610,
+  "duration_api_ms": 20582,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "3fabcb3f-a49e-4728-850a-d64f7eb301e1",
+  "total_cost_usd": 0.05126525,
+  "model_used": "claude-opus-4-7",
+  "result": "Four options:\n\n**1. Pessimistic row lock** (`SELECT ... FOR UPDATE`)\n```sql\nBEGIN;\nSELECT remaining_balance FROM gift_cards WHERE id=? FOR UPDATE;\n-- app checks balance >= amount\nUPDATE gift_cards SET remaining_balance = remaining_balance - ? WHERE id=?;\nINSERT INTO gift_card_ledger (...);\nCOMMIT;\n```\nPros: simple, correct, works across all SQL DBs\nCons: holds lock for tx duration → don't wrap payment gateway call inside. Keep tx short\n\n**2. Optimistic concurrency** (version col)\n```sql\nUPDATE gift_cards\nSET remaining_balance = remaining_balance - ?, version = version + 1\nWHERE id=? AND version=? AND remaining_balance >= ?;\n-- rows_affected == 0 → retry or fail\n```\nPros: no lock held, high concurrency\nCons: retry loop, more app code. Good when contention low (gift cards = low, usually 1 user)\n\n**3. Atomic conditional update** (no version, rely on balance check)\n```sql\nUPDATE gift_cards\nSET remaining_balance = remaining_balance - ?\nWHERE id=? AND remaining_balance >= ?;\n-- rows_affected == 0 → insufficient funds OR race lost\n```\nPros: simplest, single statement, atomic at row level\nCons: can't distinguish \"insufficient\" from \"concurrent\" without re-read. Fine — just re-SELECT on 0 rows\n\n**4. Distributed lock** (Redis/advisory lock on `gift_card:{id}`)\nPros: lock spans non-DB resources\nCons: extra infra, lock leaks on crash, overkill here\n\n**Recommendation: #3 (atomic conditional update) + ledger insert in same tx.**\n\nWhy:\n- Gift card contention realistically ≈ 0 (one owner, one checkout)\n- Single statement, no retry logic, no version col migration\n- DB enforces `balance >= amount` invariant atomically\n- Matches wallet pattern if wallets use same\n\nPattern:\n```\nBEGIN;\nUPDATE gift_cards\n  SET remaining_balance = remaining_balance - :amt,\n      updated_at = now()\n  WHERE id = :id\n    AND status = 'active'\n    AND (expires_at IS NULL OR expires_at > now())\n    AND remaining_balance >= :amt;\n-- if rows_affected = 0 → ROLLBACK, return InsufficientFunds/Invalid\nINSERT INTO gift_card_ledger (card_id, delta, order_id, type) VALUES (...);\nCOMMIT;\n```\n\nCritical rules:\n- **Never** hold DB tx across payment gateway call. Reserve → call gateway → commit/release\n- Add `CHECK (remaining_balance >= 0)` constraint → DB rejects underflow even if app logic bugs\n- Ledger insert + balance update **same tx**. Else drift\n- Idempotency key on redemption (e.g. `(card_id, order_id)` unique) → retry-safe on network blips\n\nReserve pattern (for payment-failure rollback from last msg):\n- Either: debit on reserve, credit-back on payment failure (two ledger entries, clean history)\n- Or: add `reserved_balance` col, commit-or-release on payment result (one ledger entry, more state)\n\nPrefer **debit + compensating credit**. Simpler, ledger tells full story, matches refund semantics.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 20610,
+    "duration_api_ms": 20582,
+    "num_turns": 1,
+    "result": "Four options:\n\n**1. Pessimistic row lock** (`SELECT ... FOR UPDATE`)\n```sql\nBEGIN;\nSELECT remaining_balance FROM gift_cards WHERE id=? FOR UPDATE;\n-- app checks balance >= amount\nUPDATE gift_cards SET remaining_balance = remaining_balance - ? WHERE id=?;\nINSERT INTO gift_card_ledger (...);\nCOMMIT;\n```\nPros: simple, correct, works across all SQL DBs\nCons: holds lock for tx duration → don't wrap payment gateway call inside. Keep tx short\n\n**2. Optimistic concurrency** (version col)\n```sql\nUPDATE gift_cards\nSET remaining_balance = remaining_balance - ?, version = version + 1\nWHERE id=? AND version=? AND remaining_balance >= ?;\n-- rows_affected == 0 → retry or fail\n```\nPros: no lock held, high concurrency\nCons: retry loop, more app code. Good when contention low (gift cards = low, usually 1 user)\n\n**3. Atomic conditional update** (no version, rely on balance check)\n```sql\nUPDATE gift_cards\nSET remaining_balance = remaining_balance - ?\nWHERE id=? AND remaining_balance >= ?;\n-- rows_affected == 0 → insufficient funds OR race lost\n```\nPros: simplest, single statement, atomic at row level\nCons: can't distinguish \"insufficient\" from \"concurrent\" without re-read. Fine — just re-SELECT on 0 rows\n\n**4. Distributed lock** (Redis/advisory lock on `gift_card:{id}`)\nPros: lock spans non-DB resources\nCons: extra infra, lock leaks on crash, overkill here\n\n**Recommendation: #3 (atomic conditional update) + ledger insert in same tx.**\n\nWhy:\n- Gift card contention realistically ≈ 0 (one owner, one checkout)\n- Single statement, no retry logic, no version col migration\n- DB enforces `balance >= amount` invariant atomically\n- Matches wallet pattern if wallets use same\n\nPattern:\n```\nBEGIN;\nUPDATE gift_cards\n  SET remaining_balance = remaining_balance - :amt,\n      updated_at = now()\n  WHERE id = :id\n    AND status = 'active'\n    AND (expires_at IS NULL OR expires_at > now())\n    AND remaining_balance >= :amt;\n-- if rows_affected = 0 → ROLLBACK, return InsufficientFunds/Invalid\nINSERT INTO gift_card_ledger (card_id, delta, order_id, type) VALUES (...);\nCOMMIT;\n```\n\nCritical rules:\n- **Never** hold DB tx across payment gateway call. Reserve → call gateway → commit/release\n- Add `CHECK (remaining_balance >= 0)` constraint → DB rejects underflow even if app logic bugs\n- Ledger insert + balance update **same tx**. Else drift\n- Idempotency key on redemption (e.g. `(card_id, order_id)` unique) → retry-safe on network blips\n\nReserve pattern (for payment-failure rollback from last msg):\n- Either: debit on reserve, credit-back on payment failure (two ledger entries, clean history)\n- Or: add `reserved_balance` col, commit-or-release on payment result (one ledger entry, more state)\n\nPrefer **debit + compensating credit**. Simpler, ledger tells full story, matches refund semantics.",
+    "stop_reason": "end_turn",
+    "session_id": "3fabcb3f-a49e-4728-850a-d64f7eb301e1",
+    "total_cost_usd": 0.05126525,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 981,
+      "cache_read_input_tokens": 26658,
+      "output_tokens": 1271,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 981,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 1271,
+          "cache_read_input_tokens": 26658,
+          "cache_creation_input_tokens": 981,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 981
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 1271,
+        "cacheReadInputTokens": 26658,
+        "cacheCreationInputTokens": 981,
+        "webSearchRequests": 0,
+        "costUSD": 0.05126525,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "c0f83296-4a13-45cd-9fb9-ddb0fe3aa321"
+  }
+}

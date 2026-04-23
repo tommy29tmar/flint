@@ -1,0 +1,97 @@
+{
+  "track": "T4",
+  "arm": "caveman_full_plus_ultra_directive",
+  "sequence_id": "design-feature",
+  "run_index": 1,
+  "turn": 2,
+  "arm_order_index": 0,
+  "arm_order_full": [
+    "caveman_full_plus_ultra_directive",
+    "terse",
+    "caveman_full",
+    "hewn_prompt_only",
+    "baseline",
+    "hewn_full"
+  ],
+  "digest_hex": "30a2f9a62df0d790c0598917c3ab42509bbadd672a0a484741ea201d2da3b44f",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-23T07:41:08.272198+00:00",
+  "session_id_used_for_resume": "3fabcb3f-a49e-4728-850a-d64f7eb301e1",
+  "output_tokens_tiktoken": 495,
+  "output_tokens_anthropic": 910,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 955,
+  "cache_read_input_tokens": 25703,
+  "total_input_tokens": 26664,
+  "cache_state": "warm",
+  "wallclock_ms": 25118.905709998216,
+  "duration_ms": 22256,
+  "duration_api_ms": 22223,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "3fabcb3f-a49e-4728-850a-d64f7eb301e1",
+  "total_cost_usd": 0.04160025,
+  "model_used": "claude-opus-4-7",
+  "result": "**Mutable row** (`remaining_balance` col, update in place):\n\nPros:\n- Consistent w/ existing wallet pattern → less cognitive load, shared tooling\n- Read = 1 row, O(1). No aggregation\n- Simple locking (`SELECT FOR UPDATE` on card row)\n- Smaller storage\n\nCons:\n- History lost unless paired w/ audit/ledger table (most teams add one anyway → back to 2 tables)\n- Bugs silently corrupt balance, no replay to fix\n- Harder to answer \"why is balance X?\" / support tickets\n- Refund reversals = more update logic, race-prone\n- Reconciliation w/ accounting (liability acct) needs separate ledger regardless\n\n**Event-sourced** (append-only `gift_card_events`: issued, redeemed, refunded, expired; balance = sum):\n\nPros:\n- Truth = events. Balance derivable, auditable by construction\n- Natural fit for accounting ledger (double-entry friendly)\n- Refunds/reversals = compensating event, no destructive update\n- Replay → rebuild state, fix bugs retroactively\n- Time-travel: \"balance as of date X\" free\n- Concurrent redeems = append, conflict resolution clearer\n\nCons:\n- Diverges from wallet pattern → two mental models in codebase\n- Read = aggregate (mitigate w/ cached `balance` projection row → hybrid)\n- More code: event types, projections, versioning\n- Locking still needed to prevent overdraw on concurrent append (optimistic version on projection)\n\n**Recommendation**: **hybrid**. Append-only `gift_card_transactions` ledger (source of truth) + denormalized `remaining_balance` on `gift_cards` row (fast read, locked on redeem). Every debit/credit = ledger row + balance update in same tx. Invariant check: `balance == sum(ledger)`.\n\nWhy hybrid here (not pure wallet pattern):\n- Gift cards = money liability → accounting/legal wants immutable trail. Wallets often internal credits, lower bar\n- Refund policy (re-credit vs not) needs history\n- Breakage accounting needs per-card event timeline\n- Fraud investigations need audit\n\nWhy not pure event-sourced:\n- Team already knows mutable pattern. Hybrid = 80% of benefit, 20% of divergence\n- Fast reads during checkout critical\n\nMigration path: add ledger now, keep balance col. If wallet later needs same, lift pattern.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 22256,
+    "duration_api_ms": 22223,
+    "num_turns": 1,
+    "result": "**Mutable row** (`remaining_balance` col, update in place):\n\nPros:\n- Consistent w/ existing wallet pattern → less cognitive load, shared tooling\n- Read = 1 row, O(1). No aggregation\n- Simple locking (`SELECT FOR UPDATE` on card row)\n- Smaller storage\n\nCons:\n- History lost unless paired w/ audit/ledger table (most teams add one anyway → back to 2 tables)\n- Bugs silently corrupt balance, no replay to fix\n- Harder to answer \"why is balance X?\" / support tickets\n- Refund reversals = more update logic, race-prone\n- Reconciliation w/ accounting (liability acct) needs separate ledger regardless\n\n**Event-sourced** (append-only `gift_card_events`: issued, redeemed, refunded, expired; balance = sum):\n\nPros:\n- Truth = events. Balance derivable, auditable by construction\n- Natural fit for accounting ledger (double-entry friendly)\n- Refunds/reversals = compensating event, no destructive update\n- Replay → rebuild state, fix bugs retroactively\n- Time-travel: \"balance as of date X\" free\n- Concurrent redeems = append, conflict resolution clearer\n\nCons:\n- Diverges from wallet pattern → two mental models in codebase\n- Read = aggregate (mitigate w/ cached `balance` projection row → hybrid)\n- More code: event types, projections, versioning\n- Locking still needed to prevent overdraw on concurrent append (optimistic version on projection)\n\n**Recommendation**: **hybrid**. Append-only `gift_card_transactions` ledger (source of truth) + denormalized `remaining_balance` on `gift_cards` row (fast read, locked on redeem). Every debit/credit = ledger row + balance update in same tx. Invariant check: `balance == sum(ledger)`.\n\nWhy hybrid here (not pure wallet pattern):\n- Gift cards = money liability → accounting/legal wants immutable trail. Wallets often internal credits, lower bar\n- Refund policy (re-credit vs not) needs history\n- Breakage accounting needs per-card event timeline\n- Fraud investigations need audit\n\nWhy not pure event-sourced:\n- Team already knows mutable pattern. Hybrid = 80% of benefit, 20% of divergence\n- Fast reads during checkout critical\n\nMigration path: add ledger now, keep balance col. If wallet later needs same, lift pattern.",
+    "stop_reason": "end_turn",
+    "session_id": "3fabcb3f-a49e-4728-850a-d64f7eb301e1",
+    "total_cost_usd": 0.04160025,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 955,
+      "cache_read_input_tokens": 25703,
+      "output_tokens": 910,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 955,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 910,
+          "cache_read_input_tokens": 25703,
+          "cache_creation_input_tokens": 955,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 955
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 910,
+        "cacheReadInputTokens": 25703,
+        "cacheCreationInputTokens": 955,
+        "webSearchRequests": 0,
+        "costUSD": 0.04160025,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "199f8692-a5e0-4701-ada1-4c142515c4f9"
+  }
+}

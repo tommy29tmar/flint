@@ -1,0 +1,97 @@
+{
+  "track": "T4",
+  "arm": "caveman_full_plus_ultra_directive",
+  "sequence_id": "design-feature",
+  "run_index": 2,
+  "turn": 5,
+  "arm_order_index": 3,
+  "arm_order_full": [
+    "terse",
+    "hewn_full",
+    "baseline",
+    "caveman_full_plus_ultra_directive",
+    "caveman_full",
+    "hewn_prompt_only"
+  ],
+  "digest_hex": "3191b019d37f08f3d5b68d9000f1aeb1e1a3524225f9daa893803df1e240ffd1",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-23T07:45:53.294692+00:00",
+  "session_id_used_for_resume": "19a5cba5-2b3f-4b64-a24a-e8678cbd2c7d",
+  "output_tokens_tiktoken": 1217,
+  "output_tokens_anthropic": 3078,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 1203,
+  "cache_read_input_tokens": 28829,
+  "total_input_tokens": 30038,
+  "cache_state": "warm",
+  "wallclock_ms": 55027.56528000464,
+  "duration_ms": 51702,
+  "duration_api_ms": 51662,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "19a5cba5-2b3f-4b64-a24a-e8678cbd2c7d",
+  "total_cost_usd": 0.09891325000000001,
+  "model_used": "claude-opus-4-7",
+  "result": "Dropping caveman for the sequence — order matters here.\n\n## Policy decision (pick one, document it)\n\n**Option A — Proportional (recommended default)**\nSplit refund across tenders in same ratio as original payment.\n- Order: $100 = $30 gift card + $70 card\n- Partial refund $40 → $12 to gift card, $28 to card\n- Fairest, matches accounting cleanly, defensible to customer and auditor\n- Handles edge cases uniformly (any refund amount splits the same way)\n\n**Option B — Gift-card-first**\nRefund to gift card up to amount consumed, remainder to card.\n- Same example → $30 gift card, $10 card\n- Merchant-friendly (keeps money on platform, higher breakage)\n- Customer-unfriendly on partial refunds if they wanted cash back\n- Some jurisdictions restrict this\n\n**Option C — Card-first**\nRefund to card first, gift card only if refund exceeds card charge.\n- $40 card, $0 gift card\n- Customer-friendly, rare\n\nPick A unless finance/legal wants otherwise. Document in policy doc — support agents will get asked.\n\n## Secondary decisions\n\n1. **Gift card credit target:** original card (re-credit `balance`) vs newly issued card. Original is standard. If original is expired or deactivated, policy fork — extend expiry, issue new card, or fall back to credit card.\n2. **Expiry on refunded balance:** (a) keep original `expires_at`, (b) reset to 12 months from refund, (c) extend if within N days of expiry. (a) is simplest and legally safest. Customers occasionally complain.\n3. **Expired-card refund:** if original card expired, can't credit to it. Issue new card with fresh expiry, or refund all to credit card. Pick one.\n4. **Rounding:** proportional split produces fractions. Round to cents, assign remainder deterministically (e.g., gift card absorbs rounding) and document.\n5. **Fully consumed gift card:** status may be `redeemed` / `zero`. Refund must transition back to `active`.\n6. **Refund exceeds original card charge:** shouldn't happen with proportional, can happen with gift-card-first. Cap at original tender amount.\n7. **Chargeback (involuntary refund):** different path — bank forces card refund, no merchant control over split. Usually debit gift card for its portion to stay whole, or eat the loss. Policy decision.\n\n## Code path (proportional, happy path)\n\n**Order provider-first, DB second.** Reverse of checkout, for the same reason: don't do irreversible DB work before an unreliable network call.\n\n```\n1. Load order, tender breakdown, prior refunds (for idempotency + cap).\n2. Validate: refund_amount <= order_total - already_refunded.\n3. Compute split:\n     gc_refund  = round(refund_amount * gc_paid  / order_total)\n     card_refund = refund_amount - gc_refund    // absorb rounding on card\n4. Generate refund_id (idempotency key).\n5. Insert refunds row (status='pending', splits, idempotency_key). \n   UNIQUE constraint on idempotency_key — retries short-circuit here.\n6. IF card_refund > 0:\n     Call Stripe refund API with refund_id as idempotency key.\n     On failure: mark refunds row 'failed', alert, exit. No DB credit yet → safe.\n     On success: store provider_refund_id on refunds row.\n7. IF gc_refund > 0:\n     BEGIN TXN\n       SELECT ... FROM gift_cards WHERE id = :gc_id FOR UPDATE\n       Validate card state; if expired → apply expired-card policy.\n       UPDATE gift_cards SET balance = balance + :gc_refund,\n                             status = 'active'\n         WHERE id = :gc_id\n       INSERT gift_card_audit (card_id, delta=+gc_refund, reason='refund',\n                               refund_id, order_id)\n     COMMIT\n8. UPDATE refunds SET status='completed' WHERE id=:refund_id.\n```\n\n## Failure modes and recovery\n\n| Failure point | State | Recovery |\n|---|---|---|\n| Step 5 fails | Nothing done | Retry safe |\n| Step 6 Stripe fails | Refund row 'pending', no money moved | Retry via idempotency key; operator alert after N tries |\n| Step 6 Stripe timeout (unknown result) | Query Stripe by idempotency key before retrying — don't double-refund |\n| Step 7 DB fails after Stripe success | Card refunded, gift card not credited | Retry step 7 — idempotent via `WHERE NOT EXISTS (audit row with refund_id)` guard |\n| Step 8 fails | Both tenders refunded, row still 'pending' | Reconciliation job flips to 'completed' based on audit row + provider status |\n\n## Invariants to enforce\n\n- `SUM(refunds.amount) <= order.total` per order (DB check or app-level with lock)\n- `SUM(gift_card_audit.delta) WHERE card_id = X` never exceeds lifetime issued + refunded\n- Every `refunds` row has matching `gift_card_audit` row (if `gc_refund > 0`) and Stripe `provider_refund_id` (if `card_refund > 0`)\n- Idempotency key unique across refund attempts for same order line\n\n## Operator tooling\n\n- UI shows pending/failed refunds, retry button (calls same path, idempotent)\n- Daily reconciliation job: Stripe refunds vs `refunds` table, alerts on drift\n- Support can override split (manual refund) — logged separately\n\nOne last trap: **if you later add promotions that reduce paid amount**, the \"proportional\" ratio uses paid amounts, not list prices. Cache `gc_paid` and `card_paid` on the order at checkout time — don't recompute from ratios later.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 51702,
+    "duration_api_ms": 51662,
+    "num_turns": 1,
+    "result": "Dropping caveman for the sequence — order matters here.\n\n## Policy decision (pick one, document it)\n\n**Option A — Proportional (recommended default)**\nSplit refund across tenders in same ratio as original payment.\n- Order: $100 = $30 gift card + $70 card\n- Partial refund $40 → $12 to gift card, $28 to card\n- Fairest, matches accounting cleanly, defensible to customer and auditor\n- Handles edge cases uniformly (any refund amount splits the same way)\n\n**Option B — Gift-card-first**\nRefund to gift card up to amount consumed, remainder to card.\n- Same example → $30 gift card, $10 card\n- Merchant-friendly (keeps money on platform, higher breakage)\n- Customer-unfriendly on partial refunds if they wanted cash back\n- Some jurisdictions restrict this\n\n**Option C — Card-first**\nRefund to card first, gift card only if refund exceeds card charge.\n- $40 card, $0 gift card\n- Customer-friendly, rare\n\nPick A unless finance/legal wants otherwise. Document in policy doc — support agents will get asked.\n\n## Secondary decisions\n\n1. **Gift card credit target:** original card (re-credit `balance`) vs newly issued card. Original is standard. If original is expired or deactivated, policy fork — extend expiry, issue new card, or fall back to credit card.\n2. **Expiry on refunded balance:** (a) keep original `expires_at`, (b) reset to 12 months from refund, (c) extend if within N days of expiry. (a) is simplest and legally safest. Customers occasionally complain.\n3. **Expired-card refund:** if original card expired, can't credit to it. Issue new card with fresh expiry, or refund all to credit card. Pick one.\n4. **Rounding:** proportional split produces fractions. Round to cents, assign remainder deterministically (e.g., gift card absorbs rounding) and document.\n5. **Fully consumed gift card:** status may be `redeemed` / `zero`. Refund must transition back to `active`.\n6. **Refund exceeds original card charge:** shouldn't happen with proportional, can happen with gift-card-first. Cap at original tender amount.\n7. **Chargeback (involuntary refund):** different path — bank forces card refund, no merchant control over split. Usually debit gift card for its portion to stay whole, or eat the loss. Policy decision.\n\n## Code path (proportional, happy path)\n\n**Order provider-first, DB second.** Reverse of checkout, for the same reason: don't do irreversible DB work before an unreliable network call.\n\n```\n1. Load order, tender breakdown, prior refunds (for idempotency + cap).\n2. Validate: refund_amount <= order_total - already_refunded.\n3. Compute split:\n     gc_refund  = round(refund_amount * gc_paid  / order_total)\n     card_refund = refund_amount - gc_refund    // absorb rounding on card\n4. Generate refund_id (idempotency key).\n5. Insert refunds row (status='pending', splits, idempotency_key). \n   UNIQUE constraint on idempotency_key — retries short-circuit here.\n6. IF card_refund > 0:\n     Call Stripe refund API with refund_id as idempotency key.\n     On failure: mark refunds row 'failed', alert, exit. No DB credit yet → safe.\n     On success: store provider_refund_id on refunds row.\n7. IF gc_refund > 0:\n     BEGIN TXN\n       SELECT ... FROM gift_cards WHERE id = :gc_id FOR UPDATE\n       Validate card state; if expired → apply expired-card policy.\n       UPDATE gift_cards SET balance = balance + :gc_refund,\n                             status = 'active'\n         WHERE id = :gc_id\n       INSERT gift_card_audit (card_id, delta=+gc_refund, reason='refund',\n                               refund_id, order_id)\n     COMMIT\n8. UPDATE refunds SET status='completed' WHERE id=:refund_id.\n```\n\n## Failure modes and recovery\n\n| Failure point | State | Recovery |\n|---|---|---|\n| Step 5 fails | Nothing done | Retry safe |\n| Step 6 Stripe fails | Refund row 'pending', no money moved | Retry via idempotency key; operator alert after N tries |\n| Step 6 Stripe timeout (unknown result) | Query Stripe by idempotency key before retrying — don't double-refund |\n| Step 7 DB fails after Stripe success | Card refunded, gift card not credited | Retry step 7 — idempotent via `WHERE NOT EXISTS (audit row with refund_id)` guard |\n| Step 8 fails | Both tenders refunded, row still 'pending' | Reconciliation job flips to 'completed' based on audit row + provider status |\n\n## Invariants to enforce\n\n- `SUM(refunds.amount) <= order.total` per order (DB check or app-level with lock)\n- `SUM(gift_card_audit.delta) WHERE card_id = X` never exceeds lifetime issued + refunded\n- Every `refunds` row has matching `gift_card_audit` row (if `gc_refund > 0`) and Stripe `provider_refund_id` (if `card_refund > 0`)\n- Idempotency key unique across refund attempts for same order line\n\n## Operator tooling\n\n- UI shows pending/failed refunds, retry button (calls same path, idempotent)\n- Daily reconciliation job: Stripe refunds vs `refunds` table, alerts on drift\n- Support can override split (manual refund) — logged separately\n\nOne last trap: **if you later add promotions that reduce paid amount**, the \"proportional\" ratio uses paid amounts, not list prices. Cache `gc_paid` and `card_paid` on the order at checkout time — don't recompute from ratios later.",
+    "stop_reason": "end_turn",
+    "session_id": "19a5cba5-2b3f-4b64-a24a-e8678cbd2c7d",
+    "total_cost_usd": 0.09891325000000001,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 1203,
+      "cache_read_input_tokens": 28829,
+      "output_tokens": 3078,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 1203,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 3078,
+          "cache_read_input_tokens": 28829,
+          "cache_creation_input_tokens": 1203,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 1203
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 3078,
+        "cacheReadInputTokens": 28829,
+        "cacheCreationInputTokens": 1203,
+        "webSearchRequests": 0,
+        "costUSD": 0.09891325000000001,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "cfdb5a19-2528-42f4-aa60-d8624a8c621b"
+  }
+}

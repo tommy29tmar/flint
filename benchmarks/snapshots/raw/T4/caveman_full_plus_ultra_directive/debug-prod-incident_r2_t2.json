@@ -1,0 +1,97 @@
+{
+  "track": "T4",
+  "arm": "caveman_full_plus_ultra_directive",
+  "sequence_id": "debug-prod-incident",
+  "run_index": 2,
+  "turn": 2,
+  "arm_order_index": 3,
+  "arm_order_full": [
+    "hewn_full",
+    "caveman_full",
+    "hewn_prompt_only",
+    "caveman_full_plus_ultra_directive",
+    "baseline",
+    "terse"
+  ],
+  "digest_hex": "522341918a5177210ef438fa55486ec5b622aaa576febbd731536d82595ec31b",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-23T07:42:48.001903+00:00",
+  "session_id_used_for_resume": "9c0089ec-00c8-4fcb-aada-67496faec3a8",
+  "output_tokens_tiktoken": 53,
+  "output_tokens_anthropic": 79,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 364,
+  "cache_read_input_tokens": 25716,
+  "total_input_tokens": 26086,
+  "cache_state": "warm",
+  "wallclock_ms": 6108.156658010557,
+  "duration_ms": 2931,
+  "duration_api_ms": 2892,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "9c0089ec-00c8-4fcb-aada-67496faec3a8",
+  "total_cost_usd": 0.017138,
+  "model_used": "claude-opus-4-7",
+  "result": "`items` dropped from output. Downstream `createOrder` read `builtCart.items` → undefined → `.items` crash.\n\nFix: keep `items` in return, or update caller to use source `cart.items` not `buildCart` result.",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 2931,
+    "duration_api_ms": 2892,
+    "num_turns": 1,
+    "result": "`items` dropped from output. Downstream `createOrder` read `builtCart.items` → undefined → `.items` crash.\n\nFix: keep `items` in return, or update caller to use source `cart.items` not `buildCart` result.",
+    "stop_reason": "end_turn",
+    "session_id": "9c0089ec-00c8-4fcb-aada-67496faec3a8",
+    "total_cost_usd": 0.017138,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 364,
+      "cache_read_input_tokens": 25716,
+      "output_tokens": 79,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 364,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 79,
+          "cache_read_input_tokens": 25716,
+          "cache_creation_input_tokens": 364,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 364
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 79,
+        "cacheReadInputTokens": 25716,
+        "cacheCreationInputTokens": 364,
+        "webSearchRequests": 0,
+        "costUSD": 0.017138,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "4fc05017-69ec-49e3-8a3c-391c9ed0c163"
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "track": "T4",
+  "arm": "caveman_full_plus_ultra_directive",
+  "sequence_id": "design-feature",
+  "run_index": 1,
+  "turn": 4,
+  "arm_order_index": 0,
+  "arm_order_full": [
+    "caveman_full_plus_ultra_directive",
+    "terse",
+    "caveman_full",
+    "hewn_prompt_only",
+    "baseline",
+    "hewn_full"
+  ],
+  "digest_hex": "30a2f9a62df0d790c0598917c3ab42509bbadd672a0a484741ea201d2da3b44f",
+  "seed": "hewn-bench-v1",
+  "timestamp": "2026-04-23T07:41:52.412078+00:00",
+  "session_id_used_for_resume": "3fabcb3f-a49e-4728-850a-d64f7eb301e1",
+  "output_tokens_tiktoken": 483,
+  "output_tokens_anthropic": 894,
+  "input_tokens_anthropic": 6,
+  "cache_creation_input_tokens": 1362,
+  "cache_read_input_tokens": 27639,
+  "total_input_tokens": 29007,
+  "cache_state": "warm",
+  "wallclock_ms": 20530.75788501883,
+  "duration_ms": 16864,
+  "duration_api_ms": 16829,
+  "wrapper_overhead_ms": null,
+  "stop_reason": "end_turn",
+  "num_turns": 1,
+  "session_id": "3fabcb3f-a49e-4728-850a-d64f7eb301e1",
+  "total_cost_usd": 0.044712,
+  "model_used": "claude-opus-4-7",
+  "result": "**Both. Different jobs.**\n\n**Consumption path** (authoritative, per-redemption):\n```sql\nSELECT remaining_balance FROM gift_cards\nWHERE id=? FOR UPDATE;\n-- app: if expires_at <= now() → reject\n```\nOr bake into the WHERE:\n```sql\nUPDATE ... WHERE id=? AND (expires_at IS NULL OR expires_at > now()) AND ...;\n```\nMust exist. Batch lag → expired card could be spent otherwise. This is the real gate.\n\n**Batch job** (housekeeping, not gate):\n- Flip `status='expired'` on cards past `expires_at`\n- Write ledger entry `type='expiration'`, delta = -remaining_balance → balance → 0\n- Recognize breakage revenue (accounting: liability → income)\n- Fire notifications (\"your card expired\")\n- Drive reports / dashboards\n\nWhy both, not either:\n\nConsumption-only:\n- Expired cards sit w/ stale `status='active'`, nonzero balance → liability stays on books forever\n- No breakage recognition → accounting wrong\n- No expiry notifications\n- Support sees \"active\" card that rejects → confusing\n\nBatch-only:\n- Race: card expires at 00:00, batch runs 02:00, user redeems 01:00 → spent expired card. Illegal in some jurisdictions\n- Depends on job actually running. Outage = leaks\n\n**Pattern:**\n- `expires_at` timestamp col on `gift_cards`\n- Consumption: check `expires_at > now()` in the atomic UPDATE WHERE clause. Source of truth\n- Daily job: `UPDATE ... SET status='expired' WHERE expires_at <= now() AND status='active'` + ledger expiration entry per card\n- Index on `(status, expires_at)` for batch efficiency\n\nExtra considerations:\n- **Jurisdiction**: many US states + EU prohibit/limit gift card expiry. Check legal before shipping 12mo. Some require 5yr min, some forbid expiry entirely on monetary cards\n- **Warning emails**: 60/30/7-day-before-expiry via same batch\n- **Extension policy**: redeemable activity resets clock? Usually no, but decide\n- **Grace period**: worth considering for support (\"expired yesterday, please honor\")\n- **Time zone**: store `expires_at` UTC, compare UTC. Display in user TZ",
+  "assertion_pass": true,
+  "raw_payload": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "api_error_status": null,
+    "duration_ms": 16864,
+    "duration_api_ms": 16829,
+    "num_turns": 1,
+    "result": "**Both. Different jobs.**\n\n**Consumption path** (authoritative, per-redemption):\n```sql\nSELECT remaining_balance FROM gift_cards\nWHERE id=? FOR UPDATE;\n-- app: if expires_at <= now() → reject\n```\nOr bake into the WHERE:\n```sql\nUPDATE ... WHERE id=? AND (expires_at IS NULL OR expires_at > now()) AND ...;\n```\nMust exist. Batch lag → expired card could be spent otherwise. This is the real gate.\n\n**Batch job** (housekeeping, not gate):\n- Flip `status='expired'` on cards past `expires_at`\n- Write ledger entry `type='expiration'`, delta = -remaining_balance → balance → 0\n- Recognize breakage revenue (accounting: liability → income)\n- Fire notifications (\"your card expired\")\n- Drive reports / dashboards\n\nWhy both, not either:\n\nConsumption-only:\n- Expired cards sit w/ stale `status='active'`, nonzero balance → liability stays on books forever\n- No breakage recognition → accounting wrong\n- No expiry notifications\n- Support sees \"active\" card that rejects → confusing\n\nBatch-only:\n- Race: card expires at 00:00, batch runs 02:00, user redeems 01:00 → spent expired card. Illegal in some jurisdictions\n- Depends on job actually running. Outage = leaks\n\n**Pattern:**\n- `expires_at` timestamp col on `gift_cards`\n- Consumption: check `expires_at > now()` in the atomic UPDATE WHERE clause. Source of truth\n- Daily job: `UPDATE ... SET status='expired' WHERE expires_at <= now() AND status='active'` + ledger expiration entry per card\n- Index on `(status, expires_at)` for batch efficiency\n\nExtra considerations:\n- **Jurisdiction**: many US states + EU prohibit/limit gift card expiry. Check legal before shipping 12mo. Some require 5yr min, some forbid expiry entirely on monetary cards\n- **Warning emails**: 60/30/7-day-before-expiry via same batch\n- **Extension policy**: redeemable activity resets clock? Usually no, but decide\n- **Grace period**: worth considering for support (\"expired yesterday, please honor\")\n- **Time zone**: store `expires_at` UTC, compare UTC. Display in user TZ",
+    "stop_reason": "end_turn",
+    "session_id": "3fabcb3f-a49e-4728-850a-d64f7eb301e1",
+    "total_cost_usd": 0.044712,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 1362,
+      "cache_read_input_tokens": 27639,
+      "output_tokens": 894,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 1362,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 6,
+          "output_tokens": 894,
+          "cache_read_input_tokens": 27639,
+          "cache_creation_input_tokens": 1362,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 1362
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-opus-4-7": {
+        "inputTokens": 6,
+        "outputTokens": 894,
+        "cacheReadInputTokens": 27639,
+        "cacheCreationInputTokens": 1362,
+        "webSearchRequests": 0,
+        "costUSD": 0.044712,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "uuid": "386a2b32-088f-495c-8bff-ecfff1a0c3fd"
+  }
+}
