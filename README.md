@@ -1,128 +1,27 @@
 # Hewn
 
-| Mode | Output tokens | Latency | Concepts covered |
-| --- | ---: | ---: | ---: |
-| Verbose Claude | 736 | 15s | 86% |
-| Caveman | 423 | 9s | 84% |
-| **Hewn** | **186** | **5s** | **95%** |
+[![CI](https://img.shields.io/github/actions/workflow/status/tommy29tmar/hewn/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/tommy29tmar/hewn/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/github/license/tommy29tmar/hewn?style=flat-square)](LICENSE)
+[![Made for Claude Code](https://img.shields.io/badge/made%20for-Claude%20Code-84cc16?style=flat-square)](https://claude.com/claude-code)
 
-why burn many token when few do job
+> **Make Claude Code talk less. Same answers, ~3× fewer tokens.**
+>
+> *why burn many token when few do job*
 
-**Claude talks too much. Hewn makes it get to the point.**
-
-Same useful answer. Less token burn. More context kept.
+Claude talks too much. Hewn makes it get to the point — without losing
+what the prompt actually asked for.
 
 No proxy. No telemetry. Default `claude` untouched.
 
-Launch bench: 10 long-context tasks x 4 runs, prompt cache on. "Concepts
-covered" means required points from the prompt were still present in the
-answer.
+![Multi-turn coding session — Hewn vs Caveman vs Verbose Claude](assets/hero-benchmark.png)
 
-Full benchmark methodology, raw snapshots, judge rubrics, and per-track
-evidence live in [`benchmarks/`](benchmarks/) — see
-[`benchmarks/report/REPORT.md`](benchmarks/report/REPORT.md) for the
-headline numbers and [`benchmarks/RUNBOOK.md`](benchmarks/RUNBOOK.md) for
-exact reproduction steps.
-
-## Real Long-Prompt Example
-
-Real Opus 4.7 stress-bench row. Same model, same 16k-token project handbook,
-same task.
-
-Prompt excerpt:
-
-```text
-Project handbook: Atlas API service
-- Public edge must never trust client-supplied identity headers.
-- Security-sensitive fixes should prefer narrow patches over broad rewrites.
-- Review findings should be short but concrete: finding, exploit path,
-  mitigation, verification, and main risks.
-- Preserve exact literals such as "X-Forwarded-For", "Redis", "401",
-  "next(err)", and "PostgreSQL".
-
-[Task]
-[capsule micro review]
-anchors: "X-Forwarded-For" | "Redis"
-diff: + const key=`rl:${req.headers['x-forwarded-for']||req.ip}`;
-        await redis.incr(key);
-ctx: public_api_gateway rate limiter
-deliver: risk mitigation verify
-```
-
-| Mode | Output tokens | Latency |
-| --- | ---: | ---: |
-| Verbose Claude | 523 | 11.5s |
-| Caveman Ultra-style | 512 | 11.2s |
-| **Hewn** | **167** | **4.5s** |
-
-Verbose Claude:
-
-```text
-finding: `X-Forwarded-For` trusted without proxy validation => spoofable
-rate-limit key
-
-exploit:
-- attacker sends `X-Forwarded-For: <random>` per request -> distinct keys
-  -> limiter bypassed
-- attacker pins victim IP -> exhausts victim's bucket -> DoS / lockout
-
-mitigation:
-- derive client IP from trusted proxy chain only
-- never read raw `x-forwarded-for` at public boundary
-- key on validated IP; fall back to `req.socket.remoteAddress`
-- also add `INCR` + `EXPIRE` atomically
-
-verify:
-- spoof test: 100 req with rotating `X-Forwarded-For`
-- victim-pin test: forged XFF=victim.ip
-- TTL test: `TTL rl:<ip>` returns >0 after first hit
-- proxy-off test: with `trust proxy=false`, XFF ignored entirely
-
-risks:
-- misconfigured proxy may still reflect XFF
-- IPv6 + CGNAT shared buckets
-- Redis key without `EXPIRE` = unbounded memory growth
-```
-
-Caveman Ultra-style:
-
-```text
-risk: spoof `X-Forwarded-For` -> bypass per-IP limit
-risk: multi-hop XFF -> only first/last hop parsed, wrong client
-risk: no TTL on key -> counter never resets, permanent lockout
-risk: no limit check -> `incr` without threshold compare
-risk: missing IP -> key `rl:undefined` -> shared bucket all anon
-risk: Redis failure -> no fallback -> limiter fails open or crashes
-risk: IPv6 normalization absent -> same client, multiple keys
-
-mitigation: trust XFF only from signed gateway contract; else use `req.ip`
-mitigation: parse XFF as left-most untrusted, right-most trusted hop
-mitigation: `redis.expire(key, windowSec)` on first `incr`
-mitigation: compare count vs limit -> `429` when exceeded
-mitigation: reject/normalize when IP absent
-mitigation: wrap Redis in try/catch
-mitigation: normalize IPv6
-
-verify: spoofed `X-Forwarded-For` from public edge -> limited by real IP
-verify: exact-threshold request -> allowed; threshold+1 -> `429`
-verify: key TTL present after first hit
-verify: missing IP -> rejected or isolated bucket
-verify: Redis down -> documented behavior
-```
-
-Hewn:
-
-```text
-@hewn v0 hybrid
-G: fix(rl_spoof)
-C: trust_boundary ∧ "X-Forwarded-For" ∧ "Redis"
-P: drop("X-Forwarded-For") ∧ bind(req.ip) ∧ expire(key)
-V: test(spoof_header) ∧ test(missing_ip) ∧ test(incr_ttl)
-A: ! header_spoof ∧ ! key_unbounded ∧ ? proxy_chain
-```
-
-Same risk, mitigation, and verification. Hewn compresses the answer and GCs the
-context: keep what changes the fix, drop what only burns tokens.
+> Multi-turn coding session, Claude Opus 4.7, same model and prompts
+> across all four arms. Concept retention measured by transcript-aware
+> LLM-as-judge.
+>
+> Full methodology, raw snapshots, and per-track evidence:
+> [`benchmarks/report/REPORT.md`](benchmarks/report/REPORT.md) ·
+> [`benchmarks/RUNBOOK.md`](benchmarks/RUNBOOK.md) for reproduction.
 
 ## Install
 
@@ -133,87 +32,74 @@ curl -fsSL https://raw.githubusercontent.com/tommy29tmar/hewn/main/integrations/
 ## Use
 
 ```bash
-hewn
-hewn -p "your prompt"
+hewn                     # interactive session with Hewn thinking-mode
+hewn -p "your prompt"    # non-interactive
 ```
 
-## Locales
+Any flag accepted by `claude` is forwarded:
+`hewn --model claude-opus-4-7 -p "…"`.
 
-Hewn ships classifier patterns for `en`, `it`, `es`, `fr`, `de`. The
-locale is auto-detected from `$LANG` at run time, so Italian/Spanish/
-French/German shells just work out of the box. Example: `LANG=it_IT.UTF-8`
-loads `en + it` automatically.
+The default `claude` command is untouched. Want normal Claude? Just
+type `claude`.
 
-Override when needed:
+## Beyond the headline
 
-```bash
-hewn --locale en,it        # force this stack for one invocation
-export HEWN_LOCALE=en,es   # persistent in your shell rc
-export HEWN_LOCALE=en      # force English-only
-```
+- **Long-context task comprehension** — On a long-context security
+  review with compact IR-style task framing, Hewn is the **only arm
+  that completes the task** (89% concepts captured) — Verbose Claude,
+  Caveman Full, and Caveman Ultra-style all reply *"no task specified"*
+  (0%). See [`examples/atlas-xff-review.md`](examples/atlas-xff-review.md)
+  for the full input/output triplet.
+  *Source: T3 `rate-limit-xff-review`, 3 runs per arm.*
 
-Precedence: `--locale` > `HEWN_LOCALE` > `$LANG` auto-detect > English-only.
-Details: [integrations/claude-code/README.md](integrations/claude-code/README.md#locales).
+- **The drift-fix hook is doing real work** — In multi-turn sessions,
+  removing Hewn's classifier hook costs **+4,700 to +5,300 cumulative
+  tokens** per 5-turn workflow. The hook earns its keep.
+  *Source: T4, `hewn_full` vs `hewn_prompt_only`.*
 
-Want normal Claude again?
+- **Causal savings vs default Claude** — On Caveman's own short-Q&A
+  prompts, Hewn cuts output by a median of **52%** (range 17–92%, best
+  case `fix-node-memory-leak` at 92%) compared to unprompted Claude on
+  the same model.
+  *Source: T1b, 10 prompts × 3 runs per arm.*
 
-```bash
-claude
-```
+- **No ultra-tax on technical literals** — Caveman Ultra-style's
+  aggressive compression drops required exact strings
+  (`"X-Forwarded-For"`, `"401"`) to 80% preservation; Hewn keeps them
+  at **100%**.
+  *Source: T1b literal preservation, 15 judgments per arm.*
 
-Hewn is a separate command. It never replaces `claude`.
+→ Full per-prompt breakdown and raw judgments:
+[`benchmarks/report/REPORT.md`](benchmarks/report/REPORT.md)
 
-## What It Does
+## Where Hewn doesn't win
 
-- Cuts filler.
-- Keeps answers tight.
-- Uses compact structure when structure saves more.
-- Keeps polished prose when you ask for polished prose.
-- Works inside Claude Code with one wrapper command.
+Honesty matters. The benchmark shows three areas where Hewn is not the
+right tool:
 
-## Why Not Just Caveman?
+- **Expansive prose tasks** (apology emails, release notes) — all arms
+  including Hewn produce near-stub responses on these prompts (~0%
+  rubric concepts across the board). Use plain `claude` for marketing
+  copy.
+- **Vibe / non-tech prompts** — Hewn 63% concept coverage vs Caveman 78%.
+  Hewn is agent-mode (asks before guessing); Caveman is tutorial-mode
+  (enumerates options). Different design philosophy, both valid.
+- **Tasks that genuinely need a long answer** — when the prompt
+  legitimately requires a full plan, Hewn uses similar tokens to
+  baseline. Compression gracefully degrades when there's nothing to cut.
 
-Caveman makes Claude talk shorter.
+## How it works
 
-Hewn makes Claude waste less while keeping more context.
+Hewn wraps `claude` with two pieces:
 
-The launch bench above is the short version: Caveman reduces output. Hewn
-reduces output further while covering more of what the prompt asked for.
-
-Caveman compresses voice. Hewn compresses the answer: fewer tokens, more of
-the required context preserved.
-
-## Best For
-
-- Claude Code sessions
-- Opus 4.7 token burn
-- Long prompts
-- Debugging
-- Reviews
-- Planning
-- Anything where Claude starts writing a wall of text
-
-If you want expansive creative writing, use normal `claude`.
-
-## What Gets Installed
-
-- `~/.local/bin/hewn`
-- `~/.claude/hewn_thinking_system_prompt.txt`
-- `~/.claude/hooks/hewn_drift_fixer.py`
-- `~/.claude/hooks/locales/{en,it,es,fr,de}.py`
-
-That is it.
-
-## Under The Hood
-
-Hewn wraps:
-
-```bash
-claude --append-system-prompt <hewn prompt> --settings <temp hook config>
-```
-
-The prompt keeps Claude terse. The hook re-injects the right answer shape every
-turn so long sessions do not drift back into bloated prose.
+1. **A thinking-mode system prompt** appended via `--append-system-prompt`,
+   which routes each turn to one of six answer shapes (IR, prose+code,
+   prose-findings, prose-polished, prose-polished+code, prose-caveman)
+   based on task structure.
+2. **A per-turn drift-fix hook** registered via `--settings`, which
+   classifies every user prompt and re-injects the routing directive as
+   `additionalContext`. This prevents the multi-turn drift you see when
+   relying on the system prompt alone.
 
 Technical tasks may route into a tiny IR:
 
@@ -228,6 +114,39 @@ A: action
 
 Most users do not need to care. Run `hewn`; Claude gets shorter.
 
+## Locales
+
+Hewn ships classifier patterns for `en`, `it`, `es`, `fr`, `de`. The
+locale is auto-detected from `$LANG` at run time, so non-English shells
+just work out of the box. Example: `LANG=it_IT.UTF-8` loads `en + it`
+automatically.
+
+Override when needed:
+
+```bash
+hewn --locale en,it        # force this stack for one invocation
+export HEWN_LOCALE=en,es   # persistent in your shell rc
+export HEWN_LOCALE=en      # force English-only
+```
+
+Precedence: `--locale` > `HEWN_LOCALE` > `$LANG` auto-detect > English-only.
+Details: [integrations/claude-code/README.md](integrations/claude-code/README.md#locales).
+
+## Examples
+
+- [Long-context security review (Atlas API)](examples/atlas-xff-review.md) —
+  side-by-side Verbose / Caveman Ultra-style / Hewn output on a real
+  16k-token handbook + IR-style task.
+
+## What gets installed
+
+- `~/.local/bin/hewn`
+- `~/.claude/hewn_thinking_system_prompt.txt`
+- `~/.claude/hooks/hewn_drift_fixer.py`
+- `~/.claude/hooks/locales/{en,it,es,fr,de}.py`
+
+That is it.
+
 ## Uninstall
 
 ```bash
@@ -236,6 +155,12 @@ rm -f ~/.local/bin/hewn \
       ~/.claude/hooks/hewn_drift_fixer.py
 rm -rf ~/.claude/hooks/locales
 ```
+
+## Contributing
+
+PRs welcome — especially expanding locale classifier patterns
+(`integrations/claude-code/hooks/locales/<code>.py`) with real-prompt
+evidence in non-English languages. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
